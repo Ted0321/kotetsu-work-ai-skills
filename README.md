@@ -3,7 +3,7 @@
 **仕事が前に進むAIスキルを配るリポジトリ**（X: [@kotetsu_0321](https://x.com/kotetsu_0321)）
 
 抽象的なAI論ではなく、資料・会議・方針決めの前に使える **型（スキル）** を置いています。  
-Claude / ChatGPT / Gemini / Hermes など、モデルを問わずコピペで使えます。
+共通コアはAgent Skills形式で作り、Claude Code / CodexではSkillとして、その他のAIではコピペで使えます。
 
 ---
 
@@ -12,6 +12,8 @@ Claude / ChatGPT / Gemini / Hermes など、モデルを問わずコピペで使
 | スキル | 一言 | パス |
 |---|---|---|
 | **論点整理** `issue-structuring` | AIに書く前に、決めることを切る | [`skills/issue-structuring/`](./skills/issue-structuring/) |
+| **資料レビュー** `deliverable-review` | きれいでも、決められない資料は通さない | [`skills/deliverable-review/`](./skills/deliverable-review/) |
+| **調査から示唆** `research-to-insight` | 調べた事実を、次の判断へつなぐ | [`skills/research-to-insight/`](./skills/research-to-insight/) |
 
 ---
 
@@ -20,6 +22,23 @@ Claude / ChatGPT / Gemini / Hermes など、モデルを問わずコピペで使
 1. 使いたいスキルの `SKILL.md` を開く  
 2. 中身をAIに貼る（または skill として読ませる）  
 3. 末尾に自分の案件メモを足す  
+
+### Claude Code / Codexへインストール
+
+| 対象 | 個人で使う | プロジェクトで共有する |
+|---|---|---|
+| Claude Code | `~/.claude/skills/<skill-name>/` | `.claude/skills/<skill-name>/` |
+| Codex | `~/.agents/skills/<skill-name>/` | `.agents/skills/<skill-name>/` |
+
+PowerShellの例:
+
+```powershell
+# Claude Code
+Copy-Item -Recurse -Force .\skills\issue-structuring "$HOME\.claude\skills\issue-structuring"
+
+# Codex
+Copy-Item -Recurse -Force .\skills\issue-structuring "$HOME\.agents\skills\issue-structuring"
+```
 
 ### 例（論点整理）
 
@@ -39,6 +58,10 @@ Claude / ChatGPT / Gemini / Hermes など、モデルを問わずコピペで使
 | ID | 名前 | 状態 |
 |---|---|---|
 | issue-structuring | 論点整理スキル | v0.1 |
+| deliverable-review | 資料レビュー | v0.1 |
+| research-to-insight | 調査から示唆 | v0.1 |
+
+Xでの紹介順と検証項目は [ROADMAP.md](./ROADMAP.md) にまとめています。
 
 ---
 
@@ -57,13 +80,16 @@ Claude / ChatGPT / Gemini / Hermes など、モデルを問わずコピペで使
 kotetsu-work-ai-skills/
 ├── README.md
 ├── CATALOG.md
+├── ROADMAP.md
 ├── LICENSE
 ├── skills/
-│   └── issue-structuring/
-│       ├── SKILL.md
-│       └── examples/
+│   ├── issue-structuring/
+│   ├── deliverable-review/
+│   └── research-to-insight/
 └── templates/          # 自分で薄配布を作るときの型
 ```
+
+各Skillの実行コアは `SKILL.md` と `examples/` です。`agents/openai.yaml` はCodex向けの表示メタデータで、Claude Code側の実行条件にはしていません。
 
 ---
 

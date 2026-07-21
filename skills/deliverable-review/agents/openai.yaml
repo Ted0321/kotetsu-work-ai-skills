@@ -1,0 +1,4 @@
+interface:
+  display_name: "資料レビュー"
+  short_description: "見栄えより意思決定に効く資料かを厳しくレビューする"
+  default_prompt: "Use $deliverable-review to review this document for decision usefulness and rewrite priorities."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "論点整理"
+  short_description: "雑な相談や会議メモを意思決定できる論点構造へ整理する"
+  default_prompt: "Use $issue-structuring to turn this rough brief into a decision-ready issue tree."
