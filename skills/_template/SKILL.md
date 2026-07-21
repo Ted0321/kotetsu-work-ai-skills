@@ -1,6 +1,8 @@
 ---
 name: skill-id-here
 description: "1行で何をするスキルか。いつ使うかを書く。"
+metadata:
+  internal: true
 ---
 
 # スキル名

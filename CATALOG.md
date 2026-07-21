@@ -1,17 +1,22 @@
 # カタログ
 
-| X公開日 | ID | 名前 | 版 | パス | 一言 |
-|---|---|---|---|---|---|
-| 2026-07-25 | issue-structuring | 論点整理スキル | v0.1 | [skills/issue-structuring](./skills/issue-structuring/) | AIに書く前に、決めることを切れ |
-| 2026-08-08 | deliverable-review | 資料レビュー | v0.1 | [skills/deliverable-review](./skills/deliverable-review/) | きれいでも、決められない資料は通さない |
-| 2026-08-22 | research-to-insight | 調査から示唆 | v0.1 | [skills/research-to-insight](./skills/research-to-insight/) | 調べた事実を、次の判断へつなぐ |
+| X公開日 | ID | 名前 | 版 | 種別 | パス | 一言 |
+|---|---|---|---|---|---|---|
+| 2026-07-21 | find-skills-ja | Find Skills JA | v0.1 | エージェント型 | [skills/find-skills-ja](./skills/find-skills-ja/) | 日本語で聞くだけでスキルが見つかる |
+| 2026-07-25 | issue-structuring | 論点整理スキル | v0.1 | コピペ型 | [skills/issue-structuring](./skills/issue-structuring/) | AIに書く前に、決めることを切れ |
+| 2026-08-08 | deliverable-review | 資料レビュー | v0.1 | コピペ型 | [skills/deliverable-review](./skills/deliverable-review/) | きれいでも、決められない資料は通さない |
+| 2026-08-22 | research-to-insight | 調査から示唆 | v0.1 | コピペ型 | [skills/research-to-insight](./skills/research-to-insight/) | 調べた事実を、次の判断へつなぐ |
 
-## 使い方
-1. 対象の `SKILL.md` を開く  
-2. AIに貼る  
-3. 案件メモを足す  
+## 種別
+
+| 種別 | 使い方 | 対象 |
+|---|---|---|
+| **コピペ型** | `SKILL.md` を開いてAIに貼り、案件メモを足す（Claude Code / Codex ではスキルとしても導入可） | Claude / ChatGPT / Gemini など何でも |
+| **エージェント型** | `npx skills add Ted0321/kotetsu-work-ai-skills@<ID>` で導入。以後は自動で発火 | Claude Code / Cursor / Codex など SKILL.md 対応エージェント |
 
 ## 公開順
-1. 論点整理
-2. 資料レビュー
-3. 調査から示唆
+
+1. Find Skills JA
+2. 論点整理
+3. 資料レビュー
+4. 調査から示唆

@@ -40,6 +40,9 @@ if grep -q 'name: skill-id-here' "$DEST/SKILL.md"; then
 fi
 sed -i "s/^# スキル名/# ${TITLE}/" "$DEST/SKILL.md" 2>/dev/null || \
   sed -i '' "s/^# スキル名/# ${TITLE}/" "$DEST/SKILL.md"
+# remove template-only internal flag (keeps the new skill publicly discoverable)
+sed -i '/^metadata:$/,/^  internal: true$/d' "$DEST/SKILL.md" 2>/dev/null || \
+  sed -i '' '/^metadata:$/,/^  internal: true$/d' "$DEST/SKILL.md"
 
 # append catalog stub if not present
 if ! grep -q "| ${ID} |" "$ROOT/CATALOG.md"; then
