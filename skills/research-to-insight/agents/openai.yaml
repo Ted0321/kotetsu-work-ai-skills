@@ -1,0 +1,4 @@
+interface:
+  display_name: "調査から示唆"
+  short_description: "調査結果を根拠付きの示唆と次アクションへ変換する"
+  default_prompt: "Use $research-to-insight to turn these research findings into evidence-backed implications and actions."
