@@ -1,0 +1,4 @@
+evidence_id,collected_at,published_at,source_tier,source_type,publisher,title,url_or_path,geography,period,evidence,supports,contradicts,limitations
+E001,2026-07-21T10:00:00+09:00,2026-07-01,A,management_report,Northstar Cloud,Quarterly KPI Summary,https://example.com/northstar-cloud/kpi,Japan,FY2026-Q1,NRR was reported as 118 percent,C001,,Fictional sample data
+E002,2026-07-21T10:05:00+09:00,2026-07-02,B,company_interview,Northstar Cloud,Customer Expansion Update,https://example.com/northstar-cloud/update,Japan,FY2026-Q1,Expansion revenue exceeded new-logo revenue,C001,,Fictional sample data and company-provided statement
+E003,2026-07-21T10:10:00+09:00,2026-07-03,C,industry_note,Example Research,SaaS Acquisition Benchmarks,https://example.com/research/saas,Japan,FY2026-Q1,CAC payback lengthened in the segment,,C001,Fictional sample and not company-specific

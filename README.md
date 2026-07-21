@@ -14,6 +14,7 @@
 | **論点整理** `issue-structuring` | AIに書く前に、決めることを切る | [`skills/issue-structuring/`](./skills/issue-structuring/) |
 | **資料レビュー** `deliverable-review` | きれいでも、決められない資料は通さない | [`skills/deliverable-review/`](./skills/deliverable-review/) |
 | **調査から示唆** `research-to-insight` | 調べた事実を、次の判断へつなぐ | [`skills/research-to-insight/`](./skills/research-to-insight/) |
+| **企業ディープダイブ** `company-deep-dive-report` | 企業の儲け方と次に起きることを、根拠付きで分解する | [`skills/company-deep-dive-report/`](./skills/company-deep-dive-report/) |
 
 ---
 
@@ -60,6 +61,7 @@ Copy-Item -Recurse -Force .\skills\issue-structuring "$HOME\.agents\skills\issue
 | issue-structuring | 論点整理スキル | v0.1 |
 | deliverable-review | 資料レビュー | v0.1 |
 | research-to-insight | 調査から示唆 | v0.1 |
+| company-deep-dive-report | 企業ディープダイブ・レポート | v0.1 |
 
 Xでの紹介順と検証項目は [ROADMAP.md](./ROADMAP.md) にまとめています。
 

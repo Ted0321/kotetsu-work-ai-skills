@@ -1,0 +1,30 @@
+company:
+  legal_name: "Northstar Cloud Inc. (fictional)"
+  country: "Japan"
+  official_url: "https://example.com/northstar-cloud"
+  ticker: ""
+analysis:
+  audience: "経営・事業戦略担当"
+  decision: "成長投資の継続可否を判断する"
+  central_question: "顧客拡張による成長は、獲得効率の悪化を上回れるか。"
+  as_of_date: "2026-07-21"
+  geography: "Japan"
+  comparison_companies: []
+classification:
+  listing_status: "private"
+  business_archetype: "SaaS"
+  secondary_archetypes: []
+  company_stage: "growth"
+  segment_structure: "single"
+  information_availability: "limited"
+  routing_rationale: "継続課金型であり、NRRとCAC回収を中心に評価する。"
+hypotheses:
+  - hypothesis_id: "H001"
+    statement: "既存顧客の拡張が成長の主因である"
+    why_it_matters: "新規獲得投資への依存度を判断できる"
+    required_evidence: ["契約売上の推移", "NRR", "顧客獲得費"]
+    falsifier: "新規顧客売上が純増ARRの過半を継続して占める"
+outputs:
+  report: "company_dossier.md"
+  evidence_ledger: "evidence_ledger.csv"
+  claim_graph: "claim_graph.json"

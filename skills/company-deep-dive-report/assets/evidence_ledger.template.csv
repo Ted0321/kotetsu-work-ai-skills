@@ -1,0 +1,2 @@
+evidence_id,collected_at,published_at,source_tier,source_type,publisher,title,url_or_path,geography,period,evidence,supports,contradicts,limitations
+E001,YYYY-MM-DDThh:mm:ss+09:00,YYYY-MM-DD,A,filing,Publisher,Document title,https://example.com,Global,FY2025,Verifiable fact or data point,C001,,Definition and scope limitations

@@ -1,0 +1,19 @@
+{
+  "company": "",
+  "as_of_date": "YYYY-MM-DD",
+  "claims": [
+    {
+      "claim_id": "C001",
+      "tier": 1,
+      "classification": "INFERENCE",
+      "statement": "",
+      "because": "",
+      "implication": "",
+      "confidence": "MEDIUM",
+      "evidence_ids": ["E001", "E002"],
+      "counterevidence_ids": [],
+      "falsifier": "",
+      "open_questions": []
+    }
+  ]
+}
