@@ -5,26 +5,51 @@
 抽象的なAI論ではなく、資料・会議・方針決めの前に使える **型（スキル）** を置いています。  
 共通コアはAgent Skills形式で作り、Claude Code / CodexではSkillとして、その他のAIではコピペで使えます。
 
+| 種別 | 使い方 | 対象 |
+|---|---|---|
+| **コピペ型** | `SKILL.md` をAIに貼って使う | Claude / ChatGPT / Gemini など何でも |
+| **エージェント型** | コマンド1行で導入、以後は自動で発火 | Claude Code / Cursor / Codex など |
+
 ---
 
 ## いちばん新しい / おすすめ
 
-| スキル | 一言 | パス |
-|---|---|---|
-| **論点整理** `issue-structuring` | AIに書く前に、決めることを切る | [`skills/issue-structuring/`](./skills/issue-structuring/) |
-| **資料レビュー** `deliverable-review` | きれいでも、決められない資料は通さない | [`skills/deliverable-review/`](./skills/deliverable-review/) |
-| **調査から示唆** `research-to-insight` | 調べた事実を、次の判断へつなぐ | [`skills/research-to-insight/`](./skills/research-to-insight/) |
-| **企業ディープダイブ** `company-deep-dive-report` | 企業の儲け方と次に起きることを、根拠付きで分解する | [`skills/company-deep-dive-report/`](./skills/company-deep-dive-report/) |
+| スキル | 種別 | 一言 | パス |
+|---|---|---|---|
+| **Find Skills JA** `find-skills-ja` | エージェント型 | 日本語で聞くだけでスキルが見つかる | [`skills/find-skills-ja/`](./skills/find-skills-ja/) |
+| **企業ディープダイブ** `company-deep-dive-report` | エージェント型 | 企業の儲け方と次に起きることを、根拠付きで分解する | [`skills/company-deep-dive-report/`](./skills/company-deep-dive-report/) |
+| **論点整理** `issue-structuring` | コピペ型 | AIに書く前に、決めることを切る | [`skills/issue-structuring/`](./skills/issue-structuring/) |
+| **資料レビュー** `deliverable-review` | コピペ型 | きれいでも、決められない資料は通さない | [`skills/deliverable-review/`](./skills/deliverable-review/) |
+| **調査から示唆** `research-to-insight` | コピペ型 | 調べた事実を、次の判断へつなぐ | [`skills/research-to-insight/`](./skills/research-to-insight/) |
 
 ---
 
-## 使い方（共通・3分）
+## 使い方
+
+### コピペ型（3分）
 
 1. 使いたいスキルの `SKILL.md` を開く  
 2. 中身をAIに貼る（または skill として読ませる）  
 3. 末尾に自分の案件メモを足す  
 
-### Claude Code / Codexへインストール
+```text
+（SKILL.md の本文）
+
+# 案件メモ
+来週の方針会議。先方はPoCと言っているが現場はデータ不足。経営はROI。整理して。
+```
+
+### エージェント型（1行）
+
+```bash
+# 例: Find Skills JA を導入
+npx skills add Ted0321/kotetsu-work-ai-skills@find-skills-ja
+```
+
+導入後は Claude Code などに日本語で話しかけるだけで自動発火します。  
+コピペ型のスキルも同じコマンドでスキルとして導入できます（`@issue-structuring` など）。
+
+### 手動でClaude Code / Codexへ入れる場合
 
 | 対象 | 個人で使う | プロジェクトで共有する |
 |---|---|---|
@@ -41,27 +66,19 @@ Copy-Item -Recurse -Force .\skills\issue-structuring "$HOME\.claude\skills\issue
 Copy-Item -Recurse -Force .\skills\issue-structuring "$HOME\.agents\skills\issue-structuring"
 ```
 
-### 例（論点整理）
-
-```text
-（SKILL.md の本文）
-
-# 案件メモ
-来週の方針会議。先方はPoCと言っているが現場はデータ不足。経営はROI。整理して。
-```
-
 ---
 
 ## 一覧
 
 詳しくは [CATALOG.md](./CATALOG.md)
 
-| ID | 名前 | 状態 |
-|---|---|---|
-| issue-structuring | 論点整理スキル | v0.1 |
-| deliverable-review | 資料レビュー | v0.1 |
-| research-to-insight | 調査から示唆 | v0.1 |
-| company-deep-dive-report | 企業ディープダイブ・レポート | v0.1 |
+| ID | 名前 | 種別 | 状態 |
+|---|---|---|---|
+| find-skills-ja | Find Skills JA | エージェント型 | v0.1 |
+| company-deep-dive-report | 企業ディープダイブ・レポート | エージェント型 | v0.1 |
+| issue-structuring | 論点整理スキル | コピペ型 | v0.1 |
+| deliverable-review | 資料レビュー | コピペ型 | v0.1 |
+| research-to-insight | 調査から示唆 | コピペ型 | v0.1 |
 
 Xでの紹介順と検証項目は [ROADMAP.md](./ROADMAP.md) にまとめています。
 
@@ -85,6 +102,8 @@ kotetsu-work-ai-skills/
 ├── ROADMAP.md
 ├── LICENSE
 ├── skills/
+│   ├── find-skills-ja/       # エージェント型
+│   ├── company-deep-dive-report/ # エージェント型
 │   ├── issue-structuring/
 │   ├── deliverable-review/
 │   └── research-to-insight/

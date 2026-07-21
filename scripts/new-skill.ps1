@@ -23,6 +23,8 @@ Copy-Item (Join-Path $Root "skills\_template\examples\sample_input_output.md") (
 $skill = Get-Content (Join-Path $Dest "SKILL.md") -Raw -Encoding UTF8
 $skill = $skill -replace 'name: skill-id-here', "name: $Id"
 $skill = $skill -replace '# スキル名', "# $Title"
+# remove template-only internal flag (keeps the new skill publicly discoverable)
+$skill = $skill -replace "metadata:\r?\n  internal: true\r?\n", ""
 Set-Content -Path (Join-Path $Dest "SKILL.md") -Value $skill -Encoding UTF8
 
 $readme = Get-Content (Join-Path $Dest "README.md") -Raw -Encoding UTF8
