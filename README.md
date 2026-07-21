@@ -74,7 +74,7 @@ Copy-Item -Recurse -Force .\skills\issue-structuring "$HOME\.agents\skills\issue
 
 | ID | 名前 | 種別 | 状態 |
 |---|---|---|---|
-| find-skills-ja | Find Skills JA | エージェント型 | v0.1 |
+| find-skills-ja | Find Skills JA | エージェント型 | v0.2 |
 | company-deep-dive-report | 企業ディープダイブ・レポート | エージェント型 | v0.1 |
 | issue-structuring | 論点整理スキル | コピペ型 | v0.1 |
 | deliverable-review | 資料レビュー | コピペ型 | v0.1 |

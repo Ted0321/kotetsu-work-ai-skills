@@ -2,7 +2,7 @@
 
 | X公開日 | ID | 名前 | 版 | 種別 | パス | 一言 |
 |---|---|---|---|---|---|---|
-| 2026-07-21 | find-skills-ja | Find Skills JA | v0.1 | エージェント型 | [skills/find-skills-ja](./skills/find-skills-ja/) | 日本語で聞くだけでスキルが見つかる |
+| 2026-07-21 | find-skills-ja | Find Skills JA | v0.2 | エージェント型 | [skills/find-skills-ja](./skills/find-skills-ja/) | 日本語で聞くだけでスキルが見つかる |
 | 未定 | company-deep-dive-report | 企業ディープダイブ・レポート | v0.1 | エージェント型 | [skills/company-deep-dive-report](./skills/company-deep-dive-report/) | 企業の儲け方と次に起きることを、根拠付きで分解する |
 | 2026-07-25 | issue-structuring | 論点整理スキル | v0.1 | コピペ型 | [skills/issue-structuring](./skills/issue-structuring/) | AIに書く前に、決めることを切れ |
 | 2026-08-08 | deliverable-review | 資料レビュー | v0.1 | コピペ型 | [skills/deliverable-review](./skills/deliverable-review/) | きれいでも、決められない資料は通さない |
