@@ -1,0 +1,4 @@
+interface:
+  display_name: "企業ディープダイブ・レポート"
+  short_description: "企業の儲け方・競争優位・将来シナリオを根拠付きで分解"
+  default_prompt: "Use $company-deep-dive-report to analyze this company and create an evidence-backed executive dossier."

@@ -1,0 +1,30 @@
+company:
+  legal_name: ""
+  country: ""
+  official_url: ""
+  ticker: ""
+analysis:
+  audience: "経営・事業戦略担当"
+  decision: ""
+  central_question: "この企業の価値を生む構造は何か。その構造は今後1〜3年で強まるか。"
+  as_of_date: "YYYY-MM-DD"
+  geography: "Global"
+  comparison_companies: []
+classification:
+  listing_status: "listed | private | unknown"
+  business_archetype: ""
+  secondary_archetypes: []
+  company_stage: "growth | mature | turnaround | unknown"
+  segment_structure: "single | conglomerate | unknown"
+  information_availability: "rich | limited"
+  routing_rationale: ""
+hypotheses:
+  - hypothesis_id: "H001"
+    statement: ""
+    why_it_matters: ""
+    required_evidence: []
+    falsifier: ""
+outputs:
+  report: "company_dossier.md"
+  evidence_ledger: "evidence_ledger.csv"
+  claim_graph: "claim_graph.json"

@@ -1,0 +1,19 @@
+{
+  "company": "Northstar Cloud Inc. (fictional)",
+  "as_of_date": "2026-07-21",
+  "claims": [
+    {
+      "claim_id": "C001",
+      "tier": 1,
+      "classification": "INFERENCE",
+      "statement": "既存顧客の拡張が現在の成長の主因である可能性が高い。",
+      "because": "NRRが100%を上回り、会社資料では拡張売上が新規顧客売上を上回る。",
+      "implication": "新規獲得投資だけでなく、利用拡張と定着へ資源を配分する価値が高い。",
+      "confidence": "MEDIUM",
+      "evidence_ids": ["E001", "E002"],
+      "counterevidence_ids": ["E003"],
+      "falsifier": "新規顧客売上が純増ARRの過半を継続して占める。",
+      "open_questions": ["NRRの顧客規模別内訳"]
+    }
+  ]
+}
