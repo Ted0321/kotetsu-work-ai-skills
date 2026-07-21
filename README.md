@@ -1,6 +1,6 @@
-# work-ai-skills
+# kotetsu-work-ai-skills
 
-**仕事が前に進むAIスキルを配るリポジトリ**（@kotetsu_0321）
+**仕事が前に進むAIスキルを配るリポジトリ**（X: [@kotetsu_0321](https://x.com/kotetsu_0321)）
 
 抽象的なAI論ではなく、資料・会議・方針決めの前に使える **型（スキル）** を置いています。  
 Claude / ChatGPT / Gemini / Hermes など、モデルを問わずコピペで使えます。
@@ -54,7 +54,7 @@ Claude / ChatGPT / Gemini / Hermes など、モデルを問わずコピペで使
 ## リポジトリ構成
 
 ```text
-work-ai-skills/
+kotetsu-work-ai-skills/
 ├── README.md
 ├── CATALOG.md
 ├── LICENSE
