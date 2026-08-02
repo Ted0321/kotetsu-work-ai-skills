@@ -24,11 +24,17 @@ bash scripts/sweep.sh --apply
 
 Claude Code に「PCが重い」「テストのあとブラウザが残る」「掃除を自動化して」と言うだけでも発火します。
 
+## リポジトリを入れずに試す
+
+[`assets/oneshot-prompt.md`](./assets/oneshot-prompt.md) のプロンプトを Claude Code に貼るだけでも、
+同じフックが手元に作られます（監査スクリプトと `--deep` は付きません）。
+
 ## 中身
 
 | ファイル | 役割 |
 |---|---|
 | `SKILL.md` | 判断のルール（何を消していいか・何を絶対に触らないか） |
+| `assets/oneshot-prompt.md` | 貼るだけプロンプト（薄配布版） |
 | `scripts/audit.sh` / `audit.ps1` | 読み取り専用のマシン監査。Markdownで出力 |
 | `scripts/sweep.sh` / `sweep.ps1` | 掃除。**既定はdry-run**、`--apply` で実行 |
 | `scripts/hook-post-test.sh` / `.ps1` | PostToolUseフック。テストコマンドの後だけ残骸を終了 |
