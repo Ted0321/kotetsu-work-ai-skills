@@ -1,0 +1,28 @@
+{
+  "_comment": "machine-hygiene のフック定義（Windows）。%USERPROFILE% の展開は環境で変わるため、パスは絶対パスに直して使う。ユーザー全体なら C:\\Users\\<you>\\.claude\\settings.json、プロジェクトだけなら <project>\\.claude\\settings.json の hooks にマージする。",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\<you>\\.claude\\skills\\machine-hygiene\\scripts\\hook-post-test.ps1\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\<you>\\.claude\\skills\\machine-hygiene\\scripts\\sweep.ps1\" -Apply -Quiet -Root \"%CLAUDE_PROJECT_DIR%\"",
+            "timeout": 60
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -7,6 +7,7 @@
 | 2026-07-25 | issue-structuring | 論点整理スキル | v0.1 | コピペ型 | [skills/issue-structuring](./skills/issue-structuring/) | AIに書く前に、決めることを切れ |
 | 2026-08-08 | deliverable-review | 資料レビュー | v0.1 | コピペ型 | [skills/deliverable-review](./skills/deliverable-review/) | きれいでも、決められない資料は通さない |
 | 2026-08-22 | research-to-insight | 調査から示唆 | v0.1 | コピペ型 | [skills/research-to-insight](./skills/research-to-insight/) | 調べた事実を、次の判断へつなぐ |
+| 未定 | machine-hygiene | テストの後始末を自動化 | v0.1 | エージェント型 | [skills/machine-hygiene](./skills/machine-hygiene/) | テスト後のヘッドレス残骸とキャッシュを、フックで勝手に片付ける |
 
 ## 種別
 
@@ -21,3 +22,4 @@
 3. 論点整理
 4. 資料レビュー
 5. 調査から示唆
+6. テストの後始末を自動化（公開日未定）
