@@ -24,11 +24,21 @@ E2Eテストやスクレイピングを回すたびに、ヘッドレスブラ�
 
 ## 原則（安全条件・例外なし）
 
-1. **普段使いのブラウザは絶対に終了しない。** 対象は「自動化でしか付かない
-   フラグ／パス」（`--headless`、`--remote-debugging-port`、`ms-playwright`、
-   `puppeteer_dev_chrome_profile`、`chromedriver` 等）を持つプロセスだけ。
-   実プロファイル（`AppData\Local\Google\Chrome\User Data`、
-   `Application Support/Google/Chrome` 等）を参照するプロセスは除外する。
+1. **プロセスを終了する条件は3つ全部を満たすときだけ。** 1つでも欠けたら触らない。
+   - **ブラウザ本体かドライバであること**（`chrome` / `chromium` / `msedge` /
+     `firefox` / `headless_shell` / `chromedriver` / `geckodriver` / `msedgedriver`）
+   - **自動化固有のマーカーを持つこと**（`--headless`、`--remote-debugging-port`、
+     `ms-playwright`、`puppeteer_dev_chrome_profile`、`selenium-manager` 等）
+   - **起動から3秒以上経っていること**
+
+   `--headless` だけで判定してはいけない。Windowsの `conhost.exe --headless`
+   （正規のコンソールホスト。実測で23件検出）や `libreoffice --headless`
+   （文書変換）を巻き込み、ターミナルや変換処理を落とす。
+
+   加えて、次は無条件で除外する。
+   - 実プロファイル参照（`AppData\Local\Google\Chrome\User Data`、
+     `Application Support/Google/Chrome` 等）＝普段使いのブラウザ
+   - `C:\Windows\` / `/System/` 配下＝OSのシステムプロセス
 2. **消すのは再生成できるものだけ。** ソース、`.git`、`.env`、`node_modules`本体、
    ビルド成果物の最終物は対象外。対象は下の固定リストに限る。
 3. **削除は必ず dry-run を先に見せる。** `--apply` なしで実行して結果を提示し、

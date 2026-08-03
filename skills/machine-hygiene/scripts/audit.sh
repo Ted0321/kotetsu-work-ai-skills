@@ -35,8 +35,10 @@ etime_to_secs() {
   echo $(( 10#${d:-0}*86400 + 10#${h:-0}*3600 + 10#${m:-0}*60 + 10#${s:-0} ))
 }
 
+BROWSER_RE='(chrome|chromium|msedge|microsoft-edge|firefox|headless_shell|chromedriver|geckodriver|msedgedriver|operadriver|safaridriver)'
 HEADLESS_RE='(--headless|--remote-debugging-port|--remote-debugging-pipe|ms-playwright|puppeteer_dev_chrome_profile|\.cache/puppeteer|/chromedriver|/geckodriver|/msedgedriver|selenium-manager)'
 REAL_PROFILE_RE='(Application Support/Google/Chrome|Application Support/Chromium|Application Support/Firefox|Application Support/Microsoft Edge|\.config/google-chrome|\.config/chromium|\.config/microsoft-edge|\.mozilla/firefox)'
+SYSTEM_PATH_RE='(^|[ "])((\\\\\?\\)?[A-Za-z]:\\Windows\\|/System/|/usr/libexec/|/sbin/)'
 RUNNER_RE='(vitest|jest|playwright(\.js)? test|pytest|mocha|karma|cypress|webdriver|node --test)'
 
 echo "# マシン監査 — $(date '+%Y-%m-%d %H:%M')"
@@ -50,8 +52,10 @@ while IFS= read -r line; do
   [ -z "$line" ] && continue
   read -r pid etime rss args <<<"$line"
   case "$args" in *"machine-hygiene"*) continue ;; esac
+  printf '%s' "$args" | grep -Eqi "$BROWSER_RE" || continue
   printf '%s' "$args" | grep -Eqi "$HEADLESS_RE" || continue
   printf '%s' "$args" | grep -Eqi "$REAL_PROFILE_RE" && continue
+  printf '%s' "$args" | grep -Eqi "$SYSTEM_PATH_RE" && continue
   age="$(etime_to_secs "$etime")"
   HL_N=$(( HL_N + 1 )); HL_RSS=$(( HL_RSS + ${rss:-0} ))
   [ "$age" -gt "$HL_OLD" ] && HL_OLD="$age"

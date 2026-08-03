@@ -54,10 +54,15 @@ if ((-not $NoCaches) -or $Deep) {
 }
 
 # ---- 1) 残ったヘッドレスブラウザ --------------------------------------------
-# 自動化でしか付かないフラグ／パスだけを対象にする。
+# 条件1: ブラウザ／ドライバ本体であること。
+# これが無いと Windows の conhost.exe --headless（正規のコンソールホスト）まで拾う。
+$browserRe = '(chrome|chromium|msedge|microsoft-edge|firefox|headless_shell|chromedriver|geckodriver|msedgedriver|operadriver)'
+# 条件2: 自動化でしか付かないフラグ／パスを持つこと。
 $headlessRe = '(--headless|--remote-debugging-port|--remote-debugging-pipe|ms-playwright|puppeteer_dev_chrome_profile|\.cache\\puppeteer|chromedriver|geckodriver|msedgedriver|selenium-manager)'
-# 普段使いのブラウザ（実プロファイル）は絶対に触らない。
+# 除外1: 普段使いのブラウザ（実プロファイル）は絶対に触らない。
 $realProfileRe = '(AppData\\Local\\Google\\Chrome\\User Data|AppData\\Local\\Microsoft\\Edge\\User Data|AppData\\Roaming\\Mozilla\\Firefox|AppData\\Local\\Chromium\\User Data)'
+# 除外2: Windows のシステムディレクトリにある実行ファイルは対象外。
+$systemPathRe = '[A-Za-z]:\\Windows\\'
 
 $victims = @()
 if (-not $NoProcs) {
@@ -67,8 +72,10 @@ if (-not $NoProcs) {
       $_.CommandLine -and
       $_.ProcessId -ne $PID -and
       $_.CommandLine -notmatch 'machine-hygiene' -and
+      $_.CommandLine -match $browserRe -and
       $_.CommandLine -match $headlessRe -and
       $_.CommandLine -notmatch $realProfileRe -and
+      $_.CommandLine -notmatch $systemPathRe -and
       $_.CreationDate -and (($now - $_.CreationDate).TotalSeconds -ge $MinAge)
     })
 }

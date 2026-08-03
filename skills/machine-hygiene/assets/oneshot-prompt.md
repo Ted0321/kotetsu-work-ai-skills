@@ -15,17 +15,23 @@
 
 【1】掃除スクリプト ~/.claude/scripts/sweep.sh を作る
 
-終了するプロセス（この条件を全部満たすものだけ）:
-- コマンドラインに --headless / --remote-debugging-port / --remote-debugging-pipe /
-  ms-playwright / puppeteer_dev_chrome_profile / chromedriver / geckodriver /
-  msedgedriver のいずれかを含む
+終了するプロセス（この条件を「全部」満たすものだけ）:
+- ブラウザ本体かドライバであること。コマンドラインに chrome / chromium / msedge /
+  firefox / headless_shell / chromedriver / geckodriver / msedgedriver のいずれかを含む
+- かつ、コマンドラインに --headless / --remote-debugging-port / --remote-debugging-pipe /
+  ms-playwright / puppeteer_dev_chrome_profile / selenium-manager のいずれかを含む
 - かつ、起動から3秒以上経っている
 
 絶対に終了しないもの（除外条件・例外なし）:
+- 実行ファイルが C:\Windows\ や /System/ にあるもの＝OSのシステムプロセス
 - コマンドラインに実プロファイルのパスを含むもの
   （Chrome/User Data、Application Support/Google/Chrome、.config/google-chrome、
   .config/chromium、.mozilla/firefox）＝普段使いのブラウザ
 - dev server（vite / next dev / npm start / webpack serve）
+
+※「--headless を含む」だけで判定しないこと。Windowsの conhost.exe（正規の
+コンソールホスト）や libreoffice --headless（文書変換）まで巻き込み、
+ターミナルや変換処理が落ちる。ブラウザ本体かどうかの条件が必須。
 
 削除するキャッシュ（--caches を付けたときだけ、カレント配下のみ、この固定リスト以外は消さない）:
 - node_modules/.cache, node_modules/.vite, .next/cache, .turbo, .parcel-cache,
@@ -62,6 +68,7 @@
 
 | 設計 | 理由 |
 |---|---|
+| 「ブラウザ本体であること」を必須条件にする | `--headless` だけで判定すると、Windowsの `conhost.exe --headless` を残骸と誤認する（実測で23件検出）。kill するとターミナルが落ちる |
 | 除外条件を先に書く | 「終了して」だけだと普段使いのChromeが落ちる。事故の9割はここ |
 | 削除対象を固定リストで渡す | 「キャッシュを消して」は範囲が無限。消していい物だけを列挙する |
 | dry-run を既定にする | 最初の1回を必ず目視できる |

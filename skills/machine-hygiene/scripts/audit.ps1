@@ -26,8 +26,10 @@ function Get-PathSize([string]$p) {
   if ($m.Sum) { return [double]$m.Sum } else { return 0 }
 }
 
+$browserRe = '(chrome|chromium|msedge|microsoft-edge|firefox|headless_shell|chromedriver|geckodriver|msedgedriver|operadriver)'
 $headlessRe = '(--headless|--remote-debugging-port|--remote-debugging-pipe|ms-playwright|puppeteer_dev_chrome_profile|chromedriver|geckodriver|msedgedriver|selenium-manager)'
 $realProfileRe = '(AppData\\Local\\Google\\Chrome\\User Data|AppData\\Local\\Microsoft\\Edge\\User Data|AppData\\Roaming\\Mozilla\\Firefox|AppData\\Local\\Chromium\\User Data)'
+$systemPathRe = '[A-Za-z]:\\Windows\\'
 $runnerRe = '(vitest|jest|playwright|pytest|mocha|karma|cypress|webdriver)'
 
 Write-Output ("# マシン監査 — " + (Get-Date -Format 'yyyy-MM-dd HH:mm'))
@@ -40,8 +42,10 @@ $now = Get-Date
 $procs = @(Get-CimInstance -ClassName Win32_Process | Where-Object { $_.CommandLine })
 $headless = @($procs | Where-Object {
   $_.CommandLine -notmatch 'machine-hygiene' -and
+  $_.CommandLine -match $browserRe -and
   $_.CommandLine -match $headlessRe -and
-  $_.CommandLine -notmatch $realProfileRe
+  $_.CommandLine -notmatch $realProfileRe -and
+  $_.CommandLine -notmatch $systemPathRe
 })
 $hlMem = ($headless | Measure-Object -Property WorkingSetSize -Sum).Sum
 $hlOldMin = 0

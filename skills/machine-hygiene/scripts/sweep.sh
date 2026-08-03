@@ -85,10 +85,15 @@ if [ "$DO_CACHES" -eq 1 ] || [ "$DEEP" -eq 1 ]; then
 fi
 
 # ---- 1) 残ったヘッドレスブラウザ --------------------------------------------
-# 自動化でしか付かないフラグ／パスだけを対象にする。
+# 条件1: ブラウザ／ドライバ本体であること。
+# これが無いと Windows の conhost.exe --headless や libreoffice --headless まで拾う。
+BROWSER_RE='(chrome|chromium|msedge|microsoft-edge|firefox|headless_shell|chromedriver|geckodriver|msedgedriver|operadriver|safaridriver)'
+# 条件2: 自動化でしか付かないフラグ／パスを持つこと。
 HEADLESS_RE='(--headless|--remote-debugging-port|--remote-debugging-pipe|ms-playwright|puppeteer_dev_chrome_profile|\.cache/puppeteer|/chromedriver|/geckodriver|/msedgedriver|selenium-manager)'
-# 普段使いのブラウザ（実プロファイル）は絶対に触らない。
+# 除外1: 普段使いのブラウザ（実プロファイル）は絶対に触らない。
 REAL_PROFILE_RE='(Application Support/Google/Chrome|Application Support/Chromium|Application Support/Firefox|Application Support/Microsoft Edge|\.config/google-chrome|\.config/chromium|\.config/microsoft-edge|\.mozilla/firefox|AppData/Local/Google/Chrome/User Data)'
+# 除外2: OS のシステムディレクトリにある実行ファイルは対象外。
+SYSTEM_PATH_RE='(^|[ "])((\\\\\?\\)?[A-Za-z]:\\Windows\\|/System/|/usr/libexec/|/sbin/)'
 
 etime_to_secs() { # [[dd-]hh:]mm:ss -> 秒
   local t="${1:-0}" d=0 h=0 m=0 s=0 a b c
@@ -108,8 +113,10 @@ if [ "$DO_PROCS" -eq 1 ]; then
     read -r pid etime rss args <<<"$line"
     [ "$pid" = "$$" ] && continue
     case "$args" in *"machine-hygiene"*) continue ;; esac
+    printf '%s' "$args" | grep -Eqi "$BROWSER_RE" || continue
     printf '%s' "$args" | grep -Eqi "$HEADLESS_RE" || continue
     printf '%s' "$args" | grep -Eqi "$REAL_PROFILE_RE" && continue
+    printf '%s' "$args" | grep -Eqi "$SYSTEM_PATH_RE" && continue
     [ "$(etime_to_secs "$etime")" -lt "$MIN_AGE" ] && continue
     KILL_PIDS+=("$pid")
     KILL_RSS=$(( KILL_RSS + ${rss:-0} ))
