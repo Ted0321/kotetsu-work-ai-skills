@@ -2,6 +2,7 @@
 
 | X公開日 | ID | 名前 | 版 | 種別 | パス | 一言 |
 |---|---|---|---|---|---|---|
+| 未定 | claude-cache-cleanup | Claude Code 週次おそうじ | v0.1 | エージェント型 | [skills/claude-cache-cleanup](./skills/claude-cache-cleanup/) | 溜まった古いログとキャッシュを、毎週勝手に片付ける |
 | 2026-07-21 | find-skills-ja | Find Skills JA | v0.2 | エージェント型 | [skills/find-skills-ja](./skills/find-skills-ja/) | 日本語で聞くだけでスキルが見つかる |
 | 未定 | company-deep-dive-report | 企業ディープダイブ・レポート | v0.1 | エージェント型 | [skills/company-deep-dive-report](./skills/company-deep-dive-report/) | 企業の儲け方と次に起きることを、根拠付きで分解する |
 | 2026-07-25 | issue-structuring | 論点整理スキル | v0.1 | コピペ型 | [skills/issue-structuring](./skills/issue-structuring/) | AIに書く前に、決めることを切れ |

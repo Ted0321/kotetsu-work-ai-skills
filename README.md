@@ -16,6 +16,7 @@
 
 | スキル | 種別 | 一言 | パス |
 |---|---|---|---|
+| **Claude Code 週次おそうじ** `claude-cache-cleanup` | エージェント型 | 溜まった古いログとキャッシュを、毎週勝手に片付ける | [`skills/claude-cache-cleanup/`](./skills/claude-cache-cleanup/) |
 | **Find Skills JA** `find-skills-ja` | エージェント型 | 日本語で聞くだけでスキルが見つかる | [`skills/find-skills-ja/`](./skills/find-skills-ja/) |
 | **企業ディープダイブ** `company-deep-dive-report` | エージェント型 | 企業の儲け方と次に起きることを、根拠付きで分解する | [`skills/company-deep-dive-report/`](./skills/company-deep-dive-report/) |
 | **論点整理** `issue-structuring` | コピペ型 | AIに書く前に、決めることを切る | [`skills/issue-structuring/`](./skills/issue-structuring/) |
@@ -74,6 +75,7 @@ Copy-Item -Recurse -Force .\skills\issue-structuring "$HOME\.agents\skills\issue
 
 | ID | 名前 | 種別 | 状態 |
 |---|---|---|---|
+| claude-cache-cleanup | Claude Code 週次おそうじ | エージェント型 | v0.1 |
 | find-skills-ja | Find Skills JA | エージェント型 | v0.2 |
 | company-deep-dive-report | 企業ディープダイブ・レポート | エージェント型 | v0.1 |
 | issue-structuring | 論点整理スキル | コピペ型 | v0.1 |
@@ -102,6 +104,7 @@ kotetsu-work-ai-skills/
 ├── ROADMAP.md
 ├── LICENSE
 ├── skills/
+│   ├── claude-cache-cleanup/ # エージェント型
 │   ├── find-skills-ja/       # エージェント型
 │   ├── company-deep-dive-report/ # エージェント型
 │   ├── issue-structuring/
