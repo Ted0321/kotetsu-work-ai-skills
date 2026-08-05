@@ -1,0 +1,51 @@
+<meta charset="utf-8">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1080px; background:linear-gradient(160deg,#141a28 0%,#0d1117 70%);
+         font-family:'IPAGothic','MS Gothic','BIZ UDGothic','Hiragino Kaku Gothic ProN',monospace;
+         padding:34px 40px 26px; color:#c9d1d9; }
+  .head { display:flex; align-items:baseline; gap:14px; margin-bottom:6px; }
+  .title { font-size:30px; font-weight:bold; color:#e6edf3; }
+  .badge { font-size:15px; color:#7ee787; border:1px solid #2ea04366; background:#2ea04322;
+           padding:3px 10px; border-radius:14px; }
+  .sub { font-size:15px; color:#8b95a5; margin-bottom:18px; }
+  .card { background:#0c0f14; border:1px solid #2b3240; border-radius:12px; padding:24px 28px;
+          font-size:16.5px; line-height:1.72; white-space:pre-wrap; word-break:break-all; }
+  .h { color:#79c0ff; font-weight:bold; }
+  .star { color:#e3b341; }
+  .rc { color:#7ee787; }
+  .foot { margin-top:14px; font-size:14px; color:#586274; display:flex; justify-content:space-between; }
+</style>
+<div class="head"><span class="title">Claude Code 週次おそうじ</span><span class="badge">改良版プロンプト（コピペ用）</span></div>
+<div class="sub">↓これを Claude Code に貼るだけ。ドライラン → 設置 → 週次スケジュール登録 → 初回実行まで自動で進みます</div>
+<div class="card">Claude Code が溜め込んだ古いキャッシュ・会話ログ・一時ファイルを安全に片付ける「週次おそうじ」をセットアップして。以下を厳守すること。
+
+<span class="h">【方式】</span>
+毎週の実行にAIを使わないこと。決定的なクリーンアップスクリプトを作成し、OS標準のスケジューラに毎週月曜9:00で登録する（Windows: タスクスケジューラ / macOS: launchd / Linux: cron。WSLはWindows側から wsl.exe 経由で登録）。あなたの仕事は今回の設置1回だけ。以後は確認なし・トークン消費ゼロで毎週動く。
+
+<span class="h">【消してよいもの】</span>次の場所の「30日より古いファイル」だけ（<span class="star">★印は14日</span>）
+・~/.claude/projects/ 内の *.jsonl（過去の会話ログ。memory/ など jsonl 以外は残す）
+・~/.claude/ 内の todos/ tasks/ file-history/ backups/ statsig/
+・~/.claude/shell-snapshots/ <span class="star">★</span>
+・MCPログ: ~/.cache/claude-cli-nodejs（macOSは ~/Library/Caches/claude-cli-nodejs、Windowsは %LOCALAPPDATA%\claude-cli-nodejs）
+・OSの一時フォルダ直下の claude-*
+存在しない場所はスキップ。削除は必ずファイル単位で行い、フォルダごとの rm -rf は禁止（空になったサブフォルダの削除のみ可）。
+
+<span class="h">【絶対に触らないもの】</span>
+settings.json / settings.local.json / CLAUDE.md / keybindings.json / .credentials.json / ~/.claude.json、agents・skills・commands・hooks・plugins・rules などの資産フォルダ、そして保持日数以内のファイル全部。スクリプトには「保持日数が7日未満なら実行を拒否する」安全装置を入れること。
+
+<span class="h">【手順】</span>
+1. まずドライラン: 何も消さずに、削除対象を「場所/件数/サイズ」の表で見せる
+2. スクリプトを ~/.claude/cleanup/ に設置（ドライラン用フラグ付き。実行のたび cleanup.log に記録を残す）
+3. スケジューラへ登録（既存の同名登録は置き換えて二重登録を防ぐ）。登録結果を表示して確認
+4. ~/.claude/settings.json に "cleanupPeriodDays": 30 を追記マージ（他のキーは保持。JSONが壊れていたら触らず報告）
+5. 初回のおそうじを実行し、最後に必ずこの形式で報告:
+
+━━━ Claude Code おそうじレポート ━━━
+ before : X.X GB（X,XXX ファイル）
+ after  : X.X GB → <span class="rc">★X.X GB 回収★</span>
+ 内訳   : 会話ログ X.X GB / スナップショット X.X GB / MCPログ X.X GB / その他 X.X GB
+ 次回   : 毎週月曜 9:00 に自動実行（もう確認しません）
+ 停止   : 「おそうじ自動化を止めて」と言えば解除
+━━━━━━━━━━━━━━━━━━━━━━</div>
+<div class="foot"><span>保持日数は 30日 → 60/90日 に変更可（7日未満は不可）</span><span>github.com/Ted0321/kotetsu-work-ai-skills</span></div>
