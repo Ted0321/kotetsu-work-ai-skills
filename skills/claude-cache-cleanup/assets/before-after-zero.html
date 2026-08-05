@@ -1,0 +1,75 @@
+<meta charset="utf-8">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1600px; height:900px; background:#eef0f4;
+         font-family:'IPAGothic','MS Gothic','BIZ UDGothic','Hiragino Kaku Gothic ProN',monospace;
+         display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .headline { font-size:40px; font-weight:bold; color:#1a202c; letter-spacing:.02em; }
+  .sub { margin-top:12px; font-size:19px; color:#5a6472; }
+  .row { display:flex; align-items:stretch; gap:26px; margin-top:42px; }
+  .card { width:600px; background:#0c0f14; border-radius:14px; overflow:hidden;
+          box-shadow:0 16px 40px rgba(26,32,44,.22); display:flex; flex-direction:column; }
+  .card .body { flex:1; }
+  .mid { align-self:center; }
+  .cardbar { height:38px; background:#161b24; display:flex; align-items:center; padding:0 16px; gap:8px; }
+  .dot { width:12px; height:12px; border-radius:50%; }
+  .tag { margin-left:auto; font-size:14px; font-weight:bold; padding:3px 12px; border-radius:12px; }
+  .tag.before { color:#ffb4ae; background:#ff7b7222; border:1px solid #ff7b7255; }
+  .tag.after  { color:#7ee787; background:#2ea04322; border:1px solid #2ea04355; }
+  .cardtitle { color:#8b95a5; font-size:15px; }
+  .body { padding:22px 26px 24px; font-size:18px; line-height:2.05; color:#c9d1d9; white-space:pre; }
+  .y { color:#e3b341; } .z { color:#7ee787; } .dim { color:#586274; font-size:14px; }
+  .red { color:#ff7b72; font-weight:bold; } .h { color:#e6edf3; font-weight:bold; }
+  .track { display:inline-block; width:200px; height:13px; background:#1c2431; border-radius:3px;
+           vertical-align:middle; overflow:hidden; }
+  .fill { display:block; height:100%; background:linear-gradient(90deg,#e3b341,#f0883e); border-radius:3px; }
+  .total { border-top:1px solid #2b3240; margin-top:6px; padding-top:8px; }
+  .badge { display:inline-block; margin-top:10px; font-size:24px; font-weight:bold; color:#7ee787;
+           background:#2ea04318; border:1px solid #2ea04366; border-radius:10px; padding:8px 18px; }
+  .badge.warn { font-size:17px; color:#ffa198; background:#ff7b7212; border-color:#ff7b7244; }
+  .card.after .track { background:#141a24; }
+  .mid { display:flex; flex-direction:column; align-items:center; gap:14px; width:250px; }
+  .mid .arrow { font-size:56px; color:#2f855a; font-weight:bold; }
+  .pill { background:#ffffff; border:1px solid #d3d9e2; border-radius:12px; padding:12px 16px;
+          font-size:17px; color:#1a202c; text-align:center; line-height:1.65;
+          box-shadow:0 6px 18px rgba(26,32,44,.10); }
+  .pill b { color:#2f855a; }
+  .foot { margin-top:34px; font-size:14px; color:#7a8494; }
+</style>
+
+<div class="headline">Claude Code が溜め込む古いデータ、毎週自動でゼロに。</div>
+<div class="sub">改良版プロンプト1枚 ─ 毎週の実行にAIを使わない・確認なし・直近30日分は保護</div>
+
+<div class="row">
+  <div class="card">
+    <div class="cardbar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span>
+      <span class="cardtitle">&nbsp;30日より古い不要データ（数ヶ月利用の想定例）</span><span class="tag before">BEFORE</span></div>
+    <div class="body"><span class="y">1.2 GB</span>  <span class="track"><span class="fill" style="width:100%"></span></span>  会話ログ
+<span class="y">0.8 GB</span>  <span class="track"><span class="fill" style="width:67%"></span></span>  ｼｪﾙｽﾅｯﾌﾟｼｮｯﾄ
+<span class="y">0.4 GB</span>  <span class="track"><span class="fill" style="width:33%"></span></span>  編集履歴
+<span class="y">0.3 GB</span>  <span class="track"><span class="fill" style="width:25%"></span></span>  MCPログ
+<span class="y">0.1 GB</span>  <span class="track"><span class="fill" style="width:8%"></span></span>  ﾀｽｸ・ﾊﾞｯｸｱｯﾌﾟ等
+<span class="total"><span class="red">2.8 GB</span>  <span class="h">合計</span><span class="dim">（置きっぱなしで容量だけ食う）</span></span>
+<span class="badge warn">放置すると、このまま増え続ける…</span></div>
+  </div>
+
+  <div class="mid">
+    <div class="pill">改良版プロンプトを<br><b>1回貼るだけ</b></div>
+    <div class="arrow">→</div>
+    <div class="pill" style="font-size:14.5px; color:#5a6472;">以後は毎週月曜 9:00<br>OSスケジューラが自動実行</div>
+  </div>
+
+  <div class="card after">
+    <div class="cardbar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span>
+      <span class="cardtitle">&nbsp;週次おそうじ実行後</span><span class="tag after">AFTER</span></div>
+    <div class="body"><span class="z">0 MB</span>   <span class="track"></span>  会話ログ
+<span class="z">0 MB</span>   <span class="track"></span>  ｼｪﾙｽﾅｯﾌﾟｼｮｯﾄ
+<span class="z">0 MB</span>   <span class="track"></span>  編集履歴
+<span class="z">0 MB</span>   <span class="track"></span>  MCPログ
+<span class="z">0 MB</span>   <span class="track"></span>  ﾀｽｸ・ﾊﾞｯｸｱｯﾌﾟ等
+<span class="total"><span class="z" style="font-weight:bold">0 MB</span>   <span class="h">合計</span><span class="dim">（直近30日分・設定・スキルは保護して残す）</span></span>
+<span class="badge">★ 2.8 GB 回収 ★</span></div>
+  </div>
+</div>
+
+<div class="foot">サイズは利用状況による想定例 ／ 消すのは「30日より古いファイル」だけ ─ 設定・スキル・認証情報・直近データには触れない設計</div>
