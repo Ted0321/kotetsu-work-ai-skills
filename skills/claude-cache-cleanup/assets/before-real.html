@@ -1,0 +1,35 @@
+<meta charset="utf-8">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1200px; height:675px; background:linear-gradient(135deg,#1a1f2e 0%,#0d1117 100%);
+         font-family:'IPAGothic','MS Gothic','BIZ UDGothic','Hiragino Kaku Gothic ProN',monospace;
+         display:flex; align-items:center; justify-content:center; }
+  .term { width:760px; background:#0c0f14; border:1px solid #2b3240; border-radius:12px;
+          box-shadow:0 20px 60px rgba(0,0,0,.6); overflow:hidden; }
+  .bar { height:34px; background:#161b24; display:flex; align-items:center; padding:0 14px; gap:8px;
+         color:#8b95a5; font-size:13px; }
+  .dot { width:12px; height:12px; border-radius:50%; }
+  .body { padding:20px 26px 24px; font-size:17px; line-height:1.85; color:#c9d1d9; white-space:pre; }
+  .y { color:#e3b341; } .dim { color:#586274; } .red { color:#ff7b72; font-weight:bold; }
+  .h { color:#e6edf3; font-weight:bold; }
+  .track { display:inline-block; width:240px; height:12px; background:#1c2431; border-radius:3px;
+           vertical-align:middle; overflow:hidden; }
+  .fill { display:block; height:100%; background:linear-gradient(90deg,#e3b341,#f0883e); border-radius:3px; }
+  .cap { position:absolute; bottom:12px; right:18px; color:#4a5568; font-size:12px; }
+</style>
+<div class="term">
+  <div class="bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span>&nbsp; PowerShell — Claude Code 溜まり具合チェック（実測）</div>
+  <div class="body"><span class="dim">PS C:\Users\you&gt;</span> <span style="color:#79c0ff">（診断ワンライナーを実行）</span>
+
+<span class="h">📦 Claude Code が溜め込んでいるデータ</span>
+ <span class="y">662.0 MB</span>  <span class="track"><span class="fill" style="width:100%"></span></span>  projects <span class="dim">（過去の会話ログ）</span>
+   <span class="y">0.3 MB</span>  <span class="track"><span class="fill" style="width:1%"></span></span>  backups
+   <span class="y">0.1 MB</span>  <span class="track"><span class="fill" style="width:1%"></span></span>  tasks
+   <span class="y">0.1 MB</span>  <span class="track"><span class="fill" style="width:1%"></span></span>  shell-snapshots
+   <span class="y">0.0 MB</span>  <span class="track"><span class="fill" style="width:0%"></span></span>  mcp-logs
+ ─────────────────────────────────
+ <span class="red">662.5 MB  合計</span>
+
+<span class="dim"># ほぼ全部、過去の会話ログ。これが毎日増え続ける</span></div>
+</div>
+<div class="cap">2026-08-05 実測</div>
