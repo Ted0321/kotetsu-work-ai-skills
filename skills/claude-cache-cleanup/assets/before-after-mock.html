@@ -1,0 +1,60 @@
+<meta charset="utf-8">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1200px; height:675px; background:linear-gradient(135deg,#1a1f2e 0%,#0d1117 100%);
+         font-family:'IPAGothic','MS Gothic','BIZ UDGothic','Osaka-Mono','Hiragino Kaku Gothic ProN',monospace;
+         display:flex; align-items:center; justify-content:center; gap:18px; }
+  .term { width:470px; background:#0c0f14; border:1px solid #2b3240; border-radius:10px;
+          box-shadow:0 18px 50px rgba(0,0,0,.55); overflow:hidden; }
+  .bar { height:30px; background:#161b24; display:flex; align-items:center; padding:0 12px; gap:7px;
+         color:#8b95a5; font-size:12px; }
+  .dot { width:11px; height:11px; border-radius:50%; }
+  .body { padding:16px 18px 20px; font-size:14.5px; line-height:1.75; color:#c9d1d9; white-space:pre; }
+  .g { color:#7ee787; } .y { color:#e3b341; } .b { color:#79c0ff; } .dim { color:#586274; }
+  .red { color:#ff7b72; } .big { color:#7ee787; font-size:17px; font-weight:bold; }
+  .mid { display:flex; flex-direction:column; align-items:center; gap:10px; color:#e6edf3; width:170px; }
+  .mid .arrow { font-size:40px; color:#7ee787; }
+  .mid .label { font-size:15px; text-align:center; line-height:1.6; background:#1c2431;
+                border:1px solid #2f3a4d; border-radius:8px; padding:10px 12px; }
+  .caption { position:absolute; bottom:10px; right:16px; color:#4a5568; font-size:11px; }
+  .h { color:#e6edf3; font-weight:bold; }
+  .track { display:inline-block; width:150px; height:11px; background:#1c2431; border-radius:3px;
+           vertical-align:middle; overflow:hidden; }
+  .fill { display:block; height:100%; background:linear-gradient(90deg,#e3b341,#f0883e); border-radius:3px; }
+</style>
+<div class="term">
+  <div class="bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span>&nbsp; PowerShell — 診断（Before）</div>
+  <div class="body"><span class="dim">PS C:\Users\you&gt;</span> <span class="b">claude-code 溜まり具合チェック</span>
+
+<span class="h">📦 Claude Code が溜め込んでいるデータ</span>
+ <span class="y">1.8 GB</span>  <span class="track"><span class="fill" style="width:100%"></span></span>  会話ログ
+ <span class="y">0.9 GB</span>  <span class="track"><span class="fill" style="width:50%"></span></span>  ｼｪﾙｽﾅｯﾌﾟｼｮｯﾄ
+ <span class="y">0.3 GB</span>  <span class="track"><span class="fill" style="width:17%"></span></span>  MCPログ
+ <span class="y">0.2 GB</span>  <span class="track"><span class="fill" style="width:11%"></span></span>  編集履歴
+ <span class="y">0.1 GB</span>  <span class="track"><span class="fill" style="width:6%"></span></span>  その他
+ ──────────────────────
+ <span class="red">3.3 GB  合計（2,418 ファイル）</span>
+
+<span class="dim"># 半年使っただけでこの量…</span></div>
+</div>
+<div class="mid">
+  <div class="label">改良版プロンプトを<br><span class="g">1回貼るだけ</span></div>
+  <div class="arrow">→</div>
+  <div class="label" style="font-size:12.5px;color:#8b95a5">以後は毎週自動<br>（AI不使用・確認なし）</div>
+</div>
+<div class="term">
+  <div class="bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span>&nbsp; Claude Code — 初回実行後（After）</div>
+  <div class="body"><span class="h">━━━ Claude Code おそうじレポート ━━━</span>
+ before : <span class="red">3.3 GB（2,418 ファイル）</span>
+ after  : 0.4 GB → <span class="big">★2.9 GB 回収★</span>
+ 内訳   : 会話ログ 1.7GB
+          ｽﾅｯﾌﾟｼｮｯﾄ 0.9GB / MCPログ 0.3GB
+ 残存   : <span class="g">直近30日分はすべて保護</span>
+ 次回   : 毎週月曜 9:00 に自動実行
+ 停止   : 「おそうじ自動化を止めて」
+<span class="h">━━━━━━━━━━━━━━━━━━━━</span>
+
+<span class="dim">$ crontab -l</span>
+<span class="g">0 9 * * 1 bash ~/.claude/cleanup/claude-cleanup.sh</span></div>
+</div>
+<div class="caption">サンプル画面（数字はイメージ）</div>
