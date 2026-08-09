@@ -51,6 +51,10 @@ npx skills add Ted0321/kotetsu-work-ai-skills@html-report-design
 1. [SKILL.md](./SKILL.md) を開いて中身をAIに貼る
 2. 末尾に案件メモ（資料にしたい内容）を足す
 
+X等でのシェア・お試し用には約4,500字の凝縮版
+[assets/prompt-lite.md](./assets/prompt-lite.md) もあります
+（表・KPI・矢羽根・フレームワーク表まで再現。ロードマップやSVGチャートの実装見本はフル版のみ）。
+
 想定セッション例: [examples/sample_input_output.md](./examples/sample_input_output.md)
 
 ## 注意
