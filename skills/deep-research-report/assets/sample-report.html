@@ -56,6 +56,24 @@ svg text{font-family:inherit}
 .src{font-size:11.5px;color:var(--ink-3);margin:6px 0 0}
 .note{font-size:12.5px;color:var(--ink-2);border-left:2px solid var(--hairline);
   padding:2px 0 2px 14px;margin:24px 0 16px;max-width:40em}
+.chevrons{display:flex;margin:28px 0 8px;min-width:520px}
+.chev{flex:1;padding:9px 10px 9px 22px;font-size:12px;font-weight:600;line-height:1.5;
+  text-align:center;background:var(--fill-gray);margin-left:4px;
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 50%,calc(100% - 12px) 100%,0 100%,12px 50%)}
+.chev:first-child{margin-left:0;
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 50%,calc(100% - 12px) 100%,0 100%)}
+.chev.on{background:var(--accent);color:#fff}
+.chev small{display:block;font-size:10.5px;font-weight:500;opacity:.75}
+.roadmap{min-width:560px;margin:28px 0 8px}
+.rm-row{display:grid;grid-template-columns:150px repeat(4,1fr);align-items:center}
+.rm-row.rm-head{border-bottom:1px solid var(--ink)}
+.rm-h{font-size:11px;font-weight:600;color:var(--ink-3);text-align:center;
+  padding:0 0 8px;letter-spacing:.04em}
+.rm-row:not(.rm-head){border-bottom:1px solid var(--hairline);padding:12px 0}
+.rm-lane{font-size:12px;font-weight:600;padding-right:12px;line-height:1.5}
+.rm-bar{font-size:11px;font-weight:600;line-height:1.4;padding:4px 10px;
+  background:var(--fill-gray);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rm-bar.on{background:var(--accent);color:#fff}
 .matrix{display:grid;grid-template-columns:var(--mx-label,140px) repeat(var(--mx-cols,2),1fr);
   gap:18px 20px;margin:28px 0 8px;min-width:560px}
 .mx-h{font-size:11.5px;font-weight:600;color:var(--ink-2);text-align:center;
@@ -66,13 +84,13 @@ svg text{font-family:inherit}
 .mx-label small{font-size:10px;font-weight:600;opacity:.7;letter-spacing:.08em}
 .mx-label.alt{background:var(--fill-gray);color:var(--ink)}
 .mx-cell{font-size:12px;line-height:1.75}
+.mx-cell ul{margin:0}
 .mx-h.stage{border-bottom:0;background:var(--fill-gray);color:var(--ink);padding:7px 8px;line-height:1.4;
   clip-path:polygon(0 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,0 100%,10px 50%)}
 .mx-h.stage.first{clip-path:polygon(0 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,0 100%)}
 .mx-h.stage.on{background:var(--accent);color:#fff}
 .mx-h.stage small{display:block;font-size:9.5px;font-weight:600;opacity:.7;letter-spacing:.06em}
 b,strong{font-weight:700}
-/* 出典一覧（deep-research-report 追加コンポーネント） */
 .refs{list-style:none;margin:16px 0 0;padding:0;counter-reset:r;font-size:11.5px;color:var(--ink-3)}
 .refs li{counter-increment:r;position:relative;padding-left:2.2em;margin-bottom:5px;line-height:1.7}
 .refs li::before{content:"[" counter(r) "]";position:absolute;left:0;font-variant-numeric:tabular-nums}
@@ -84,7 +102,7 @@ b,strong{font-weight:700}
   body{border-top-width:4px}
   .page{max-width:none;padding:0}
   .page>section{margin-top:48px;padding-top:32px}
-  table,figure,.kpis,.matrix{break-inside:avoid}
+  table,figure,.kpis,.chevrons,.roadmap,.matrix{break-inside:avoid}
 }
 </style>
 </head>
@@ -132,7 +150,7 @@ b,strong{font-weight:700}
 
     <figure>
       <figcaption>図表1: 生成AI導入率の推移（%）</figcaption>
-      <svg viewBox="0 0 640 240" role="img" aria-label="導入率の推移の折れ線グラフ。2022年度18%から2026年度68%まで上昇し、2028年度は85%超の予測。">
+      <svg viewBox="0 0 640 250" role="img" aria-label="導入率の推移の折れ線グラフ。2022年度18%から2026年度68%まで上昇し、2028年度は85%超の予測。">
         <line x1="40" y1="155" x2="560" y2="155" stroke="#efefef" stroke-width="1"/>
         <line x1="40" y1="100" x2="560" y2="100" stroke="#efefef" stroke-width="1"/>
         <line x1="40" y1="45" x2="560" y2="45" stroke="#efefef" stroke-width="1"/>
@@ -144,29 +162,44 @@ b,strong{font-weight:700}
         <polyline points="40,170.4 143,146.2 246,119.8 349,91.2 452,60.4" fill="none" stroke="#173f66" stroke-width="2.5"/>
         <polyline points="452,60.4 560,23" fill="none" stroke="#173f66" stroke-width="2.5" stroke-dasharray="5 4"/>
         <circle cx="452" cy="60.4" r="3.5" fill="#173f66"/>
-        <text x="40" y="190" text-anchor="middle" font-size="11.5" fill="#555555">18</text>
-        <text x="452" y="47" text-anchor="middle" font-size="12" font-weight="700" fill="#173f66">68</text>
-        <text x="556" y="16" text-anchor="end" font-size="12" font-weight="700" fill="#173f66">85超</text>
-        <text x="40" y="232" text-anchor="middle" font-size="11" fill="#8e8e8e">'22</text>
-        <text x="143" y="232" text-anchor="middle" font-size="11" fill="#8e8e8e">'23</text>
-        <text x="246" y="232" text-anchor="middle" font-size="11" fill="#8e8e8e">'24</text>
-        <text x="349" y="232" text-anchor="middle" font-size="11" fill="#8e8e8e">'25</text>
-        <text x="452" y="232" text-anchor="middle" font-size="11" fill="#8e8e8e">'26</text>
-        <text x="560" y="232" text-anchor="middle" font-size="11" fill="#8e8e8e">'28F</text>
+        <text x="452" y="46" text-anchor="middle" font-size="12" font-weight="700" fill="#173f66">68</text>
+        <text x="568" y="27" font-size="12" font-weight="700" fill="#173f66">85超</text>
+        <text x="40" y="234" text-anchor="middle" font-size="11" fill="#8e8e8e">'22</text>
+        <text x="143" y="234" text-anchor="middle" font-size="11" fill="#8e8e8e">'23</text>
+        <text x="246" y="234" text-anchor="middle" font-size="11" fill="#8e8e8e">'24</text>
+        <text x="349" y="234" text-anchor="middle" font-size="11" fill="#8e8e8e">'25</text>
+        <text x="452" y="234" text-anchor="middle" font-size="11" fill="#8e8e8e">'26</text>
+        <text x="560" y="234" text-anchor="middle" font-size="11" fill="#8e8e8e">'28F</text>
       </svg>
       <p class="src">出所: 年次利用実態調査 [1][4]。'28Fは「85%超」との予測値。点線は予測（本資料のデータはすべて架空）</p>
     </figure>
 
-    <p>企業規模による格差は拡大しており、大企業（1,000名以上）の導入率81%に対し、中堅企業62%・中小企業44%と開きがある[2]。投資は今後も<b>年率40%前後で拡大</b>し、2028年度には導入率85%超との予測が示されている[3][4]。</p>
-    <p class="note">注: 「導入」は一部部門での業務利用を含む。「定着」は週次利用者が過半の部門を持つ企業の割合 [1]。</p>
+    <figure>
+      <figcaption>図表2: 企業規模別の導入率（%）— 規模間の格差は拡大傾向</figcaption>
+      <svg viewBox="0 0 640 130" role="img" aria-label="企業規模別導入率の横棒グラフ。大企業81、中堅企業62、中小企業44パーセント。">
+        <line x1="150" y1="0" x2="150" y2="124" stroke="#d9d9d9" stroke-width="1"/>
+        <text x="142" y="17" text-anchor="end" font-size="12.5" fill="#173f66" font-weight="700">大企業</text>
+        <rect x="150" y="2" width="440" height="22" fill="#173f66"/>
+        <text x="598" y="17" font-size="12" fill="#173f66" font-weight="700">81</text>
+        <text x="142" y="59" text-anchor="end" font-size="12.5" fill="#1a1a1a">中堅企業</text>
+        <rect x="150" y="44" width="337" height="22" fill="#c9ccd1"/>
+        <text x="495" y="59" font-size="12" fill="#555555">62</text>
+        <text x="142" y="101" text-anchor="end" font-size="12.5" fill="#1a1a1a">中小企業</text>
+        <rect x="150" y="86" width="239" height="22" fill="#c9ccd1"/>
+        <text x="397" y="101" font-size="12" fill="#555555">44</text>
+      </svg>
+      <p class="src">注: 大企業=従業員1,000名以上、中堅=300〜999名、中小=300名未満。出所: 企業規模別クロス集計 [2]（架空データ）</p>
+    </figure>
+
+    <p class="note">注: 「導入」は一部部門での業務利用を含む。「定着」は週次利用者が過半の部門を持つ企業の割合 [1]。投資は年率40%前後で拡大し、2028年度には導入率85%超との予測 [3][4]。</p>
   </section>
 
   <section>
-    <h2><span class="no">02</span>部門別 — ユースケースが明確な部門から進む</h2>
-    <p class="msg">活用率は営業企画62%から人事24%まで大きな差。先行3部門はユースケースが明確で、ここから着手して横展開するのが現実的である。</p>
+    <h2><span class="no">02</span>部門別と効果 — ユースケースが明確な部門から進む</h2>
+    <p class="msg">活用率は営業企画62%から人事24%まで大きな差。効果は業務プロセスに組み込んだ先行企業で時間削減31%と、全体平均18%の1.7倍に達している。</p>
 
     <figure>
-      <figcaption>図表2: 部門別の活用率（%）</figcaption>
+      <figcaption>図表3: 部門別の活用率（%）</figcaption>
       <svg viewBox="0 0 640 240" role="img" aria-label="部門別活用率の横棒グラフ。営業企画62、マーケティング58、開発55、カスタマーサポート41、経理・財務28、人事24パーセント。">
         <line x1="150" y1="0" x2="150" y2="234" stroke="#d9d9d9" stroke-width="1"/>
         <text x="142" y="17" text-anchor="end" font-size="12.5" fill="#173f66" font-weight="700">営業企画</text>
@@ -191,7 +224,34 @@ b,strong{font-weight:700}
       <p class="src">注: 濃紺は着手を推奨する先行3部門。出所: 部門別活用実態調査 [5]（架空データ）</p>
     </figure>
 
-    <p>サポート部門は顧客対応品質への懸念、経理・人事は機密情報の制約が普及を抑えている[5][6]。効果面では、対象業務の時間削減が<b>全体平均18%に対し先行企業は31%</b>と1.7倍の差がついており[7]、差の要因は次章以降の「進め方」にある。</p>
+    <p>サポート部門は顧客対応品質への懸念、経理・人事は機密情報の制約が普及を抑えている[5][6]。</p>
+
+    <figure>
+      <figcaption>図表4: 先行企業の時間削減31%の内訳（ポイント）</figcaption>
+      <svg viewBox="0 0 640 280" role="img" aria-label="時間削減31パーセントの内訳のウォーターフォールチャート。資料作成12、情報収集9、議事録・記録6、その他4ポイントの積み上げで合計31パーセント。">
+        <line x1="30" y1="240" x2="620" y2="240" stroke="#d9d9d9" stroke-width="1"/>
+        <rect x="62" y="168" width="68" height="72" fill="#173f66"/>
+        <text x="96" y="160" text-anchor="middle" font-size="11.5" font-weight="700" fill="#173f66">+12</text>
+        <line x1="130" y1="168" x2="178" y2="168" stroke="#d9d9d9" stroke-width="1"/>
+        <rect x="178" y="114" width="68" height="54" fill="#173f66"/>
+        <text x="212" y="106" text-anchor="middle" font-size="11.5" font-weight="700" fill="#173f66">+9</text>
+        <line x1="246" y1="114" x2="294" y2="114" stroke="#d9d9d9" stroke-width="1"/>
+        <rect x="294" y="78" width="68" height="36" fill="#173f66"/>
+        <text x="328" y="70" text-anchor="middle" font-size="11.5" font-weight="700" fill="#173f66">+6</text>
+        <line x1="362" y1="78" x2="410" y2="78" stroke="#d9d9d9" stroke-width="1"/>
+        <rect x="410" y="54" width="68" height="24" fill="#173f66"/>
+        <text x="444" y="46" text-anchor="middle" font-size="11.5" font-weight="700" fill="#173f66">+4</text>
+        <line x1="478" y1="54" x2="526" y2="54" stroke="#d9d9d9" stroke-width="1"/>
+        <rect x="526" y="54" width="68" height="186" fill="#1a1a1a"/>
+        <text x="560" y="46" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1a1a1a">31</text>
+        <text x="96" y="262" text-anchor="middle" font-size="11" fill="#8e8e8e">資料作成</text>
+        <text x="212" y="262" text-anchor="middle" font-size="11" fill="#8e8e8e">情報収集</text>
+        <text x="328" y="262" text-anchor="middle" font-size="11" fill="#8e8e8e">議事録・記録</text>
+        <text x="444" y="262" text-anchor="middle" font-size="11" fill="#8e8e8e">その他</text>
+        <text x="560" y="262" text-anchor="middle" font-size="11" fill="#8e8e8e">合計</text>
+      </svg>
+      <p class="src">注: 資料作成と情報収集で内訳の3分の2を占める。出所: 先行企業の定量効果分析 [7]（架空データ）</p>
+    </figure>
   </section>
 
   <section>
@@ -199,7 +259,7 @@ b,strong{font-weight:700}
     <p class="msg">挙げられる課題はセキュリティ47%・人材41%・ROI38%・データ整備33%。いずれもツールの性能ではなく、受け入れ側の体制と設計の問題である。</p>
 
     <figure>
-    <figcaption>図表3: 上位4課題の実態と対応</figcaption>
+    <figcaption>図表5: 上位課題と対応の方向</figcaption>
     <div class="fig-scroll">
     <div class="matrix">
       <div class="mx-h"></div>
@@ -232,7 +292,7 @@ b,strong{font-weight:700}
     <p class="msg">企業の分布はステージ0・1で69%を占める。先行企業の共通項は推進組織・業務組み込み・指標の3点であり、ステージ2への移行がそのまま競争力の差になる。</p>
 
     <figure>
-    <figcaption>図表4: 生成AI活用の成熟度ステージと企業分布</figcaption>
+    <figcaption>図表6: 生成AI活用の成熟度ステージと企業分布</figcaption>
     <div class="fig-scroll">
     <div class="matrix" style="--mx-cols:4;--mx-label:96px;min-width:620px">
       <div></div>
@@ -266,11 +326,56 @@ b,strong{font-weight:700}
 
   <section>
     <h2><span class="no">05</span>示唆 — 来期は「ステージ2到達」を目標に3つの打ち手</h2>
-    <p class="msg">導入率は2〜3年でコモディティ化する。差がつくのは「業務に組み込めているか」であり、来期は次の3点に投資を集中すべきである。</p>
+    <p class="msg">導入率は2〜3年でコモディティ化する。差がつくのは「業務に組み込めているか」であり、来期は打ち手を3点に絞って投資を集中すべきである。</p>
+
+    <figure>
+      <figcaption>図表7: 業務組み込みまでの進め方（定石）</figcaption>
+      <div class="fig-scroll">
+      <div class="chevrons">
+        <div class="chev">対象業務の選定<small>先行3部門から</small></div>
+        <div class="chev">パイロット<small>2部門で実施</small></div>
+        <div class="chev on">業務組み込み<small>プロセスに明示</small></div>
+        <div class="chev">横展開<small>成功パターンを移植</small></div>
+      </div>
+      </div>
+      <p class="src">注: 濃紺が定着の分かれ目。ツール配布で止めない [9]（架空のサンプル）</p>
+    </figure>
+
+    <figure>
+      <figcaption>図表8: 来期の進め方（四半期）</figcaption>
+      <div class="fig-scroll">
+      <div class="roadmap">
+        <div class="rm-row rm-head">
+          <div class="rm-lane"></div>
+          <div class="rm-h">Q1</div>
+          <div class="rm-h">Q2</div>
+          <div class="rm-h">Q3</div>
+          <div class="rm-h">Q4</div>
+        </div>
+        <div class="rm-row">
+          <div class="rm-lane">推進組織・指標設計</div>
+          <div class="rm-bar" style="grid-column:2/3">設置・設計</div>
+        </div>
+        <div class="rm-row">
+          <div class="rm-lane">パイロット（2部門）</div>
+          <div class="rm-bar" style="grid-column:2/4">実施→効果測定</div>
+        </div>
+        <div class="rm-row">
+          <div class="rm-lane">横展開</div>
+          <div class="rm-bar on" style="grid-column:4/6">成功パターンを他部門へ</div>
+        </div>
+        <div class="rm-row">
+          <div class="rm-lane">データ基盤整備</div>
+          <div class="rm-bar" style="grid-column:2/6">通期で並行</div>
+        </div>
+      </div>
+      </div>
+      <p class="src">出所: 進め方の定石とスケジュール想定 [7][9]（架空データ）</p>
+    </figure>
 
     <div class="tbl">
     <table>
-      <caption>図表5: 推奨する打ち手</caption>
+      <caption>図表9: 推奨する打ち手</caption>
       <thead>
         <tr>
           <th style="width:34%">打ち手</th>
@@ -282,17 +387,17 @@ b,strong{font-weight:700}
         <tr>
           <td>経営直下の推進組織の設置</td>
           <td>部門横断の意思決定を迅速化。部門任せでは組み込みが進まない</td>
-          <td>来期初</td>
+          <td>Q1</td>
         </tr>
         <tr>
           <td>効果指標の設計（時間削減率・利用率）</td>
           <td>ROI不明を解消し、投資継続の根拠を作る</td>
-          <td>導入初期から</td>
+          <td>Q1</td>
         </tr>
         <tr>
           <td>先行3部門への業務組み込み→横展開</td>
           <td>営業企画・マーケ・開発で成功パターンを作り、全社へ広げる</td>
-          <td>四半期単位</td>
+          <td>Q1〜通期</td>
         </tr>
       </tbody>
     </table>
