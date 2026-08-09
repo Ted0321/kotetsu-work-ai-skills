@@ -1,0 +1,221 @@
+---
+name: html-report-design
+description: "Design system that makes HTML output look like a professional consulting deliverable instead of default AI styling. Use WHENEVER generating any HTML document — report, analysis memo, proposal, research summary, dashboard, artifact — and when the user says 「HTMLで資料」「HTMLでまとめて」「レポートにして」「コンサル風に」「資料っぽく」「デザインがダサい」 or asks to restyle existing AI-generated HTML. Replaces boxes, borders, gradients, emoji and rainbow colors with whitespace-driven, typography-first, print-ready (A4) design."
+---
+
+# HTML資料デザイン — コンサル品質の出力設計
+
+AIが出すHTMLがダサいのは、**構造を「線と箱」で作るから**。
+一流の資料は、構造を**「余白と文字の階層」**で作る。
+このスキルは、HTMLを出力するあらゆる場面でその流儀を強制する。
+
+## 目的
+
+HTMLで資料（報告書・分析メモ・提案書・調査サマリー・ダッシュボード）を出すとき、
+そのまま社内外に出せる「コンサル品質」のデザインで出力する。
+デフォルトのAIっぽい見た目（カード乱立・グラデ・絵文字・虹色）を禁止する。
+
+## 原則（5つ）
+
+1. **区切りは余白で作る。** セクションの境界は64px以上の余白＋横の細罫1本まで。囲み枠は使わない。
+2. **階層は文字で作る。** サイズ・太さ・色の濃淡（黒→グレー2段階）で階層を表現する。背景色で表現しない。
+3. **色は3つまで。** 紙の白＋インクの黒グレー系＋アクセント1色（既定は濃紺）。アクセントは面積5%以下、重要な数字と構造要素だけに使う。
+4. **構造は「メッセージ→根拠」。** 各セクションは見出しの直後に「言いたいこと1文（メッセージライン）」を置き、その下に根拠（表・図・本文）を並べる。
+5. **印刷に耐える。** 白背景固定・A4で崩れない。画面映えではなく配布資料として設計する。
+
+## 禁止事項（ダサさの正体。1つでもあれば直す）
+
+- `border` + `border-radius` + `box-shadow` の**カードUI**でコンテンツを囲む
+- グラデーション背景（特に紫→青）、ダークテーマ既定
+- 絵文字・アイコンを見出しや箇条書きの飾りに使う
+- 意味なく色数が増える（青の情報ボックス、黄色の注意ボックス、緑の成功ボックス…）
+- 本文・見出しのセンタリング（表紙のみ例外可、既定は左揃え）
+- 表の縦罫線・全セル罫線・シマシマ背景
+- 角丸・影・立体表現の多用
+- `border-left: 4px solid` の色付きコールアウト乱立
+
+## デザインCSS（そのまま使う。変えてよいのは --accent の1色だけ）
+
+```css
+:root{
+  --ink:#1a1a1a;         /* 本文 */
+  --ink-2:#555555;       /* 補足 */
+  --ink-3:#8e8e8e;       /* キャプション・出所 */
+  --accent:#173f66;      /* アクセント（濃紺）。クライアントカラーがあれば1色だけ差し替え */
+  --accent-tint:#eef3f8; /* アクセント淡色。合計行など最小限に */
+  --hairline:#d9d9d9;    /* 罫線 */
+  --paper:#ffffff;
+}
+html{color-scheme:light}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Helvetica Neue",Arial,"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic Medium","Yu Gothic",Meiryo,sans-serif;
+  font-size:15px;line-height:1.9;
+  border-top:6px solid var(--accent);
+  -webkit-font-smoothing:antialiased;
+}
+.page{max-width:760px;margin:0 auto;padding:56px clamp(24px,6vw,48px) 96px}
+
+/* 表紙ブロック */
+.doc-header{padding-bottom:28px;border-bottom:1px solid var(--ink)}
+.eyebrow{font-size:11px;letter-spacing:.16em;color:var(--ink-3);text-transform:uppercase;margin:0 0 20px}
+h1{font-size:27px;line-height:1.5;letter-spacing:.02em;margin:0 0 12px;font-feature-settings:"palt" 1}
+.lead{font-size:14px;color:var(--ink-2);margin:0 0 24px;max-width:38em}
+.doc-meta{font-size:12px;color:var(--ink-3);display:flex;gap:24px;flex-wrap:wrap}
+
+/* セクション */
+.page>section{border-top:1px solid var(--hairline);padding-top:44px;margin-top:64px}
+.page>section:first-of-type{border-top:0;padding-top:0;margin-top:56px}
+h2{font-size:19px;letter-spacing:.03em;margin:0;font-feature-settings:"palt" 1}
+h2 .no{color:var(--accent);margin-right:14px;font-variant-numeric:tabular-nums}
+.msg{font-size:16px;font-weight:600;line-height:1.8;margin:18px 0 24px;max-width:36em}
+h3{font-size:15px;margin:36px 0 8px}
+p{margin:0 0 16px;max-width:42em}
+
+/* リスト */
+ul,ol{margin:0 0 16px;padding-left:1.4em;max-width:41em}
+li{margin-bottom:6px}
+ul{list-style:none;padding-left:1.2em}
+ul li::before{content:"–";float:left;margin-left:-1.2em;color:var(--ink-3)}
+
+/* サマリー（結論の番号付き列挙） */
+.summary{list-style:none;margin:24px 0 0;padding:0;counter-reset:s;max-width:44em}
+.summary li{counter-increment:s;position:relative;padding-left:2.4em;margin-bottom:14px}
+.summary li::before{
+  content:counter(s,decimal-leading-zero);position:absolute;left:0;top:.4em;
+  font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.04em;
+  font-variant-numeric:tabular-nums;
+}
+
+/* KPI（数字は箱に入れず、余白と縦罫で並べる） */
+.kpis{display:flex;flex-wrap:wrap;row-gap:24px;margin:32px 0 8px}
+.kpi{padding:2px 32px}
+.kpi:first-child{padding-left:0}
+.kpi+.kpi{border-left:1px solid var(--hairline)}
+.kpi .v{font-size:30px;font-weight:700;color:var(--accent);line-height:1.3;
+  font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.kpi .v small{font-size:14px;font-weight:600;margin-left:2px}
+.kpi .l{font-size:11.5px;color:var(--ink-3);letter-spacing:.06em;margin-top:6px}
+
+/* 表（縦線なし・横の細罫のみ。数字は右揃え） */
+table{width:100%;border-collapse:collapse;margin:28px 0 8px;font-size:13px;line-height:1.6}
+caption{text-align:left;font-size:12.5px;font-weight:600;margin-bottom:10px}
+th{font-size:12px;font-weight:600;text-align:left;padding:10px 12px;
+  border-top:2px solid var(--ink);border-bottom:1px solid var(--ink);vertical-align:bottom}
+td{padding:10px 12px;border-bottom:1px solid var(--hairline);vertical-align:top}
+th.num,td.num{text-align:right;font-variant-numeric:tabular-nums}
+tr.total td{border-top:1px solid var(--ink);border-bottom:2px solid var(--ink);
+  font-weight:600;background:var(--accent-tint)}
+
+/* 図表・出所・注記 */
+figure{margin:32px 0 8px}
+figcaption{font-size:12.5px;font-weight:600;margin-bottom:14px}
+figure svg{width:100%;height:auto;display:block}
+svg text{font-family:inherit}
+.src{font-size:11.5px;color:var(--ink-3);margin:6px 0 0}
+.note{font-size:12.5px;color:var(--ink-2);border-left:2px solid var(--hairline);
+  padding:2px 0 2px 14px;margin:24px 0 16px;max-width:40em}
+
+/* 強調（色の強調はアクセント1色・重要な数字だけ） */
+b,strong{font-weight:700}
+.em{color:var(--accent);font-weight:700}
+a{color:inherit;text-decoration:underline;text-decoration-color:var(--hairline);text-underline-offset:3px}
+a:hover{text-decoration-color:var(--accent)}
+
+/* フッター */
+.doc-footer{margin-top:88px;padding-top:20px;border-top:1px solid var(--hairline);
+  font-size:11.5px;color:var(--ink-3);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+/* 印刷（A4で配れる） */
+@media print{
+  @page{size:A4;margin:16mm}
+  body{border-top-width:4px}
+  .page{max-width:none;padding:0}
+  .page>section{margin-top:48px;padding-top:32px}
+  table,figure,.kpis{break-inside:avoid}
+  a{text-decoration:none}
+}
+```
+
+## 資料の骨格（HTML構造）
+
+```html
+<div class="page">
+
+  <header class="doc-header">
+    <p class="eyebrow">社外秘 ／ Draft などの取扱い表記</p>
+    <h1>結論が伝わるタイトル</h1>
+    <p class="lead">この資料が何を扱い、何を決めるためのものかを1〜2文で。</p>
+    <div class="doc-meta"><span>日付</span><span>作成部署</span><span>宛先</span></div>
+  </header>
+
+  <section>
+    <h2>エグゼクティブサマリー</h2>
+    <ol class="summary">
+      <li><b>結論。</b>補足1文。</li>
+      <li><b>根拠の要点。</b>補足1文。</li>
+      <li><b>依頼・次の判断。</b>補足1文。</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2><span class="no">01</span>セクション見出し（トピック）</h2>
+    <p class="msg">このセクションで言いたいこと1文（so what）。</p>
+    <!-- 根拠: .kpis / table / figure / 本文 -->
+  </section>
+
+  <!-- 02, 03 … 最後は「推奨アクション」（アクション・オーナー・期限の表） -->
+
+  <footer class="doc-footer">
+    <span>資料名</span><span>出所・注記</span>
+  </footer>
+
+</div>
+```
+
+- サマリーは**結論→根拠→依頼**の3点。本文を書いてから最後に要約を書くのではなく、先に決める
+- セクション見出しはトピック、`.msg` は主張。**見出しだけ読めば流れが、.msgだけ読めば結論がわかる**状態にする
+- 最終セクションは必ず「次のアクション」（誰が・何を・いつまでに）
+
+## コンポーネントの作法
+
+**表**
+- 縦罫線は引かない。ヘッダー上2px＋下1pxの黒、行間は細いグレー罫のみ
+- 数字の列は `class="num"` で右揃え・桁区切り・単位はヘッダーに明記（例:「売上（億円）」）
+- 強調したい行は `tr.total`（淡色背景＋太字）を1行まで
+
+**KPI・大きい数字**
+- 箱に入れない。`.kpis` で横に並べ、間は縦の細罫1本
+- 数字はアクセント色・単位は `<small>`、ラベルは小さくグレー
+
+**チャート（SVG推奨）**
+- 配色は「**脇役は全部グレー #c9ccd1、主役の1系列だけ濃紺 var(--accent)**」。虹色に塗り分けない
+- 凡例ボックスは作らず、系列名・数値は**バーや線の近くに直接ラベル**
+- 3D・影・グラデ・チャートの外枠は禁止。軸線・グリッドは細いグレーを最小限
+- 負値・悪化を示すときだけレンガ色 `#a33c2e` を追加してよい
+
+**注記・出所**
+- データを見せたら `.src`（出所）を必ず添える。推計なら推計と書く
+- 補足は `.note`（グレーの細い左罫）。色付き警告ボックスにしない
+
+## 手順
+
+1. 用途を判定する（報告書／分析メモ／提案書…）。指定があればアクセント1色だけクライアントカラーに差し替える。確認のための質問はせず、既定（濃紺）で進めてよい
+2. 内容を骨格に流し込む（サマリー→番号付きセクション→推奨アクション）
+3. 上記CSSを**改変せずそのまま**使う（足してよいのはレイアウト微調整のみ。新しい色・枠・影は足さない）
+4. 出力前に下の品質チェックを通す
+
+## 品質チェック（出力前）
+
+- [ ] 枠線で囲んだカードが**0個**（罫線は「水平の罫」「注記・KPIの縦罫」のみ）
+- [ ] 使用色がインク系＋アクセント1色に収まっている（3色目が出たら削る）
+- [ ] グラデ0・影0・絵文字0・角丸0
+- [ ] 本文は左揃え、1行の長さは42em以下
+- [ ] 各セクションに `.msg`（メッセージライン）がある
+- [ ] 数字は右揃え・桁区切り・単位明記、表に出所がある
+- [ ] 印刷プレビュー（A4）で表・図が泣き別れしない
+
+## トーン
+
+- 簡潔、実務。装飾で盛らず、余白と階層で読ませる
+- 完成見本: `assets/report.template.html`（ブラウザで開けばそのまま確認できる）

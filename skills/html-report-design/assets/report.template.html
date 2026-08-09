@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EC物流代行市場 参入評価（デザインサンプル）</title>
+<style>
+/* ============================================================
+   html-report-design v0.1 — コンサル品質のHTML資料デザイン
+   原則: 構造は「余白と文字の階層」で作る。線と箱で作らない。
+   ============================================================ */
+:root{
+  --ink:#1a1a1a;         /* 本文 */
+  --ink-2:#555555;       /* 補足 */
+  --ink-3:#8e8e8e;       /* キャプション・出所 */
+  --accent:#173f66;      /* アクセント（濃紺）。クライアントカラーがあれば1色だけ差し替え */
+  --accent-tint:#eef3f8; /* アクセント淡色。合計行など最小限に */
+  --hairline:#d9d9d9;    /* 罫線 */
+  --paper:#ffffff;
+}
+html{color-scheme:light}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Helvetica Neue",Arial,"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic Medium","Yu Gothic",Meiryo,sans-serif;
+  font-size:15px;line-height:1.9;
+  border-top:6px solid var(--accent);
+  -webkit-font-smoothing:antialiased;
+}
+.page{max-width:760px;margin:0 auto;padding:56px clamp(24px,6vw,48px) 96px}
+
+/* --- 表紙ブロック --- */
+.doc-header{padding-bottom:28px;border-bottom:1px solid var(--ink)}
+.eyebrow{font-size:11px;letter-spacing:.16em;color:var(--ink-3);text-transform:uppercase;margin:0 0 20px}
+h1{font-size:27px;line-height:1.5;letter-spacing:.02em;margin:0 0 12px;font-feature-settings:"palt" 1}
+.lead{font-size:14px;color:var(--ink-2);margin:0 0 24px;max-width:38em}
+.doc-meta{font-size:12px;color:var(--ink-3);display:flex;gap:24px;flex-wrap:wrap}
+
+/* --- セクション --- */
+.page>section{border-top:1px solid var(--hairline);padding-top:44px;margin-top:64px}
+.page>section:first-of-type{border-top:0;padding-top:0;margin-top:56px}
+h2{font-size:19px;letter-spacing:.03em;margin:0;font-feature-settings:"palt" 1}
+h2 .no{color:var(--accent);margin-right:14px;font-variant-numeric:tabular-nums}
+.msg{font-size:16px;font-weight:600;line-height:1.8;margin:18px 0 24px;max-width:36em}
+h3{font-size:15px;margin:36px 0 8px}
+p{margin:0 0 16px;max-width:42em}
+
+/* --- リスト --- */
+ul,ol{margin:0 0 16px;padding-left:1.4em;max-width:41em}
+li{margin-bottom:6px}
+ul{list-style:none;padding-left:1.2em}
+ul li::before{content:"–";float:left;margin-left:-1.2em;color:var(--ink-3)}
+
+/* サマリー（結論の番号付き列挙） */
+.summary{list-style:none;margin:24px 0 0;padding:0;counter-reset:s;max-width:44em}
+.summary li{counter-increment:s;position:relative;padding-left:2.4em;margin-bottom:14px}
+.summary li::before{
+  content:counter(s,decimal-leading-zero);position:absolute;left:0;top:.4em;
+  font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.04em;
+  font-variant-numeric:tabular-nums;
+}
+.summary li::after{content:none}
+.summary li b{font-weight:700}
+
+/* --- KPI（数字は箱に入れず、余白と縦罫で並べる） --- */
+.kpis{display:flex;flex-wrap:wrap;row-gap:24px;margin:32px 0 8px}
+.kpi{padding:2px 32px}
+.kpi:first-child{padding-left:0}
+.kpi+.kpi{border-left:1px solid var(--hairline)}
+.kpi .v{font-size:30px;font-weight:700;color:var(--accent);line-height:1.3;
+  font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.kpi .v small{font-size:14px;font-weight:600;margin-left:2px}
+.kpi .l{font-size:11.5px;color:var(--ink-3);letter-spacing:.06em;margin-top:6px}
+
+/* --- 表（縦線なし・横の細罫のみ。数字は右揃え） --- */
+table{width:100%;border-collapse:collapse;margin:28px 0 8px;font-size:13px;line-height:1.6}
+caption{text-align:left;font-size:12.5px;font-weight:600;margin-bottom:10px}
+th{font-size:12px;font-weight:600;text-align:left;padding:10px 12px;
+  border-top:2px solid var(--ink);border-bottom:1px solid var(--ink);vertical-align:bottom}
+td{padding:10px 12px;border-bottom:1px solid var(--hairline);vertical-align:top}
+th.num,td.num{text-align:right;font-variant-numeric:tabular-nums}
+tr.total td{border-top:1px solid var(--ink);border-bottom:2px solid var(--ink);
+  font-weight:600;background:var(--accent-tint)}
+
+/* --- 図表・出所・注記 --- */
+figure{margin:32px 0 8px}
+figcaption{font-size:12.5px;font-weight:600;margin-bottom:14px}
+figure svg{width:100%;height:auto;display:block}
+svg text{font-family:inherit}
+.src{font-size:11.5px;color:var(--ink-3);margin:6px 0 0}
+.note{font-size:12.5px;color:var(--ink-2);border-left:2px solid var(--hairline);
+  padding:2px 0 2px 14px;margin:24px 0 16px;max-width:40em}
+
+/* --- 強調（色の強調はアクセント1色・重要な数字だけ） --- */
+b,strong{font-weight:700}
+.em{color:var(--accent);font-weight:700}
+a{color:inherit;text-decoration:underline;text-decoration-color:var(--hairline);text-underline-offset:3px}
+a:hover{text-decoration-color:var(--accent)}
+
+/* --- フッター --- */
+.doc-footer{margin-top:88px;padding-top:20px;border-top:1px solid var(--hairline);
+  font-size:11.5px;color:var(--ink-3);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+/* --- 印刷（A4で配れる） --- */
+@media print{
+  @page{size:A4;margin:16mm}
+  body{border-top-width:4px}
+  .page{max-width:none;padding:0}
+  .page>section{margin-top:48px;padding-top:32px}
+  table,figure,.kpis{break-inside:avoid}
+  a{text-decoration:none}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="doc-header">
+    <p class="eyebrow">Sample — 社外秘（架空データ）</p>
+    <h1>EC物流代行市場への参入評価と推奨アクション</h1>
+    <p class="lead">2027年度事業計画に向け、EC物流代行（3PL）市場への参入可否を市場性・競合・リスクの3点から評価し、推奨アクションを提示する。</p>
+    <div class="doc-meta">
+      <span>2026年8月9日</span>
+      <span>経営企画部</span>
+      <span>配布先: 経営会議</span>
+    </div>
+  </header>
+
+  <section>
+    <h2>エグゼクティブサマリー</h2>
+    <ol class="summary">
+      <li><b>参入を推奨する。</b>市場は年率12%で拡大しており、中堅EC事業者向けの領域には有力な専業プレイヤーが不在である。</li>
+      <li>勝ち筋は<b>化粧品・ヘルスケア領域への特化</b>。温度管理・薬機法対応という参入障壁を、既存アセットで満たせるのは当社を含め2社のみ。</li>
+      <li>初期投資8億円に対し、<b>3年目に単年黒字化・5年累計で投資回収</b>の見立て。最大のリスクは倉庫人員の確保であり、着手前に採用パートナー契約の締結を求めたい。</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2><span class="no">01</span>市場性 — 拡大が続き、特化領域に空白がある</h2>
+    <p class="msg">EC物流代行市場は1,530億円・年率+12%で拡大。うち化粧品・ヘルスケアは325億円と3番目の規模だが、専業対応できる事業者が最も少ない。</p>
+
+    <div class="kpis">
+      <div class="kpi">
+        <div class="v">1,530<small>億円</small></div>
+        <div class="l">市場規模（2026年度）</div>
+      </div>
+      <div class="kpi">
+        <div class="v">+12.4<small>%</small></div>
+        <div class="l">年平均成長率（22–26）</div>
+      </div>
+      <div class="kpi">
+        <div class="v">3.2<small>%</small></div>
+        <div class="l">5年目の想定シェア</div>
+      </div>
+    </div>
+
+    <figure>
+      <figcaption>図表1: セグメント別市場規模（2026年度、億円）</figcaption>
+      <svg viewBox="0 0 640 170" role="img" aria-label="セグメント別市場規模の横棒グラフ。アパレル420、食品・日用品380、化粧品・ヘルスケア325、家電・雑貨251、その他189億円。">
+        <line x1="120" y1="0" x2="120" y2="164" stroke="#d9d9d9" stroke-width="1"/>
+        <text x="112" y="17" text-anchor="end" font-size="12.5" fill="#1a1a1a">アパレル</text>
+        <rect x="120" y="2" width="440" height="22" fill="#c9ccd1"/>
+        <text x="568" y="17" font-size="12" fill="#555555">420</text>
+        <text x="112" y="51" text-anchor="end" font-size="12.5" fill="#1a1a1a">食品・日用品</text>
+        <rect x="120" y="36" width="398" height="22" fill="#c9ccd1"/>
+        <text x="526" y="51" font-size="12" fill="#555555">380</text>
+        <text x="112" y="85" text-anchor="end" font-size="12.5" fill="#173f66" font-weight="700">化粧品</text>
+        <rect x="120" y="70" width="325" height="22" fill="#173f66"/>
+        <text x="453" y="85" font-size="12" fill="#173f66" font-weight="700">325</text>
+        <text x="112" y="119" text-anchor="end" font-size="12.5" fill="#1a1a1a">家電・雑貨</text>
+        <rect x="120" y="104" width="251" height="22" fill="#c9ccd1"/>
+        <text x="379" y="119" font-size="12" fill="#555555">251</text>
+        <text x="112" y="153" text-anchor="end" font-size="12.5" fill="#1a1a1a">その他</text>
+        <rect x="120" y="138" width="189" height="22" fill="#c9ccd1"/>
+        <text x="317" y="153" font-size="12" fill="#555555">189</text>
+      </svg>
+      <p class="src">出所: 業界レポートより当社推計（本資料は架空のサンプルデータ）</p>
+    </figure>
+
+    <p>成長ドライバーはEC化率の上昇そのものではなく、<b>中堅EC事業者の「物流内製の限界」</b>にある。月間出荷1〜5万件の事業者は自社倉庫では採算が合わず、大手3PLからは優先度を下げられており、この帯を狙った専業サービスが立ち上がりつつある。</p>
+    <p class="note">注: 市場規模はフルフィルメント受託（保管・梱包・出荷）のみを対象とし、幹線輸送・ラストワンマイルは含まない。</p>
+  </section>
+
+  <section>
+    <h2><span class="no">02</span>競合 — 障壁の高い領域で正面競合は1社</h2>
+    <p class="msg">化粧品・ヘルスケア領域で求められる温度管理と薬機法対応を両立できるのは、現状A社と当社のみ。A社は関東に集中しており、西日本に空白がある。</p>
+
+    <table>
+      <caption>図表2: 主要競合の比較（2026年度、サンプル）</caption>
+      <thead>
+        <tr>
+          <th>社名</th>
+          <th class="num">売上（億円）</th>
+          <th class="num">拠点数</th>
+          <th>強み</th>
+          <th>化粧品対応</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>A社</td>
+          <td class="num">182</td>
+          <td class="num">6</td>
+          <td>薬機法対応の実績、大手ブランド顧客</td>
+          <td>◎（関東のみ）</td>
+        </tr>
+        <tr>
+          <td>B社</td>
+          <td class="num">143</td>
+          <td class="num">11</td>
+          <td>全国網と価格競争力</td>
+          <td>△（常温のみ）</td>
+        </tr>
+        <tr>
+          <td>C社</td>
+          <td class="num">96</td>
+          <td class="num">4</td>
+          <td>アパレル特化の高い作業品質</td>
+          <td>—</td>
+        </tr>
+        <tr class="total">
+          <td>当社（参入時）</td>
+          <td class="num">—</td>
+          <td class="num">2</td>
+          <td>西日本の温度管理倉庫、製薬向け品質管理体制</td>
+          <td>◎（西日本）</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="src">出所: 各社公開資料より作成（本資料は架空のサンプルデータ）</p>
+
+    <p>価格で戦うB社型ではなく、<b>規制対応と品質を売るA社型</b>のポジションを取る。A社との地理的な棲み分けが効く3年の間に、西日本でのシェアを固めることが参入の前提条件になる。</p>
+  </section>
+
+  <section>
+    <h2><span class="no">03</span>リスク — 最大の変数は人員確保</h2>
+    <p class="msg">事業リスクのうち投資判断に影響するのは倉庫人員の確保のみ。他は参入後の運用で吸収可能と評価する。</p>
+
+    <table>
+      <caption>図表3: 主要リスクの評価と対応</caption>
+      <thead>
+        <tr>
+          <th>リスク</th>
+          <th>影響</th>
+          <th>対応方針</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>倉庫人員の未充足</td>
+          <td>立ち上げ遅延（最大12ヶ月）</td>
+          <td><b>着手前に</b>採用パートナー2社と契約。充足率80%を投資実行の条件とする</td>
+        </tr>
+        <tr>
+          <td>大手3PLの中堅帯参入</td>
+          <td>価格競争によるマージン低下</td>
+          <td>規制対応・品質で差別化し、価格勝負の土俵を避ける</td>
+        </tr>
+        <tr>
+          <td>薬機法の運用厳格化</td>
+          <td>対応コスト増</td>
+          <td>既存の品質管理部門を転用。むしろ参入障壁の上昇として有利に働く</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2><span class="no">04</span>推奨アクション</h2>
+    <p class="msg">本会議では「条件付き参入」の承認を求める。投資実行の判断は、下記2件の完了を条件に12月の経営会議で行う。</p>
+
+    <table>
+      <caption>図表4: 次のアクション</caption>
+      <thead>
+        <tr>
+          <th style="width:55%">アクション</th>
+          <th>オーナー</th>
+          <th>期限</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>採用パートナー2社との契約締結（投資実行の前提条件）</td>
+          <td>人事部</td>
+          <td>10月末</td>
+        </tr>
+        <tr>
+          <td>アンカー顧客2社からの意向表明取得（投資実行の前提条件）</td>
+          <td>営業本部</td>
+          <td>11月末</td>
+        </tr>
+        <tr>
+          <td>投資実行の最終判断（初期投資8億円）</td>
+          <td>経営会議</td>
+          <td>12月</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <footer class="doc-footer">
+    <span>EC物流代行市場への参入評価（デザインサンプル）</span>
+    <span>本資料のデータはすべて架空です</span>
+  </footer>
+
+</div>
+</body>
+</html>
