@@ -116,6 +116,27 @@ svg text{font-family:inherit}
 .rm-bar.on{background:var(--accent);color:#fff}
 .rm-ms{font-size:11.5px;font-weight:700;color:var(--accent);white-space:nowrap}
 
+/* --- フレームワーク表（左=濃色ラベル。中身は枠で囲まず、余白で整列させる） --- */
+.matrix{display:grid;grid-template-columns:var(--mx-label,140px) repeat(var(--mx-cols,2),1fr);
+  gap:18px 20px;margin:28px 0 8px;min-width:560px}
+.mx-h{font-size:11.5px;font-weight:600;color:var(--ink-2);text-align:center;
+  align-self:end;padding-bottom:8px;border-bottom:1px solid var(--ink)}
+.mx-label{background:var(--accent);color:#fff;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;gap:2px;
+  font-size:12px;font-weight:700;line-height:1.5;padding:12px 10px}
+.mx-label small{font-size:10px;font-weight:600;opacity:.7;letter-spacing:.08em}
+.mx-label.alt{background:var(--fill-gray);color:var(--ink)}
+.mx-cell{font-size:12px;line-height:1.75}
+.mx-cell ul{margin:0}
+.mx-cell li{margin-bottom:5px}
+/* ステージ型の列見出し（矢羽根ヘッダー。目標ステージだけ濃紺） */
+.mx-h.stage{border-bottom:0;background:var(--fill-gray);color:var(--ink);
+  padding:7px 8px;line-height:1.4;
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,0 100%,10px 50%)}
+.mx-h.stage.first{clip-path:polygon(0 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,0 100%)}
+.mx-h.stage.on{background:var(--accent);color:#fff}
+.mx-h.stage small{display:block;font-size:9.5px;font-weight:600;opacity:.7;letter-spacing:.06em}
+
 /* --- 強調（色の強調はアクセント1色・重要な数字だけ） --- */
 b,strong{font-weight:700}
 .em{color:var(--accent);font-weight:700}
@@ -132,7 +153,7 @@ a:hover{text-decoration-color:var(--accent)}
   body{border-top-width:4px}
   .page{max-width:none;padding:0}
   .page>section{margin-top:48px;padding-top:32px}
-  table,figure,.kpis,.chevrons,.roadmap{break-inside:avoid}
+  table,figure,.kpis,.chevrons,.roadmap,.matrix{break-inside:avoid}
   a{text-decoration:none}
 }
 </style>
@@ -370,41 +391,66 @@ a:hover{text-decoration-color:var(--accent)}
     </figure>
 
     <p>前提は、稼働2年目に倉庫稼働率75%、アンカー顧客2社からの紹介経由で顧客獲得コストを市場平均の6割に抑えること。<b>感応度としては稼働率が10pt下振れた場合、回収は7年に後ろ倒し</b>となるが、撤退ラインには達しない。</p>
+
+    <figure>
+      <figcaption>図表7: 立ち上げステージ — 5年でSTAGE 2「西日本の面展開」まで到達する</figcaption>
+      <div class="fig-scroll">
+      <div class="matrix" style="--mx-cols:4;--mx-label:96px;min-width:620px">
+        <div></div>
+        <div class="mx-h stage first"><small>STAGE 0</small>参入準備</div>
+        <div class="mx-h stage"><small>STAGE 1</small>単拠点稼働</div>
+        <div class="mx-h stage on"><small>STAGE 2</small>西日本の面展開</div>
+        <div class="mx-h stage"><small>STAGE 3</small>全国基盤化</div>
+
+        <div class="mx-label alt">顧客</div>
+        <div class="mx-cell">意向表明2社の獲得</div>
+        <div class="mx-cell">アンカー2社の個別運用</div>
+        <div class="mx-cell">紹介経由で20社超、化粧品比率8割</div>
+        <div class="mx-cell">他カテゴリへ横展開</div>
+
+        <div class="mx-label alt">拠点</div>
+        <div class="mx-cell">既存倉庫の転用設計</div>
+        <div class="mx-cell">1拠点（改修済み）</div>
+        <div class="mx-cell">2〜3拠点を共通オペレーションで運営</div>
+        <div class="mx-cell">全国4拠点＋パートナー網</div>
+
+        <div class="mx-label alt">組織</div>
+        <div class="mx-cell">準備室（兼務）</div>
+        <div class="mx-cell">専任チーム化</div>
+        <div class="mx-cell">事業部化、採用を内製化</div>
+        <div class="mx-cell">独立採算の事業会社化</div>
+      </div>
+      </div>
+      <p class="src">注: 濃紺は5年目の到達目標。中身のセルは枠で囲まず、整列だけで行・列を見せる（架空のサンプル）</p>
+    </figure>
   </section>
 
   <section>
     <h2><span class="no">04</span>リスク — 最大の変数は人員確保</h2>
     <p class="msg">事業リスクのうち投資判断に影響するのは倉庫人員の確保のみ。他は参入後の運用で吸収可能と評価する。</p>
 
-    <div class="tbl">
-    <table>
-      <caption>図表7: 主要リスクの評価と対応</caption>
-      <thead>
-        <tr>
-          <th>リスク</th>
-          <th>影響</th>
-          <th>対応方針</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>倉庫人員の未充足</td>
-          <td>立ち上げ遅延（最大12ヶ月）</td>
-          <td><b>着手前に</b>採用パートナー2社と契約。充足率80%を投資実行の条件とする</td>
-        </tr>
-        <tr>
-          <td>大手3PLの中堅帯参入</td>
-          <td>価格競争によるマージン低下</td>
-          <td>規制対応・品質で差別化し、価格勝負の土俵を避ける</td>
-        </tr>
-        <tr>
-          <td>薬機法の運用厳格化</td>
-          <td>対応コスト増</td>
-          <td>既存の品質管理部門を転用。むしろ参入障壁の上昇として有利に働く</td>
-        </tr>
-      </tbody>
-    </table>
-    </div>
+    <figure>
+      <figcaption>図表8: 主要リスクの評価と対応</figcaption>
+      <div class="fig-scroll">
+      <div class="matrix">
+        <div class="mx-h"></div>
+        <div class="mx-h">想定される影響</div>
+        <div class="mx-h">対応方針</div>
+
+        <div class="mx-label"><small>01</small>倉庫人員の未充足</div>
+        <div class="mx-cell">立ち上げ遅延（最大12ヶ月）。売上計画の後ろ倒しに直結する</div>
+        <div class="mx-cell"><b>着手前に</b>採用パートナー2社と契約。充足率80%を投資実行の条件とする</div>
+
+        <div class="mx-label"><small>02</small>大手3PLの中堅帯参入</div>
+        <div class="mx-cell">価格競争によるマージン低下</div>
+        <div class="mx-cell">規制対応・品質で差別化し、価格勝負の土俵を避ける</div>
+
+        <div class="mx-label"><small>03</small>薬機法の運用厳格化</div>
+        <div class="mx-cell">対応コストの増加</div>
+        <div class="mx-cell">既存の品質管理部門を転用。むしろ参入障壁の上昇として有利に働く</div>
+      </div>
+      </div>
+    </figure>
   </section>
 
   <section>
@@ -413,7 +459,7 @@ a:hover{text-decoration-color:var(--accent)}
 
     <div class="tbl">
     <table>
-      <caption>図表8: 次のアクション</caption>
+      <caption>図表9: 次のアクション</caption>
       <thead>
         <tr>
           <th style="width:55%">アクション</th>
@@ -442,7 +488,7 @@ a:hover{text-decoration-color:var(--accent)}
     </div>
 
     <figure>
-      <figcaption>図表9: 参入ロードマップ — 判断からサービス開始まで12ヶ月</figcaption>
+      <figcaption>図表10: 参入ロードマップ — 判断からサービス開始まで12ヶ月</figcaption>
       <div class="fig-scroll">
       <div class="roadmap">
         <div class="rm-row rm-head">

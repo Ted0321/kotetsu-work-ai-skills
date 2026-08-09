@@ -142,6 +142,27 @@ svg text{font-family:inherit}
 .rm-bar.on{background:var(--accent);color:#fff}
 .rm-ms{font-size:11.5px;font-weight:700;color:var(--accent);white-space:nowrap}
 
+/* フレームワーク表（左=濃色ラベル。中身は枠で囲まず、余白で整列させる） */
+.matrix{display:grid;grid-template-columns:var(--mx-label,140px) repeat(var(--mx-cols,2),1fr);
+  gap:18px 20px;margin:28px 0 8px;min-width:560px}
+.mx-h{font-size:11.5px;font-weight:600;color:var(--ink-2);text-align:center;
+  align-self:end;padding-bottom:8px;border-bottom:1px solid var(--ink)}
+.mx-label{background:var(--accent);color:#fff;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;gap:2px;
+  font-size:12px;font-weight:700;line-height:1.5;padding:12px 10px}
+.mx-label small{font-size:10px;font-weight:600;opacity:.7;letter-spacing:.08em}
+.mx-label.alt{background:var(--fill-gray);color:var(--ink)}
+.mx-cell{font-size:12px;line-height:1.75}
+.mx-cell ul{margin:0}
+.mx-cell li{margin-bottom:5px}
+/* ステージ型の列見出し（矢羽根ヘッダー。目標ステージだけ濃紺） */
+.mx-h.stage{border-bottom:0;background:var(--fill-gray);color:var(--ink);
+  padding:7px 8px;line-height:1.4;
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,0 100%,10px 50%)}
+.mx-h.stage.first{clip-path:polygon(0 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,0 100%)}
+.mx-h.stage.on{background:var(--accent);color:#fff}
+.mx-h.stage small{display:block;font-size:9.5px;font-weight:600;opacity:.7;letter-spacing:.06em}
+
 /* 強調（色の強調はアクセント1色・重要な数字だけ） */
 b,strong{font-weight:700}
 .em{color:var(--accent);font-weight:700}
@@ -158,7 +179,7 @@ a:hover{text-decoration-color:var(--accent)}
   body{border-top-width:4px}
   .page{max-width:none;padding:0}
   .page>section{margin-top:48px;padding-top:32px}
-  table,figure,.kpis,.chevrons,.roadmap{break-inside:avoid}
+  table,figure,.kpis,.chevrons,.roadmap,.matrix{break-inside:avoid}
   a{text-decoration:none}
 }
 ```
@@ -230,13 +251,16 @@ a:hover{text-decoration-color:var(--accent)}
 | --- | --- | --- |
 | プロセス・バリューチェーン・フェーズ | 矢羽根 `.chevrons` | HTML/CSS |
 | 計画・スケジュール・体制の時間軸 | ロードマップ `.roadmap` | HTML/CSS（grid） |
+| 論点×観点の整理・文章セルの比較 | フレームワーク表 `.matrix` | HTML/CSS（grid） |
+| 成熟度・ステージ比較（現状→目標） | フレームワーク表＋矢羽根見出し `.mx-h.stage` | HTML/CSS（grid） |
 | 競合・市場の布置（2軸＋規模） | バブルマップ | SVG |
 | 増減の内訳（なぜ増えた／減った） | ウォーターフォール | SVG |
 | 推移・トレンド（実績＋予測） | 折れ線 | SVG |
 | 量の比較・ランキング | 横棒 | SVG |
 
 どの型も共通ルールは同じ: **脇役グレー・主役だけ濃紺・直接ラベル・図表番号と出所つき**。
-SVG系（バブル・ウォーターフォール・折れ線・横棒）の実装見本は `assets/report.template.html` の図表1〜6にある。
+実装見本は `assets/report.template.html`（SVG系=図表1・2・3・6、矢羽根=図表5、
+フレームワーク表=図表7・8、ロードマップ=図表10）。
 
 **矢羽根（`.chevrons`）**
 - フェーズは5個まで。当社領域・注力フェーズだけ `.on`（濃紺）、他はグレー
@@ -278,6 +302,41 @@ SVG系（バブル・ウォーターフォール・折れ線・横棒）の実�
 </div></div>
 ```
 
+**フレームワーク表（`.matrix`）— 左に濃色ラベル、中身は余白で整列**
+- コンサル頻出の「左端に濃色ボックス＝行ラベル、右に等間隔の列」を再現する型（論点一覧・比較表・ステージ表）
+- **塗るのは左の行ラベルと（あれば）目標ステージの列見出しだけ。** 中身のセルには枠も背景も付けず、
+  gridの余白だけで行・列が揃って見える状態を作る。「箱を並べた感」を出さないことが本体
+- 列は等幅（1fr）。列数は `--mx-cols`、ラベル幅は `--mx-label` で調整。セルは短文か「–」の箇条書き
+- 濃紺の主役は1つの図で1系統まで。行ラベルを濃紺にしたらステージ見出しはグレー、
+  目標ステージを濃紺 `.on` にしたら行ラベルは `.alt`（グレー）に落とす
+- 使い分け: **数値の比較は `table`、文章・観点の比較は `.matrix`**
+
+```html
+<div class="fig-scroll"><div class="matrix"><!-- 列数は --mx-cols で変更（既定2列） -->
+  <div class="mx-h"></div>
+  <div class="mx-h">想定される影響</div>
+  <div class="mx-h">対応方針</div>
+  <div class="mx-label"><small>01</small>倉庫人員の未充足</div>
+  <div class="mx-cell">立ち上げ遅延（最大12ヶ月）</div>
+  <div class="mx-cell"><b>着手前に</b>採用パートナー2社と契約</div>
+</div></div>
+```
+
+ステージ比較にする場合は、列見出しを矢羽根にする（先頭は `.first`、目標ステージだけ `.on`）:
+
+```html
+<div class="matrix" style="--mx-cols:4;--mx-label:96px">
+  <div></div>
+  <div class="mx-h stage first"><small>STAGE 0</small>参入準備</div>
+  <div class="mx-h stage"><small>STAGE 1</small>単拠点稼働</div>
+  <div class="mx-h stage on"><small>STAGE 2</small>面展開</div>
+  <div class="mx-h stage"><small>STAGE 3</small>全国基盤化</div>
+  <div class="mx-label alt">顧客</div>
+  <div class="mx-cell">…</div><div class="mx-cell">…</div>
+  <div class="mx-cell">…</div><div class="mx-cell">…</div>
+</div>
+```
+
 **バブルマップ（SVG）**
 - 軸は左と下の2本＋矢じり、中央に淡い十字ガイドのみ。象限の塗り分けはしない
 - バブルは脇役グレー（`opacity:.85`）、当社・主役だけ濃紺。名前はバブル内か直近に直接ラベル
@@ -311,8 +370,9 @@ SVG系（バブル・ウォーターフォール・折れ線・横棒）の実�
 - [ ] 本文は左揃え、1行の長さは42em以下
 - [ ] 各セクションに `.msg`（メッセージライン）がある
 - [ ] 数字は右揃え・桁区切り・単位明記、表に出所がある
-- [ ] 図解が型（矢羽根・ロードマップ・バブル・ウォーターフォール・折れ線・横棒）に沿っており、
+- [ ] 図解が型（矢羽根・ロードマップ・フレームワーク表・バブル・ウォーターフォール・折れ線・横棒）に沿っており、
       配色は脇役グレー＋主役の濃紺（負値のみレンガ色）、凡例ボックスなしの直接ラベルになっている
+- [ ] フレームワーク表で塗っているのは行ラベル（＋目標ステージ）だけで、中身のセルは枠なし・背景なし
 - [ ] 印刷プレビュー（A4）で表・図が泣き別れしない
 
 ## トーン
