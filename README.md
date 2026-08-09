@@ -16,6 +16,7 @@
 
 | スキル | 種別 | 一言 | パス |
 |---|---|---|---|
+| **Deep Research Report** `deep-research-report` | コピペ型／エージェント型 | Deep Researchの長文を、会議に出せるレポートに編集する | [`skills/deep-research-report/`](./skills/deep-research-report/) |
 | **HTML資料デザイン** `html-report-design` | コピペ型／エージェント型 | AIのダサいHTML出力を、コンサル品質の配布資料にする | [`skills/html-report-design/`](./skills/html-report-design/) |
 | **Find Skills JA** `find-skills-ja` | エージェント型 | 日本語で聞くだけでスキルが見つかる | [`skills/find-skills-ja/`](./skills/find-skills-ja/) |
 | **企業ディープダイブ** `company-deep-dive-report` | エージェント型 | 企業の儲け方と次に起きることを、根拠付きで分解する | [`skills/company-deep-dive-report/`](./skills/company-deep-dive-report/) |
@@ -75,6 +76,7 @@ Copy-Item -Recurse -Force .\skills\issue-structuring "$HOME\.agents\skills\issue
 
 | ID | 名前 | 種別 | 状態 |
 |---|---|---|---|
+| deep-research-report | Deep Research Report | コピペ型／エージェント型 | v0.1 |
 | html-report-design | HTML資料デザイン | コピペ型／エージェント型 | v0.1 |
 | find-skills-ja | Find Skills JA | エージェント型 | v0.2 |
 | company-deep-dive-report | 企業ディープダイブ・レポート | エージェント型 | v0.1 |
@@ -104,6 +106,7 @@ kotetsu-work-ai-skills/
 ├── ROADMAP.md
 ├── LICENSE
 ├── skills/
+│   ├── deep-research-report/ # コピペ型／エージェント型
 │   ├── html-report-design/   # コピペ型／エージェント型
 │   ├── find-skills-ja/       # エージェント型
 │   ├── company-deep-dive-report/ # エージェント型

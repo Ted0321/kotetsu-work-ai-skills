@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>国内企業の生成AI導入 — 調査サマリーと示唆（デモ）</title>
+<style>
+/* deep-research-report v0.1 — html-report-design のデザインシステムを同梱 */
+:root{
+  --ink:#1a1a1a;--ink-2:#555555;--ink-3:#8e8e8e;
+  --accent:#173f66;--accent-tint:#eef3f8;
+  --hairline:#d9d9d9;--fill-gray:#e7e9ec;--paper:#ffffff;
+}
+html{color-scheme:light}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Helvetica Neue",Arial,"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic Medium","Yu Gothic",Meiryo,sans-serif;
+  font-size:15px;line-height:1.9;border-top:6px solid var(--accent);-webkit-font-smoothing:antialiased}
+.page{max-width:760px;margin:0 auto;padding:56px clamp(24px,6vw,48px) 96px}
+.doc-header{padding-bottom:28px;border-bottom:1px solid var(--ink)}
+.eyebrow{font-size:11px;letter-spacing:.16em;color:var(--ink-3);text-transform:uppercase;margin:0 0 20px}
+h1{font-size:27px;line-height:1.5;letter-spacing:.02em;margin:0 0 12px;font-feature-settings:"palt" 1}
+.lead{font-size:14px;color:var(--ink-2);margin:0 0 24px;max-width:38em}
+.doc-meta{font-size:12px;color:var(--ink-3);display:flex;gap:24px;flex-wrap:wrap}
+.page>section{border-top:1px solid var(--hairline);padding-top:44px;margin-top:64px}
+.page>section:first-of-type{border-top:0;padding-top:0;margin-top:56px}
+h2{font-size:19px;letter-spacing:.03em;margin:0;font-feature-settings:"palt" 1}
+h2 .no{color:var(--accent);margin-right:14px;font-variant-numeric:tabular-nums}
+.msg{font-size:16px;font-weight:600;line-height:1.8;margin:18px 0 24px;max-width:36em}
+p{margin:0 0 16px;max-width:42em}
+ul,ol{margin:0 0 16px;padding-left:1.4em;max-width:41em}
+li{margin-bottom:6px}
+ul{list-style:none;padding-left:1.2em}
+ul li::before{content:"–";float:left;margin-left:-1.2em;color:var(--ink-3)}
+.summary{list-style:none;margin:24px 0 0;padding:0;counter-reset:s;max-width:44em}
+.summary li{counter-increment:s;position:relative;padding-left:2.4em;margin-bottom:14px}
+.summary li::before{content:counter(s,decimal-leading-zero);position:absolute;left:0;top:.4em;
+  font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.kpis{display:flex;flex-wrap:wrap;row-gap:24px;margin:32px 0 8px}
+.kpi{padding:2px 32px}
+.kpi:first-child{padding-left:0}
+.kpi+.kpi{border-left:1px solid var(--hairline)}
+.kpi .v{font-size:30px;font-weight:700;color:var(--accent);line-height:1.3;font-variant-numeric:tabular-nums}
+.kpi .v small{font-size:14px;font-weight:600;margin-left:2px}
+.kpi .l{font-size:11.5px;color:var(--ink-3);letter-spacing:.06em;margin-top:6px}
+.tbl,.fig-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;margin:28px 0 8px;font-size:13px;line-height:1.6}
+caption,figcaption{text-align:left;font-size:12.5px;font-weight:600;margin-bottom:10px}
+th{font-size:12px;font-weight:600;text-align:left;padding:10px 12px;
+  border-top:2px solid var(--ink);border-bottom:1px solid var(--ink);vertical-align:bottom}
+td{padding:10px 12px;border-bottom:1px solid var(--hairline);vertical-align:top}
+th.num,td.num{text-align:right;font-variant-numeric:tabular-nums}
+figure{margin:32px 0 8px}
+figcaption{margin-bottom:14px}
+figure svg{width:100%;height:auto;display:block}
+svg text{font-family:inherit}
+.src{font-size:11.5px;color:var(--ink-3);margin:6px 0 0}
+.note{font-size:12.5px;color:var(--ink-2);border-left:2px solid var(--hairline);
+  padding:2px 0 2px 14px;margin:24px 0 16px;max-width:40em}
+.matrix{display:grid;grid-template-columns:var(--mx-label,140px) repeat(var(--mx-cols,2),1fr);
+  gap:18px 20px;margin:28px 0 8px;min-width:560px}
+.mx-h{font-size:11.5px;font-weight:600;color:var(--ink-2);text-align:center;
+  align-self:end;padding-bottom:8px;border-bottom:1px solid var(--ink)}
+.mx-label{background:var(--accent);color:#fff;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;gap:2px;
+  font-size:12px;font-weight:700;line-height:1.5;padding:12px 10px}
+.mx-label small{font-size:10px;font-weight:600;opacity:.7;letter-spacing:.08em}
+.mx-label.alt{background:var(--fill-gray);color:var(--ink)}
+.mx-cell{font-size:12px;line-height:1.75}
+.mx-h.stage{border-bottom:0;background:var(--fill-gray);color:var(--ink);padding:7px 8px;line-height:1.4;
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,0 100%,10px 50%)}
+.mx-h.stage.first{clip-path:polygon(0 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,0 100%)}
+.mx-h.stage.on{background:var(--accent);color:#fff}
+.mx-h.stage small{display:block;font-size:9.5px;font-weight:600;opacity:.7;letter-spacing:.06em}
+b,strong{font-weight:700}
+/* 出典一覧（deep-research-report 追加コンポーネント） */
+.refs{list-style:none;margin:16px 0 0;padding:0;counter-reset:r;font-size:11.5px;color:var(--ink-3)}
+.refs li{counter-increment:r;position:relative;padding-left:2.2em;margin-bottom:5px;line-height:1.7}
+.refs li::before{content:"[" counter(r) "]";position:absolute;left:0;font-variant-numeric:tabular-nums}
+.refs li::after{content:none}
+.doc-footer{margin-top:88px;padding-top:20px;border-top:1px solid var(--hairline);
+  font-size:11.5px;color:var(--ink-3);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+@media print{
+  @page{size:A4;margin:16mm}
+  body{border-top-width:4px}
+  .page{max-width:none;padding:0}
+  .page>section{margin-top:48px;padding-top:32px}
+  table,figure,.kpis,.matrix{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="doc-header">
+    <p class="eyebrow">Sample — 社外秘（架空データ）</p>
+    <h1>国内企業の生成AI導入 — 「導入68%・定着31%」のギャップをどう埋めるか</h1>
+    <p class="lead">公開調査・実態調査・事例研究を統合し、導入状況・部門別活用・課題・先行企業の共通項を整理した上で、来期に取るべき打ち手を提示する。</p>
+    <div class="doc-meta">
+      <span>2026年8月9日</span>
+      <span>調査チーム</span>
+      <span>社内共有用</span>
+    </div>
+  </header>
+
+  <section>
+    <h2>エグゼクティブサマリー</h2>
+    <ol class="summary">
+      <li><b>導入は進んだが、使われていない。</b>導入率は5年で18%→68%に達した一方、週次利用が定着した企業は31%。「導入と定着のギャップ」が最大の論点である。</li>
+      <li>分かれ目は<b>ツール配布ではなく業務組み込み</b>。プロセスに組み込んだ先行企業の時間削減効果は31%と、全体平均18%の1.7倍に達する。</li>
+      <li>打ち手は<b>経営直下の推進組織・効果指標の設計・部門を絞った組み込み</b>の3点。来期は「ステージ2: 業務組み込み」への到達を目標に置くべきである。</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2><span class="no">01</span>導入状況 — 導入率は68%、しかし定着は31%</h2>
+    <p class="msg">導入率は5年連続で上昇し68%に到達。ただし「週次で使う部門が過半」の企業は31%にとどまり、導入企業の半数以上で生成AIは日常的に使われていない。</p>
+
+    <div class="kpis">
+      <div class="kpi">
+        <div class="v">68<small>%</small></div>
+        <div class="l">導入率（2026年度）</div>
+      </div>
+      <div class="kpi">
+        <div class="v">31<small>%</small></div>
+        <div class="l">定着率（週次利用が過半）</div>
+      </div>
+      <div class="kpi">
+        <div class="v">1,200<small>万円</small></div>
+        <div class="l">年間投資額の中央値</div>
+      </div>
+    </div>
+
+    <figure>
+      <figcaption>図表1: 生成AI導入率の推移（%）</figcaption>
+      <svg viewBox="0 0 640 240" role="img" aria-label="導入率の推移の折れ線グラフ。2022年度18%から2026年度68%まで上昇し、2028年度は85%超の予測。">
+        <line x1="40" y1="155" x2="560" y2="155" stroke="#efefef" stroke-width="1"/>
+        <line x1="40" y1="100" x2="560" y2="100" stroke="#efefef" stroke-width="1"/>
+        <line x1="40" y1="45" x2="560" y2="45" stroke="#efefef" stroke-width="1"/>
+        <line x1="40" y1="210" x2="560" y2="210" stroke="#d9d9d9" stroke-width="1"/>
+        <text x="34" y="214" text-anchor="end" font-size="10.5" fill="#8e8e8e">0</text>
+        <text x="34" y="159" text-anchor="end" font-size="10.5" fill="#8e8e8e">25</text>
+        <text x="34" y="104" text-anchor="end" font-size="10.5" fill="#8e8e8e">50</text>
+        <text x="34" y="49" text-anchor="end" font-size="10.5" fill="#8e8e8e">75</text>
+        <polyline points="40,170.4 143,146.2 246,119.8 349,91.2 452,60.4" fill="none" stroke="#173f66" stroke-width="2.5"/>
+        <polyline points="452,60.4 560,23" fill="none" stroke="#173f66" stroke-width="2.5" stroke-dasharray="5 4"/>
+        <circle cx="452" cy="60.4" r="3.5" fill="#173f66"/>
+        <text x="40" y="190" text-anchor="middle" font-size="11.5" fill="#555555">18</text>
+        <text x="452" y="47" text-anchor="middle" font-size="12" font-weight="700" fill="#173f66">68</text>
+        <text x="556" y="16" text-anchor="end" font-size="12" font-weight="700" fill="#173f66">85超</text>
+        <text x="40" y="232" text-anchor="middle" font-size="11" fill="#8e8e8e">'22</text>
+        <text x="143" y="232" text-anchor="middle" font-size="11" fill="#8e8e8e">'23</text>
+        <text x="246" y="232" text-anchor="middle" font-size="11" fill="#8e8e8e">'24</text>
+        <text x="349" y="232" text-anchor="middle" font-size="11" fill="#8e8e8e">'25</text>
+        <text x="452" y="232" text-anchor="middle" font-size="11" fill="#8e8e8e">'26</text>
+        <text x="560" y="232" text-anchor="middle" font-size="11" fill="#8e8e8e">'28F</text>
+      </svg>
+      <p class="src">出所: 年次利用実態調査 [1][4]。'28Fは「85%超」との予測値。点線は予測（本資料のデータはすべて架空）</p>
+    </figure>
+
+    <p>企業規模による格差は拡大しており、大企業（1,000名以上）の導入率81%に対し、中堅企業62%・中小企業44%と開きがある[2]。投資は今後も<b>年率40%前後で拡大</b>し、2028年度には導入率85%超との予測が示されている[3][4]。</p>
+    <p class="note">注: 「導入」は一部部門での業務利用を含む。「定着」は週次利用者が過半の部門を持つ企業の割合 [1]。</p>
+  </section>
+
+  <section>
+    <h2><span class="no">02</span>部門別 — ユースケースが明確な部門から進む</h2>
+    <p class="msg">活用率は営業企画62%から人事24%まで大きな差。先行3部門はユースケースが明確で、ここから着手して横展開するのが現実的である。</p>
+
+    <figure>
+      <figcaption>図表2: 部門別の活用率（%）</figcaption>
+      <svg viewBox="0 0 640 240" role="img" aria-label="部門別活用率の横棒グラフ。営業企画62、マーケティング58、開発55、カスタマーサポート41、経理・財務28、人事24パーセント。">
+        <line x1="150" y1="0" x2="150" y2="234" stroke="#d9d9d9" stroke-width="1"/>
+        <text x="142" y="17" text-anchor="end" font-size="12.5" fill="#173f66" font-weight="700">営業企画</text>
+        <rect x="150" y="2" width="406" height="22" fill="#173f66"/>
+        <text x="564" y="17" font-size="12" fill="#173f66" font-weight="700">62</text>
+        <text x="142" y="56" text-anchor="end" font-size="12.5" fill="#173f66" font-weight="700">マーケティング</text>
+        <rect x="150" y="41" width="380" height="22" fill="#173f66"/>
+        <text x="538" y="56" font-size="12" fill="#173f66" font-weight="700">58</text>
+        <text x="142" y="95" text-anchor="end" font-size="12.5" fill="#173f66" font-weight="700">開発</text>
+        <rect x="150" y="80" width="360" height="22" fill="#173f66"/>
+        <text x="518" y="95" font-size="12" fill="#173f66" font-weight="700">55</text>
+        <text x="142" y="134" text-anchor="end" font-size="12.5" fill="#1a1a1a">サポート</text>
+        <rect x="150" y="119" width="269" height="22" fill="#c9ccd1"/>
+        <text x="427" y="134" font-size="12" fill="#555555">41</text>
+        <text x="142" y="173" text-anchor="end" font-size="12.5" fill="#1a1a1a">経理・財務</text>
+        <rect x="150" y="158" width="183" height="22" fill="#c9ccd1"/>
+        <text x="341" y="173" font-size="12" fill="#555555">28</text>
+        <text x="142" y="212" text-anchor="end" font-size="12.5" fill="#1a1a1a">人事</text>
+        <rect x="150" y="197" width="157" height="22" fill="#c9ccd1"/>
+        <text x="315" y="212" font-size="12" fill="#555555">24</text>
+      </svg>
+      <p class="src">注: 濃紺は着手を推奨する先行3部門。出所: 部門別活用実態調査 [5]（架空データ）</p>
+    </figure>
+
+    <p>サポート部門は顧客対応品質への懸念、経理・人事は機密情報の制約が普及を抑えている[5][6]。効果面では、対象業務の時間削減が<b>全体平均18%に対し先行企業は31%</b>と1.7倍の差がついており[7]、差の要因は次章以降の「進め方」にある。</p>
+  </section>
+
+  <section>
+    <h2><span class="no">03</span>課題 — 上位4課題はすべて「体制と設計」の問題</h2>
+    <p class="msg">挙げられる課題はセキュリティ47%・人材41%・ROI38%・データ整備33%。いずれもツールの性能ではなく、受け入れ側の体制と設計の問題である。</p>
+
+    <figure>
+    <figcaption>図表3: 上位4課題の実態と対応</figcaption>
+    <div class="fig-scroll">
+    <div class="matrix">
+      <div class="mx-h"></div>
+      <div class="mx-h">実態</div>
+      <div class="mx-h">対応の方向</div>
+
+      <div class="mx-label"><small>47%</small>セキュリティ懸念</div>
+      <div class="mx-cell">情報漏洩への不安。ポリシー整備が追いつかない</div>
+      <div class="mx-cell">入力データの取扱ルール整備と、学習に使われない法人プランの採用 [6]</div>
+
+      <div class="mx-label"><small>41%</small>推進人材の不足</div>
+      <div class="mx-cell">業務を理解して組み込みを設計できる人材が社内に少ない</div>
+      <div class="mx-cell">外部採用は困難。業務部門からの育成・兼任で確保する [8]</div>
+
+      <div class="mx-label"><small>38%</small>ROIが不明確</div>
+      <div class="mx-cell">時間削減の測定方法が未確立で、投資判断の根拠を示せない</div>
+      <div class="mx-cell">導入初期から時間削減率・利用率の指標を設計する [7]</div>
+
+      <div class="mx-label"><small>33%</small>データ整備の遅れ</div>
+      <div class="mx-cell">社内文書・ナレッジが構造化されていない</div>
+      <div class="mx-cell">参照させたい業務からデータ整備の優先順位を付ける [6]</div>
+    </div>
+    </div>
+    <p class="src">出所: 複数調査の共通上位項目 [6][8]（架空データ）</p>
+    </figure>
+  </section>
+
+  <section>
+    <h2><span class="no">04</span>成熟度 — 69%がステージ1以下。差は「業務組み込み」で開く</h2>
+    <p class="msg">企業の分布はステージ0・1で69%を占める。先行企業の共通項は推進組織・業務組み込み・指標の3点であり、ステージ2への移行がそのまま競争力の差になる。</p>
+
+    <figure>
+    <figcaption>図表4: 生成AI活用の成熟度ステージと企業分布</figcaption>
+    <div class="fig-scroll">
+    <div class="matrix" style="--mx-cols:4;--mx-label:96px;min-width:620px">
+      <div></div>
+      <div class="mx-h stage first"><small>STAGE 0 — 32%</small>様子見</div>
+      <div class="mx-h stage"><small>STAGE 1 — 37%</small>ツール配布</div>
+      <div class="mx-h stage on"><small>STAGE 2 — 24%</small>業務組み込み</div>
+      <div class="mx-h stage"><small>STAGE 3 — 7%</small>全社基盤化</div>
+
+      <div class="mx-label alt">推進体制</div>
+      <div class="mx-cell">担当不在</div>
+      <div class="mx-cell">情シスが兼務</div>
+      <div class="mx-cell">経営直下の専任組織</div>
+      <div class="mx-cell">全部門に推進役</div>
+
+      <div class="mx-label alt">使い方</div>
+      <div class="mx-cell">個人の試用のみ</div>
+      <div class="mx-cell">ライセンス配布で終わる</div>
+      <div class="mx-cell">業務プロセスに組み込み</div>
+      <div class="mx-cell">社内基盤・データ連携</div>
+
+      <div class="mx-label alt">効果</div>
+      <div class="mx-cell">測定していない</div>
+      <div class="mx-cell">利用率のみ把握</div>
+      <div class="mx-cell">時間削減31%を定期測定</div>
+      <div class="mx-cell">経営指標に組み込み</div>
+    </div>
+    </div>
+    <p class="src">注: 濃紺は来期の到達目標。分布は [1][9]、先行企業の共通項は [7][9] より（架空データ）</p>
+    </figure>
+  </section>
+
+  <section>
+    <h2><span class="no">05</span>示唆 — 来期は「ステージ2到達」を目標に3つの打ち手</h2>
+    <p class="msg">導入率は2〜3年でコモディティ化する。差がつくのは「業務に組み込めているか」であり、来期は次の3点に投資を集中すべきである。</p>
+
+    <div class="tbl">
+    <table>
+      <caption>図表5: 推奨する打ち手</caption>
+      <thead>
+        <tr>
+          <th style="width:34%">打ち手</th>
+          <th>ねらい</th>
+          <th>着手</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>経営直下の推進組織の設置</td>
+          <td>部門横断の意思決定を迅速化。部門任せでは組み込みが進まない</td>
+          <td>来期初</td>
+        </tr>
+        <tr>
+          <td>効果指標の設計（時間削減率・利用率）</td>
+          <td>ROI不明を解消し、投資継続の根拠を作る</td>
+          <td>導入初期から</td>
+        </tr>
+        <tr>
+          <td>先行3部門への業務組み込み→横展開</td>
+          <td>営業企画・マーケ・開発で成功パターンを作り、全社へ広げる</td>
+          <td>四半期単位</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>出典一覧</h2>
+    <ol class="refs">
+      <li>国内IT調査会社「企業における生成AI利用実態調査 2026」</li>
+      <li>同調査 企業規模別クロス集計</li>
+      <li>民間シンクタンク「生成AI市場投資動向レポート 2026」</li>
+      <li>業界アナリストによる市場予測レポート（2026年上期）</li>
+      <li>業界団体「部門別生成AI活用実態調査」</li>
+      <li>情報セキュリティ関連団体「企業のAI利用とリスク対応に関する調査」</li>
+      <li>事例研究「生成AI活用先行企業の定量効果分析」</li>
+      <li>人材サービス会社「AI推進人材の需給に関する調査」</li>
+      <li>コンサルティング会社「企業の生成AI成熟度モデルと事例集」</li>
+      <li>各社公開資料・決算説明資料</li>
+    </ol>
+    <p class="note">確度の注記: 本レポートは元調査の記載のみから構成し、原文にない数値・事実は追加していない。'28Fの導入率は元調査の「85%超」という予測表現をそのまま用いた。</p>
+  </section>
+
+  <footer class="doc-footer">
+    <span>国内企業の生成AI導入 調査サマリー（デモ）</span>
+    <span>本資料のデータ・出典はすべて架空です</span>
+  </footer>
+
+</div>
+</body>
+</html>
