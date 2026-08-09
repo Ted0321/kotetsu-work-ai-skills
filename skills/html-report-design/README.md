@@ -44,14 +44,22 @@ ClaudeやChatGPTにHTMLで資料を作らせると、枠線だらけのカード
 
 ## 導入
 
-### エージェント型（Claude Code / Cursor / Codex）
+### いちばん簡単: Claudeに貼るだけ（デスクトップアプリOK）
+
+Claude Code（デスクトップ版・CLIどちらでも）に、次の1行を貼るだけです。
+
+```text
+https://github.com/Ted0321/kotetsu-work-ai-skills の skills/html-report-design を ~/.claude/skills/ にインストールして
+```
+
+Claudeがリポジトリを取得してスキルを配置します。以後は「この分析、HTMLで資料にして」と
+言うだけで自動発火します。既存のダサいHTMLを渡して「このスキルで直して」でも使えます。
+
+### コマンド派（Claude Code / Cursor / Codex）
 
 ```bash
 npx skills add Ted0321/kotetsu-work-ai-skills@html-report-design
 ```
-
-導入後は「この分析、HTMLで資料にして」と言うだけで自動発火します。
-既存のダサいHTMLを渡して「このスキルで直して」でも使えます。
 
 ### コピペ型（Claude / ChatGPT / Gemini など何でも）
 
