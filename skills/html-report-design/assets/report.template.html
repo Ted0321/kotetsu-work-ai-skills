@@ -8,6 +8,8 @@
 /* ============================================================
    html-report-design v0.1 — コンサル品質のHTML資料デザイン
    原則: 構造は「余白と文字の階層」で作る。線と箱で作らない。
+   図解の配色: 脇役=グレー（面#c9ccd1/地#e7e9ec/線#a8adb5）、
+   主役=濃紺1色、負値のみレンガ色#a33c2e。凡例ではなく直接ラベル。
    ============================================================ */
 :root{
   --ink:#1a1a1a;         /* 本文 */
@@ -16,6 +18,7 @@
   --accent:#173f66;      /* アクセント（濃紺）。クライアントカラーがあれば1色だけ差し替え */
   --accent-tint:#eef3f8; /* アクセント淡色。合計行など最小限に */
   --hairline:#d9d9d9;    /* 罫線 */
+  --fill-gray:#e7e9ec;   /* 図解の脇役の面（矢羽根・ロードマップのバー） */
   --paper:#ffffff;
 }
 html{color-scheme:light}
@@ -58,8 +61,6 @@ ul li::before{content:"–";float:left;margin-left:-1.2em;color:var(--ink-3)}
   font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.04em;
   font-variant-numeric:tabular-nums;
 }
-.summary li::after{content:none}
-.summary li b{font-weight:700}
 
 /* --- KPI（数字は箱に入れず、余白と縦罫で並べる） --- */
 .kpis{display:flex;flex-wrap:wrap;row-gap:24px;margin:32px 0 8px}
@@ -72,6 +73,7 @@ ul li::before{content:"–";float:left;margin-left:-1.2em;color:var(--ink-3)}
 .kpi .l{font-size:11.5px;color:var(--ink-3);letter-spacing:.06em;margin-top:6px}
 
 /* --- 表（縦線なし・横の細罫のみ。数字は右揃え） --- */
+.tbl{overflow-x:auto}
 table{width:100%;border-collapse:collapse;margin:28px 0 8px;font-size:13px;line-height:1.6}
 caption{text-align:left;font-size:12.5px;font-weight:600;margin-bottom:10px}
 th{font-size:12px;font-weight:600;text-align:left;padding:10px 12px;
@@ -86,9 +88,33 @@ figure{margin:32px 0 8px}
 figcaption{font-size:12.5px;font-weight:600;margin-bottom:14px}
 figure svg{width:100%;height:auto;display:block}
 svg text{font-family:inherit}
+.fig-scroll{overflow-x:auto}
 .src{font-size:11.5px;color:var(--ink-3);margin:6px 0 0}
 .note{font-size:12.5px;color:var(--ink-2);border-left:2px solid var(--hairline);
   padding:2px 0 2px 14px;margin:24px 0 16px;max-width:40em}
+
+/* --- 矢羽根（プロセス・バリューチェーン。主役フェーズだけ濃紺） --- */
+.chevrons{display:flex;margin:28px 0 8px;min-width:520px}
+.chev{flex:1;padding:9px 10px 9px 22px;font-size:12px;font-weight:600;line-height:1.5;
+  text-align:center;background:var(--fill-gray);margin-left:4px;
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 50%,calc(100% - 12px) 100%,0 100%,12px 50%)}
+.chev:first-child{margin-left:0;
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 50%,calc(100% - 12px) 100%,0 100%)}
+.chev.on{background:var(--accent);color:#fff}
+.chev small{display:block;font-size:10.5px;font-weight:500;opacity:.75}
+
+/* --- ロードマップ（列=時間、行=ワークストリーム。縦のグリッド線は引かない） --- */
+.roadmap{min-width:560px;margin:28px 0 8px}
+.rm-row{display:grid;grid-template-columns:120px repeat(6,1fr);align-items:center}
+.rm-row.rm-head{border-bottom:1px solid var(--ink)}
+.rm-h{font-size:11px;font-weight:600;color:var(--ink-3);text-align:center;
+  padding:0 0 8px;letter-spacing:.04em}
+.rm-row:not(.rm-head){border-bottom:1px solid var(--hairline);padding:12px 0}
+.rm-lane{font-size:12px;font-weight:600;padding-right:12px;line-height:1.5}
+.rm-bar{font-size:11px;font-weight:600;line-height:1.4;padding:4px 10px;
+  background:var(--fill-gray);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rm-bar.on{background:var(--accent);color:#fff}
+.rm-ms{font-size:11.5px;font-weight:700;color:var(--accent);white-space:nowrap}
 
 /* --- 強調（色の強調はアクセント1色・重要な数字だけ） --- */
 b,strong{font-weight:700}
@@ -106,7 +132,7 @@ a:hover{text-decoration-color:var(--accent)}
   body{border-top-width:4px}
   .page{max-width:none;padding:0}
   .page>section{margin-top:48px;padding-top:32px}
-  table,figure,.kpis{break-inside:avoid}
+  table,figure,.kpis,.chevrons,.roadmap{break-inside:avoid}
   a{text-decoration:none}
 }
 </style>
@@ -117,7 +143,7 @@ a:hover{text-decoration-color:var(--accent)}
   <header class="doc-header">
     <p class="eyebrow">Sample — 社外秘（架空データ）</p>
     <h1>EC物流代行市場への参入評価と推奨アクション</h1>
-    <p class="lead">2027年度事業計画に向け、EC物流代行（3PL）市場への参入可否を市場性・競合・リスクの3点から評価し、推奨アクションを提示する。</p>
+    <p class="lead">2027年度事業計画に向け、EC物流代行（3PL）市場への参入可否を市場性・競合・事業計画・リスクの4点から評価し、推奨アクションを提示する。</p>
     <div class="doc-meta">
       <span>2026年8月9日</span>
       <span>経営企画部</span>
@@ -136,7 +162,7 @@ a:hover{text-decoration-color:var(--accent)}
 
   <section>
     <h2><span class="no">01</span>市場性 — 拡大が続き、特化領域に空白がある</h2>
-    <p class="msg">EC物流代行市場は1,530億円・年率+12%で拡大。うち化粧品・ヘルスケアは325億円と3番目の規模だが、専業対応できる事業者が最も少ない。</p>
+    <p class="msg">EC物流代行市場は1,530億円・年率+12%で拡大。うち化粧品・ヘルスケアは325億円と3番目の規模だが、成長率は市場全体を大きく上回る。</p>
 
     <div class="kpis">
       <div class="kpi">
@@ -176,6 +202,36 @@ a:hover{text-decoration-color:var(--accent)}
       <p class="src">出所: 業界レポートより当社推計（本資料は架空のサンプルデータ）</p>
     </figure>
 
+    <figure>
+      <figcaption>図表2: 市場規模の推移 — 化粧品セグメントが市場全体を上回る成長（2022年度=100）</figcaption>
+      <svg viewBox="0 0 640 250" role="img" aria-label="市場全体と化粧品セグメントの成長推移の折れ線グラフ。2022年度を100とした指数で、2028年度に市場全体198、化粧品253。2027年度以降は予測で破線。">
+        <line x1="40" y1="157.2" x2="560" y2="157.2" stroke="#efefef" stroke-width="1"/>
+        <line x1="40" y1="99.4" x2="560" y2="99.4" stroke="#efefef" stroke-width="1"/>
+        <line x1="40" y1="41.6" x2="560" y2="41.6" stroke="#efefef" stroke-width="1"/>
+        <line x1="40" y1="215" x2="560" y2="215" stroke="#d9d9d9" stroke-width="1"/>
+        <text x="34" y="219" text-anchor="end" font-size="10.5" fill="#8e8e8e">100</text>
+        <text x="34" y="161" text-anchor="end" font-size="10.5" fill="#8e8e8e">150</text>
+        <text x="34" y="103" text-anchor="end" font-size="10.5" fill="#8e8e8e">200</text>
+        <text x="34" y="45" text-anchor="end" font-size="10.5" fill="#8e8e8e">250</text>
+        <polyline points="40,215 126.7,200 213.3,184.9 300,165.3 386.7,146.8" fill="none" stroke="#a8adb5" stroke-width="2"/>
+        <polyline points="386.7,146.8 473.3,124.8 560,101.7" fill="none" stroke="#a8adb5" stroke-width="2" stroke-dasharray="5 4"/>
+        <polyline points="40,215 126.7,198.8 213.3,179.2 300,153.7 386.7,121.3" fill="none" stroke="#173f66" stroke-width="2.5"/>
+        <polyline points="386.7,121.3 473.3,83.2 560,38.1" fill="none" stroke="#173f66" stroke-width="2.5" stroke-dasharray="5 4"/>
+        <circle cx="560" cy="101.7" r="3" fill="#a8adb5"/>
+        <circle cx="560" cy="38.1" r="3.5" fill="#173f66"/>
+        <text x="568" y="42" font-size="12" fill="#173f66" font-weight="700">化粧品 253</text>
+        <text x="568" y="106" font-size="12" fill="#555555">市場全体 198</text>
+        <text x="40" y="240" text-anchor="middle" font-size="11" fill="#8e8e8e">'22</text>
+        <text x="126.7" y="240" text-anchor="middle" font-size="11" fill="#8e8e8e">'23</text>
+        <text x="213.3" y="240" text-anchor="middle" font-size="11" fill="#8e8e8e">'24</text>
+        <text x="300" y="240" text-anchor="middle" font-size="11" fill="#8e8e8e">'25</text>
+        <text x="386.7" y="240" text-anchor="middle" font-size="11" fill="#8e8e8e">'26</text>
+        <text x="473.3" y="240" text-anchor="middle" font-size="11" fill="#8e8e8e">'27F</text>
+        <text x="560" y="240" text-anchor="middle" font-size="11" fill="#8e8e8e">'28F</text>
+      </svg>
+      <p class="src">出所: 業界レポートより当社推計。点線は予測（本資料は架空のサンプルデータ）</p>
+    </figure>
+
     <p>成長ドライバーはEC化率の上昇そのものではなく、<b>中堅EC事業者の「物流内製の限界」</b>にある。月間出荷1〜5万件の事業者は自社倉庫では採算が合わず、大手3PLからは優先度を下げられており、この帯を狙った専業サービスが立ち上がりつつある。</p>
     <p class="note">注: 市場規模はフルフィルメント受託（保管・梱包・出荷）のみを対象とし、幹線輸送・ラストワンマイルは含まない。</p>
   </section>
@@ -184,8 +240,36 @@ a:hover{text-decoration-color:var(--accent)}
     <h2><span class="no">02</span>競合 — 障壁の高い領域で正面競合は1社</h2>
     <p class="msg">化粧品・ヘルスケア領域で求められる温度管理と薬機法対応を両立できるのは、現状A社と当社のみ。A社は関東に集中しており、西日本に空白がある。</p>
 
+    <figure>
+      <figcaption>図表3: 競合ポジショニング — 規制対応で戦う象限は空いている</figcaption>
+      <svg viewBox="0 0 640 400" role="img" aria-label="競合ポジショニングのバブルマップ。縦軸は規制・品質対応力、横軸は価格競争力。A社と当社が規制対応の高い象限に位置し、B社とC社は価格軸の象限に位置する。バブルの大きさは売上規模。">
+        <line x1="340" y1="30" x2="340" y2="355" stroke="#ececec" stroke-width="1"/>
+        <line x1="65" y1="190" x2="615" y2="190" stroke="#ececec" stroke-width="1"/>
+        <line x1="60" y1="360" x2="620" y2="360" stroke="#8e8e8e" stroke-width="1"/>
+        <polygon points="620,360 610,356 610,364" fill="#8e8e8e"/>
+        <line x1="60" y1="360" x2="60" y2="20" stroke="#8e8e8e" stroke-width="1"/>
+        <polygon points="60,20 56,30 64,30" fill="#8e8e8e"/>
+        <text x="620" y="382" text-anchor="end" font-size="11" fill="#8e8e8e">価格競争力</text>
+        <text transform="rotate(-90 38 190)" x="38" y="190" text-anchor="middle" font-size="11" fill="#8e8e8e">規制・品質対応力</text>
+        <text x="78" y="48" font-size="11" fill="#8e8e8e">規制対応で戦うゾーン</text>
+        <circle cx="490" cy="295" r="30" fill="#c9ccd1" opacity=".85"/>
+        <text x="490" y="299" text-anchor="middle" font-size="12" fill="#1a1a1a">B社</text>
+        <circle cx="330" cy="290" r="25" fill="#c9ccd1" opacity=".85"/>
+        <text x="330" y="294" text-anchor="middle" font-size="12" fill="#1a1a1a">C社</text>
+        <circle cx="295" cy="100" r="34" fill="#c9ccd1" opacity=".85"/>
+        <text x="295" y="104" text-anchor="middle" font-size="12" fill="#1a1a1a">A社</text>
+        <circle cx="165" cy="135" r="18" fill="#173f66"/>
+        <text x="165" y="139" text-anchor="middle" font-size="11.5" font-weight="700" fill="#ffffff">当社</text>
+        <text x="165" y="172" text-anchor="middle" font-size="10.5" fill="#173f66">（5年目・計画）</text>
+      </svg>
+      <p class="src">注: バブルの大きさは売上規模（当社は5年目の計画値）。出所: 各社公開資料より作成（架空のサンプルデータ）</p>
+    </figure>
+
+    <p>価格軸で戦うB社・C社に対し、A社だけが規制対応を武器に高マージンを確保している。当社が参入すべきはこの<b>「規制対応で戦うゾーン」</b>であり、価格競争の象限には近づかない。</p>
+
+    <div class="tbl">
     <table>
-      <caption>図表2: 主要競合の比較（2026年度、サンプル）</caption>
+      <caption>図表4: 主要競合の比較（2026年度、サンプル）</caption>
       <thead>
         <tr>
           <th>社名</th>
@@ -226,17 +310,75 @@ a:hover{text-decoration-color:var(--accent)}
         </tr>
       </tbody>
     </table>
+    </div>
     <p class="src">出所: 各社公開資料より作成（本資料は架空のサンプルデータ）</p>
 
-    <p>価格で戦うB社型ではなく、<b>規制対応と品質を売るA社型</b>のポジションを取る。A社との地理的な棲み分けが効く3年の間に、西日本でのシェアを固めることが参入の前提条件になる。</p>
+    <figure>
+      <figcaption>図表5: バリューチェーンと当社の提供領域</figcaption>
+      <div class="fig-scroll">
+      <div class="chevrons">
+        <div class="chev">集荷・入庫</div>
+        <div class="chev on">保管<small>温度管理・薬機法</small></div>
+        <div class="chev on">流通加工<small>ギフト・同梱</small></div>
+        <div class="chev on">出荷<small>当日カットオフ</small></div>
+        <div class="chev">配送<small>パートナー連携</small></div>
+      </div>
+      </div>
+      <p class="src">注: 濃紺は当社の自社提供領域。集荷・配送は既存3PLパートナーと連携する（架空のサンプル）</p>
+    </figure>
+
+    <p>提供領域は<b>保管〜出荷に絞る</b>。既存の温度管理倉庫と製薬向け品質管理体制をそのまま転用でき、A社との地理的な棲み分けが効く3年の間に西日本でのシェアを固めることが参入の前提条件になる。</p>
   </section>
 
   <section>
-    <h2><span class="no">03</span>リスク — 最大の変数は人員確保</h2>
+    <h2><span class="no">03</span>事業計画 — 3年目に黒字転換、5年累計で回収</h2>
+    <p class="msg">初期投資8.0億円は5年累計で回収する計画。3年目に単年黒字へ転換し、4年目以降は年3億円超のキャッシュを創出する。</p>
+
+    <figure>
+      <figcaption>図表6: 投資回収の見通し — 累計キャッシュフローの内訳（億円）</figcaption>
+      <svg viewBox="0 0 640 300" role="img" aria-label="投資回収のウォーターフォールチャート。初期投資マイナス8.0億円、1年目マイナス1.5、2年目マイナス0.3、3年目プラス2.1、4年目プラス3.4、5年目プラス4.6億円で、5年累計はプラス0.3億円。">
+        <line x1="40" y1="52" x2="620" y2="52" stroke="#d9d9d9" stroke-width="1"/>
+        <rect x="60" y="52" width="56" height="176" fill="#a33c2e"/>
+        <text x="88" y="243" text-anchor="middle" font-size="11.5" font-weight="700" fill="#a33c2e">▲8.0</text>
+        <line x1="116" y1="228" x2="144" y2="228" stroke="#d9d9d9" stroke-width="1"/>
+        <rect x="144" y="228" width="56" height="33" fill="#a33c2e"/>
+        <text x="172" y="276" text-anchor="middle" font-size="11.5" font-weight="700" fill="#a33c2e">▲1.5</text>
+        <line x1="200" y1="261" x2="228" y2="261" stroke="#d9d9d9" stroke-width="1"/>
+        <rect x="228" y="261" width="56" height="6.6" fill="#a33c2e"/>
+        <text x="256" y="282" text-anchor="middle" font-size="11.5" font-weight="700" fill="#a33c2e">▲0.3</text>
+        <line x1="284" y1="267.6" x2="312" y2="267.6" stroke="#d9d9d9" stroke-width="1"/>
+        <rect x="312" y="221.4" width="56" height="46.2" fill="#173f66"/>
+        <text x="340" y="215" text-anchor="middle" font-size="11.5" font-weight="700" fill="#173f66">+2.1</text>
+        <line x1="368" y1="221.4" x2="396" y2="221.4" stroke="#d9d9d9" stroke-width="1"/>
+        <rect x="396" y="146.6" width="56" height="74.8" fill="#173f66"/>
+        <text x="424" y="140" text-anchor="middle" font-size="11.5" font-weight="700" fill="#173f66">+3.4</text>
+        <line x1="452" y1="146.6" x2="480" y2="146.6" stroke="#d9d9d9" stroke-width="1"/>
+        <rect x="480" y="45.4" width="56" height="101.2" fill="#173f66"/>
+        <text x="508" y="39" text-anchor="middle" font-size="11.5" font-weight="700" fill="#173f66">+4.6</text>
+        <line x1="536" y1="45.4" x2="564" y2="45.4" stroke="#d9d9d9" stroke-width="1"/>
+        <rect x="564" y="45.4" width="56" height="6.6" fill="#1a1a1a"/>
+        <text x="592" y="39" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1a1a1a">+0.3</text>
+        <text x="88" y="293" text-anchor="middle" font-size="11" fill="#8e8e8e">初期投資</text>
+        <text x="172" y="293" text-anchor="middle" font-size="11" fill="#8e8e8e">1年目</text>
+        <text x="256" y="293" text-anchor="middle" font-size="11" fill="#8e8e8e">2年目</text>
+        <text x="340" y="293" text-anchor="middle" font-size="11" fill="#8e8e8e">3年目</text>
+        <text x="424" y="293" text-anchor="middle" font-size="11" fill="#8e8e8e">4年目</text>
+        <text x="508" y="293" text-anchor="middle" font-size="11" fill="#8e8e8e">5年目</text>
+        <text x="592" y="293" text-anchor="middle" font-size="11" fill="#8e8e8e">5年累計</text>
+      </svg>
+      <p class="src">注: ▲はマイナス。単年フリーキャッシュフローの積み上げ。出所: 当社試算（架空のサンプルデータ）</p>
+    </figure>
+
+    <p>前提は、稼働2年目に倉庫稼働率75%、アンカー顧客2社からの紹介経由で顧客獲得コストを市場平均の6割に抑えること。<b>感応度としては稼働率が10pt下振れた場合、回収は7年に後ろ倒し</b>となるが、撤退ラインには達しない。</p>
+  </section>
+
+  <section>
+    <h2><span class="no">04</span>リスク — 最大の変数は人員確保</h2>
     <p class="msg">事業リスクのうち投資判断に影響するのは倉庫人員の確保のみ。他は参入後の運用で吸収可能と評価する。</p>
 
+    <div class="tbl">
     <table>
-      <caption>図表3: 主要リスクの評価と対応</caption>
+      <caption>図表7: 主要リスクの評価と対応</caption>
       <thead>
         <tr>
           <th>リスク</th>
@@ -262,14 +404,16 @@ a:hover{text-decoration-color:var(--accent)}
         </tr>
       </tbody>
     </table>
+    </div>
   </section>
 
   <section>
-    <h2><span class="no">04</span>推奨アクション</h2>
+    <h2><span class="no">05</span>推奨アクション</h2>
     <p class="msg">本会議では「条件付き参入」の承認を求める。投資実行の判断は、下記2件の完了を条件に12月の経営会議で行う。</p>
 
+    <div class="tbl">
     <table>
-      <caption>図表4: 次のアクション</caption>
+      <caption>図表8: 次のアクション</caption>
       <thead>
         <tr>
           <th style="width:55%">アクション</th>
@@ -295,6 +439,45 @@ a:hover{text-decoration-color:var(--accent)}
         </tr>
       </tbody>
     </table>
+    </div>
+
+    <figure>
+      <figcaption>図表9: 参入ロードマップ — 判断からサービス開始まで12ヶ月</figcaption>
+      <div class="fig-scroll">
+      <div class="roadmap">
+        <div class="rm-row rm-head">
+          <div class="rm-lane"></div>
+          <div class="rm-h">'26/10</div>
+          <div class="rm-h">11月</div>
+          <div class="rm-h">12月</div>
+          <div class="rm-h">'27/1Q</div>
+          <div class="rm-h">2Q</div>
+          <div class="rm-h">3Q</div>
+        </div>
+        <div class="rm-row">
+          <div class="rm-lane">前提条件の充足</div>
+          <div class="rm-bar" style="grid-column:2/4">採用契約・意向表明</div>
+        </div>
+        <div class="rm-row">
+          <div class="rm-lane">投資判断</div>
+          <div class="rm-ms" style="grid-column:4">◆ 最終判断</div>
+        </div>
+        <div class="rm-row">
+          <div class="rm-lane">拠点立ち上げ</div>
+          <div class="rm-bar on" style="grid-column:5/7">西日本1拠点 改修→稼働</div>
+        </div>
+        <div class="rm-row">
+          <div class="rm-lane">営業・受注</div>
+          <div class="rm-bar" style="grid-column:3/8">アンカー2社 → 拡販</div>
+        </div>
+        <div class="rm-row">
+          <div class="rm-lane">サービス開始</div>
+          <div class="rm-ms" style="grid-column:7">◆ サービスイン</div>
+        </div>
+      </div>
+      </div>
+      <p class="src">注: ◆はマイルストーン。濃紺は投資実行後にのみ着手する工程（架空のサンプル）</p>
+    </figure>
   </section>
 
   <footer class="doc-footer">

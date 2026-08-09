@@ -44,6 +44,7 @@ HTMLで資料（報告書・分析メモ・提案書・調査サマリー・ダ�
   --accent:#173f66;      /* アクセント（濃紺）。クライアントカラーがあれば1色だけ差し替え */
   --accent-tint:#eef3f8; /* アクセント淡色。合計行など最小限に */
   --hairline:#d9d9d9;    /* 罫線 */
+  --fill-gray:#e7e9ec;   /* 図解の脇役の面（矢羽根・ロードマップのバー） */
   --paper:#ffffff;
 }
 html{color-scheme:light}
@@ -98,6 +99,7 @@ ul li::before{content:"–";float:left;margin-left:-1.2em;color:var(--ink-3)}
 .kpi .l{font-size:11.5px;color:var(--ink-3);letter-spacing:.06em;margin-top:6px}
 
 /* 表（縦線なし・横の細罫のみ。数字は右揃え） */
+.tbl{overflow-x:auto}
 table{width:100%;border-collapse:collapse;margin:28px 0 8px;font-size:13px;line-height:1.6}
 caption{text-align:left;font-size:12.5px;font-weight:600;margin-bottom:10px}
 th{font-size:12px;font-weight:600;text-align:left;padding:10px 12px;
@@ -112,9 +114,33 @@ figure{margin:32px 0 8px}
 figcaption{font-size:12.5px;font-weight:600;margin-bottom:14px}
 figure svg{width:100%;height:auto;display:block}
 svg text{font-family:inherit}
+.fig-scroll{overflow-x:auto}
 .src{font-size:11.5px;color:var(--ink-3);margin:6px 0 0}
 .note{font-size:12.5px;color:var(--ink-2);border-left:2px solid var(--hairline);
   padding:2px 0 2px 14px;margin:24px 0 16px;max-width:40em}
+
+/* 矢羽根（プロセス・バリューチェーン。主役フェーズだけ濃紺） */
+.chevrons{display:flex;margin:28px 0 8px;min-width:520px}
+.chev{flex:1;padding:9px 10px 9px 22px;font-size:12px;font-weight:600;line-height:1.5;
+  text-align:center;background:var(--fill-gray);margin-left:4px;
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 50%,calc(100% - 12px) 100%,0 100%,12px 50%)}
+.chev:first-child{margin-left:0;
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 50%,calc(100% - 12px) 100%,0 100%)}
+.chev.on{background:var(--accent);color:#fff}
+.chev small{display:block;font-size:10.5px;font-weight:500;opacity:.75}
+
+/* ロードマップ（列=時間、行=ワークストリーム。縦のグリッド線は引かない） */
+.roadmap{min-width:560px;margin:28px 0 8px}
+.rm-row{display:grid;grid-template-columns:120px repeat(6,1fr);align-items:center}
+.rm-row.rm-head{border-bottom:1px solid var(--ink)}
+.rm-h{font-size:11px;font-weight:600;color:var(--ink-3);text-align:center;
+  padding:0 0 8px;letter-spacing:.04em}
+.rm-row:not(.rm-head){border-bottom:1px solid var(--hairline);padding:12px 0}
+.rm-lane{font-size:12px;font-weight:600;padding-right:12px;line-height:1.5}
+.rm-bar{font-size:11px;font-weight:600;line-height:1.4;padding:4px 10px;
+  background:var(--fill-gray);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rm-bar.on{background:var(--accent);color:#fff}
+.rm-ms{font-size:11.5px;font-weight:700;color:var(--accent);white-space:nowrap}
 
 /* 強調（色の強調はアクセント1色・重要な数字だけ） */
 b,strong{font-weight:700}
@@ -132,7 +158,7 @@ a:hover{text-decoration-color:var(--accent)}
   body{border-top-width:4px}
   .page{max-width:none;padding:0}
   .page>section{margin-top:48px;padding-top:32px}
-  table,figure,.kpis{break-inside:avoid}
+  table,figure,.kpis,.chevrons,.roadmap{break-inside:avoid}
   a{text-decoration:none}
 }
 ```
@@ -161,7 +187,7 @@ a:hover{text-decoration-color:var(--accent)}
   <section>
     <h2><span class="no">01</span>セクション見出し（トピック）</h2>
     <p class="msg">このセクションで言いたいこと1文（so what）。</p>
-    <!-- 根拠: .kpis / table / figure / 本文 -->
+    <!-- 根拠: .kpis / table / figure（チャート・矢羽根・ロードマップ等の図解） / 本文 -->
   </section>
 
   <!-- 02, 03 … 最後は「推奨アクション」（アクション・オーナー・期限の表） -->
@@ -189,10 +215,82 @@ a:hover{text-decoration-color:var(--accent)}
 - 数字はアクセント色・単位は `<small>`、ラベルは小さくグレー
 
 **チャート（SVG推奨）**
-- 配色は「**脇役は全部グレー #c9ccd1、主役の1系列だけ濃紺 var(--accent)**」。虹色に塗り分けない
+- 配色は「**脇役は全部グレー、主役の1系列だけ濃紺 var(--accent)**」。虹色に塗り分けない
+  （グレーの使い分け: 面 `#c9ccd1`／広い地 `#e7e9ec`／線 `#a8adb5`）
 - 凡例ボックスは作らず、系列名・数値は**バーや線の近くに直接ラベル**
 - 3D・影・グラデ・チャートの外枠は禁止。軸線・グリッドは細いグレーを最小限
-- 負値・悪化を示すときだけレンガ色 `#a33c2e` を追加してよい
+- 負値・悪化を示すときだけレンガ色 `#a33c2e` を追加してよい（マイナスは `▲8.0` 表記）
+- SVGは `viewBox` で書き、CSS側の `figure svg{width:100%;height:auto}` で可変にする
+
+## 図解の型（コンサル図解をHTMLで作る）
+
+「何を伝えたいか」で型を選ぶ。箱と矢印の自由描画はしない。
+
+| 伝えたいこと | 型 | 実装 |
+| --- | --- | --- |
+| プロセス・バリューチェーン・フェーズ | 矢羽根 `.chevrons` | HTML/CSS |
+| 計画・スケジュール・体制の時間軸 | ロードマップ `.roadmap` | HTML/CSS（grid） |
+| 競合・市場の布置（2軸＋規模） | バブルマップ | SVG |
+| 増減の内訳（なぜ増えた／減った） | ウォーターフォール | SVG |
+| 推移・トレンド（実績＋予測） | 折れ線 | SVG |
+| 量の比較・ランキング | 横棒 | SVG |
+
+どの型も共通ルールは同じ: **脇役グレー・主役だけ濃紺・直接ラベル・図表番号と出所つき**。
+SVG系（バブル・ウォーターフォール・折れ線・横棒）の実装見本は `assets/report.template.html` の図表1〜6にある。
+
+**矢羽根（`.chevrons`）**
+- フェーズは5個まで。当社領域・注力フェーズだけ `.on`（濃紺）、他はグレー
+- 補足は各羽根の中に `<small>` で1行。矢印画像や `→` 文字で代用しない
+
+```html
+<div class="fig-scroll"><div class="chevrons">
+  <div class="chev">集荷・入庫</div>
+  <div class="chev on">保管<small>温度管理・薬機法</small></div>
+  <div class="chev on">出荷<small>当日カットオフ</small></div>
+  <div class="chev">配送<small>パートナー連携</small></div>
+</div></div>
+```
+
+**ロードマップ（`.roadmap`）**
+- 列=時間（月・四半期）、行=ワークストリーム。列数を変えるときは `repeat(6,1fr)` を書き換える
+- バーの位置は `style="grid-column:開始列/終了列"`（1列目はレーン名。時間軸は2列目から）
+- 主役のバーだけ `.on`（濃紺）。マイルストーンは `.rm-ms` で `◆ 名称`（絵文字は使わない）
+
+```html
+<div class="fig-scroll"><div class="roadmap">
+  <div class="rm-row rm-head">
+    <div class="rm-lane"></div>
+    <div class="rm-h">10月</div><div class="rm-h">11月</div><div class="rm-h">12月</div>
+    <div class="rm-h">1Q</div><div class="rm-h">2Q</div><div class="rm-h">3Q</div>
+  </div>
+  <div class="rm-row">
+    <div class="rm-lane">前提条件の充足</div>
+    <div class="rm-bar" style="grid-column:2/4">採用契約・意向表明</div>
+  </div>
+  <div class="rm-row">
+    <div class="rm-lane">投資判断</div>
+    <div class="rm-ms" style="grid-column:4">◆ 最終判断</div>
+  </div>
+  <div class="rm-row">
+    <div class="rm-lane">拠点立ち上げ</div>
+    <div class="rm-bar on" style="grid-column:5/7">改修→稼働</div>
+  </div>
+</div></div>
+```
+
+**バブルマップ（SVG）**
+- 軸は左と下の2本＋矢じり、中央に淡い十字ガイドのみ。象限の塗り分けはしない
+- バブルは脇役グレー（`opacity:.85`）、当社・主役だけ濃紺。名前はバブル内か直近に直接ラベル
+- 大きさの意味（売上規模など）は出所行で説明する。サイズ凡例は作らない
+
+**ウォーターフォール（SVG）**
+- 減=レンガ色（`▲`表記）、増=濃紺、合計=黒。バーの間は運用レベルを細いグレー線でつなぐ
+- ゼロラインを細罫で引き、数値は各バーの外側に直接ラベル。Y軸目盛は不要
+
+**折れ線（SVG）**
+- 主役1本だけ濃紺（太め2.5px）、比較線はグレー（2px）。凡例ではなく**線の右端に系列名＋最新値**
+- 予測期間は `stroke-dasharray` の破線で切り替え、出所行に「点線は予測」と明記
+- 水平グリッドは3本程度の淡いグレーまで。縦グリッドは引かない
 
 **注記・出所**
 - データを見せたら `.src`（出所）を必ず添える。推計なら推計と書く
@@ -213,6 +311,8 @@ a:hover{text-decoration-color:var(--accent)}
 - [ ] 本文は左揃え、1行の長さは42em以下
 - [ ] 各セクションに `.msg`（メッセージライン）がある
 - [ ] 数字は右揃え・桁区切り・単位明記、表に出所がある
+- [ ] 図解が型（矢羽根・ロードマップ・バブル・ウォーターフォール・折れ線・横棒）に沿っており、
+      配色は脇役グレー＋主役の濃紺（負値のみレンガ色）、凡例ボックスなしの直接ラベルになっている
 - [ ] 印刷プレビュー（A4）で表・図が泣き別れしない
 
 ## トーン
