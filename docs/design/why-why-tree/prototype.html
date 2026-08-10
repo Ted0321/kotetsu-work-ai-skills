@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>なぜなぜ分析 — 育つロジックツリー（why-why-tree プロトタイプ v0.1）</title>
+</head>
+<body>
+<style>
+/* ============================================================
+   why-why-tree prototype v0.1
+   デザインは kotetsu-work-ai-skills のハウス標準
+   （html-report-design: 紙白・インク黒・グレー2段・濃紺1色・細罫、
+     カード/影/角丸/グラデ禁止）を継承。
+   ページは白い「配布物」の世界観に固定（単一テーマ・全色明示）。
+   ============================================================ */
+:root{
+  --ink:#1a1a1a; --ink-2:#555555; --ink-3:#8e8e8e;
+  --accent:#173f66; --accent-tint:#eef3f8;
+  --hairline:#d9d9d9; --fill-gray:#e7e9ec;
+  --paper:#ffffff; --ground:#eef0f3;
+  --edge:#c2c7cd; --node-border:#c9cdd2;
+  --brick:#a33c2e;
+}
+html{color-scheme:light}
+body{
+  margin:0;background:var(--ground);color:var(--ink);
+  font-family:"Helvetica Neue",Arial,"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic Medium","Yu Gothic",Meiryo,sans-serif;
+  font-size:15px;line-height:1.9;-webkit-font-smoothing:antialiased;
+}
+.page{max-width:1240px;margin:0 auto;padding:40px clamp(20px,4vw,44px) 72px}
+
+/* ---- ドキュメントヘッダー ---- */
+.doc-header{padding-bottom:22px;margin-bottom:26px;border-bottom:1px solid var(--ink)}
+.eyebrow{font-size:11px;letter-spacing:.16em;color:var(--ink-3);text-transform:uppercase;margin:0 0 14px}
+h1{font-size:26px;line-height:1.5;letter-spacing:.02em;margin:0 0 10px;font-feature-settings:"palt" 1;text-wrap:balance}
+.lead{font-size:13.5px;color:var(--ink-2);margin:0 0 16px;max-width:46em}
+.doc-meta{font-size:12px;color:var(--ink-3);display:flex;gap:24px;flex-wrap:wrap}
+
+/* ---- 16:9 ステージ ---- */
+.stage-outer{position:relative;width:100%;aspect-ratio:16/9;background:var(--paper);
+  border:1px solid var(--hairline);border-top:4px solid var(--accent);overflow:hidden}
+.stage{position:absolute;top:0;left:0;width:1280px;height:720px;transform-origin:0 0}
+.noanim, .noanim *{transition:none !important;animation:none !important}
+
+#edges{position:absolute;inset:0;width:1280px;height:720px;pointer-events:none}
+.edge{fill:none;stroke:var(--edge);stroke-width:1.4;stroke-dasharray:1;stroke-dashoffset:1;
+  transition:stroke-dashoffset .55s ease,opacity .5s,stroke .4s,stroke-width .3s}
+.edge.in{stroke-dashoffset:0}
+.edge.e-heavy{stroke-width:2.2}
+
+/* 列見出し */
+.chead{position:absolute;top:14px;font-size:11px;letter-spacing:.14em;color:var(--ink-3);
+  text-transform:uppercase;opacity:0;transition:opacity .5s}
+.chead b{color:var(--accent);font-weight:700;letter-spacing:.06em}
+.chead.in{opacity:1}
+.legend{position:absolute;top:14px;right:20px;font-size:10.5px;color:var(--ink-3);letter-spacing:.04em}
+.legend .mk{color:var(--accent);font-weight:700}
+.legend .mkv{color:var(--brick);font-weight:700}
+
+/* ---- ノード ---- */
+.node{position:absolute;box-sizing:border-box;background:var(--paper);
+  border:1px solid var(--node-border);padding:9px 11px 8px;
+  opacity:0;transform:translateX(-10px);
+  transition:opacity .45s ease,transform .45s ease,border-color .5s}
+.node.in{opacity:1;transform:none}
+.node p{margin:0;font-size:12px;line-height:1.55;letter-spacing:.01em}
+.ntag{display:block;font-size:9.5px;letter-spacing:.18em;color:var(--ink-3);
+  text-transform:uppercase;margin-bottom:3px}
+.nbadge{display:block;font-size:9.5px;letter-spacing:.14em;margin-bottom:3px;font-weight:700}
+.nsub{display:block;font-size:10px;line-height:1.5;color:var(--ink-3);margin-top:4px}
+
+.node.problem{background:var(--ink);border-color:var(--ink)}
+.node.problem p{color:#fff;font-size:12.5px;font-weight:700}
+.node.problem .ntag{color:#9aa0a6}
+.node.problem .nsub{color:#b7bcc2}
+
+.node.root{background:var(--accent);border-color:var(--accent)}
+.node.root p{color:#fff}
+.node.root .nbadge{color:#c8d6e5}
+
+.node.verify .nbadge{color:var(--brick)}
+.node.verify .nsub{color:var(--brick);opacity:.85}
+
+.node.flash{outline:3px solid #cfdcea;outline-offset:2px}
+
+/* 寄与度チップ（なぜ①ノードの右下に重ねる。リフローさせない） */
+.contrib{position:absolute;right:8px;bottom:-11px;font-size:10px;letter-spacing:.04em;
+  padding:1px 7px;background:var(--paper);border:1px solid var(--node-border);color:var(--ink-3);
+  font-variant-numeric:tabular-nums;opacity:0;transition:opacity .5s .1s}
+.contrib.main{background:var(--accent-tint);border-color:#b9cbdc;color:var(--accent);font-weight:700}
+.stage.show-contrib .contrib{opacity:1}
+
+/* 打ち手チップ（本命リーフの右） */
+.action{position:absolute;left:calc(100% + 17px);top:50%;transform:translateY(-50%);
+  width:200px;box-sizing:border-box;background:var(--accent-tint);
+  border-left:3px solid var(--accent);padding:8px 10px;opacity:0;transition:opacity .6s}
+.action::before{content:"";position:absolute;left:-18px;top:50%;width:17px;height:1.5px;background:var(--accent)}
+.action .ntag{color:var(--accent);margin-bottom:2px}
+.action p{font-size:10.5px !important;line-height:1.6 !important;font-weight:400 !important;color:var(--ink) !important}
+.action.show{opacity:1}
+
+/* ---- 本命パスの点灯（他を減光） ---- */
+.stage.focus .node:not(.pn):not(.problem){opacity:.3}
+.stage.focus .edge:not(.pe){opacity:.22}
+.stage.focus .chead{opacity:.4}
+.stage.focus .contrib{opacity:0}
+.stage.focus .contrib.main{opacity:1}
+.stage.focus .edge.pe{stroke:var(--accent);stroke-width:2.6}
+.stage.focus .node.pn{border-color:var(--accent)}
+.stage.focus .node.pn:not(.root){border-width:1.5px;padding:8.5px 10.5px 7.5px}
+
+/* ---- キャプション帯（ステージ内・下部） ---- */
+.caption{position:absolute;left:0;right:0;top:620px;bottom:0;border-top:1px solid var(--hairline);
+  display:flex;align-items:stretch;background:var(--paper)}
+.cap-main{flex:1 1 55%;padding:12px 26px 8px;min-width:0}
+.cap-step{font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--accent);
+  font-variant-numeric:tabular-nums;margin:0 0 2px}
+.cap-title{font-size:15px;font-weight:700;margin:0 0 2px;letter-spacing:.02em}
+.cap-desc{font-size:11px;line-height:1.6;color:var(--ink-2);margin:0;padding-right:8px}
+.cap-main.swap .cap-step,.cap-main.swap .cap-title,.cap-main.swap .cap-desc{animation:capin .45s ease}
+@keyframes capin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+.cap-log{flex:0 0 470px;border-left:1px solid var(--hairline);padding:11px 22px 6px;box-sizing:border-box}
+.cap-log .lg-h{font-size:9.5px;letter-spacing:.18em;color:var(--ink-3);text-transform:uppercase;margin:0 0 4px;
+  display:flex;justify-content:space-between;gap:12px}
+.cap-log .lg-brand{color:#b9bec4;letter-spacing:.08em;white-space:nowrap}
+.cap-log ul{list-style:none;margin:0;padding:0}
+.cap-log li{font-size:11px;line-height:1.55;margin:0 0 3px;display:flex;gap:7px;animation:login .35s ease}
+.cap-log li .mk{flex:0 0 auto;font-weight:700;color:var(--accent)}
+.cap-log li .mk.brick{color:var(--brick)}
+.cap-log li.old{color:var(--ink-3)}
+.cap-log li.old .mk{opacity:.55}
+@keyframes login{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+
+/* ---- コントロール ---- */
+.controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0 0}
+.controls button,.controls select{
+  font:inherit;font-size:12px;letter-spacing:.04em;color:var(--ink);
+  background:var(--paper);border:1px solid var(--node-border);border-radius:0;
+  padding:7px 14px;cursor:pointer}
+.controls button:hover{background:#f5f6f8}
+.controls button:focus-visible,.controls select:focus-visible,.controls label:focus-within{outline:2px solid var(--accent);outline-offset:1px}
+.controls .primary{background:var(--accent);border-color:var(--accent);color:#fff;min-width:96px}
+.controls .primary:hover{background:#1d4a77}
+.controls .rec{font-size:12px;color:var(--ink-2);display:flex;align-items:center;gap:6px;margin-left:6px}
+.controls .hint{margin-left:auto;font-size:11px;color:var(--ink-3);letter-spacing:.03em}
+
+/* ---- 見どころ ---- */
+.explain{border-top:1px solid var(--hairline);margin-top:44px;padding-top:30px}
+.explain h2{font-size:16px;margin:0 0 6px;letter-spacing:.03em}
+.explain .msg{font-size:13.5px;font-weight:600;color:var(--ink);margin:0 0 18px;max-width:44em}
+.explain ol{list-style:none;margin:0 0 20px;padding:0;counter-reset:s;max-width:52em}
+.explain ol li{counter-increment:s;position:relative;padding-left:2.3em;margin-bottom:12px;font-size:13px;line-height:1.8}
+.explain ol li::before{content:counter(s,decimal-leading-zero);position:absolute;left:0;top:.32em;
+  font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.note{font-size:12px;color:var(--ink-2);border-left:2px solid var(--hairline);
+  padding:2px 0 2px 14px;margin:20px 0 0;max-width:46em;line-height:1.8}
+.doc-footer{margin-top:56px;padding-top:16px;border-top:1px solid var(--hairline);
+  font-size:11.5px;color:var(--ink-3);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+/* ---- 録画モード ---- */
+body.record .doc-header,body.record .controls,body.record .explain,body.record .doc-footer{display:none}
+body.record .page{padding-top:26px}
+#unrecord{display:none;position:fixed;right:14px;bottom:12px;z-index:9;
+  font:inherit;font-size:11px;color:var(--ink-2);background:var(--paper);
+  border:1px solid var(--node-border);padding:5px 10px;cursor:pointer;opacity:.35}
+#unrecord:hover,#unrecord:focus-visible{opacity:1}
+body.record #unrecord{display:block}
+
+@media (prefers-reduced-motion:reduce){
+  *{transition:none !important;animation:none !important}
+}
+</style>
+
+<div class="page">
+
+  <header class="doc-header">
+    <p class="eyebrow">Kotetsu Work AI Skills — Why-Why-Tree / Design Prototype v0.1</p>
+    <h1>なぜなぜ分析、検証しながら育つロジックツリー</h1>
+    <p class="lead">サンプル問題「システム開発プロジェクトの納期遅延が常態化している」を、展開 → 兄弟監査 → 停止判定の階層ループで3階層まで深掘りした過程の再生。✓は演出ではなく、実際に実行される監査の記録。</p>
+    <div class="doc-meta"><span>15ノード・なぜ3階層</span><span>根本原因 ●4 ／ 要検証 ◐1</span><span>デザインは html-report-design 標準を継承</span></div>
+  </header>
+
+  <div class="stage-outer" id="stageOuter">
+    <div class="stage" id="stage" role="img" aria-label="なぜなぜ分析のロジックツリーが階層ごとに成長するアニメーション"></div>
+  </div>
+
+  <div class="controls">
+    <button type="button" class="primary" id="btnPlay">▶ 再生</button>
+    <button type="button" id="btnStep">⏭ 次のステップ</button>
+    <button type="button" id="btnReset">↺ 最初から</button>
+    <select id="selSpeed" aria-label="再生速度">
+      <option value="0.75">0.75×</option>
+      <option value="1" selected>1×（標準）</option>
+      <option value="1.5">1.5×</option>
+      <option value="2">2×</option>
+    </select>
+    <label class="rec"><input type="checkbox" id="chkRec">録画モード（ステージのみ表示）</label>
+    <span class="hint">Space = 再生／停止　→ = 1ステップ　URLに ?end=1 で最終フレーム</span>
+  </div>
+
+  <section class="explain">
+    <h2>このプロトタイプで見せていること</h2>
+    <p class="msg">「木が出てくる」だけなら既視感がある。差別化の本体は、階層ごとに検証が走る過程が見えること。</p>
+    <ol>
+      <li><b>階層ごとの監査が見える。</b>粒度チェック・網羅チェック・「だから」逆読みが検証ログに✓として残る（設計要件1: MECE感と1歩の幅）。</li>
+      <li><b>停止判定が型で残る。</b>掘る前に毎ノード判定し、● 対策可（打ち手1文が書ける）／◐ 要検証（断定せず検証タスク化）で打ち止め。「なぜ5回」は目安であって目的ではない（設計要件2）。</li>
+      <li><b>最後に本命パスだけが立つ。</b>寄与度×制御可能性で「効く1本道」に絞り、根本原因を打ち手へ接続して着地する（設計要件3: コンサルの勘所）。</li>
+    </ol>
+    <p class="note">事例・寄与度の数値はデモ用のサンプル。実装時は、スキルがツリーJSON（ノード・監査ログ・本命パス）だけを生成し、このテンプレートに流し込む方式（座標計算はテンプレート側。AIにレイアウトをさせない）。設計の全体は同梱の DESIGN.md を参照。</p>
+  </section>
+
+  <footer class="doc-footer">
+    <span>why-why-tree 設計プロトタイプ</span>
+    <span>kotetsu-work-ai-skills — docs/design/why-why-tree/</span>
+  </footer>
+
+</div>
+
+<button type="button" id="unrecord">表示を戻す（Esc）</button>
+
+<script>
+(function(){
+"use strict";
+
+/* ============ ツリーデータ（実装時はスキルが生成するJSONに置き換わる） ============ */
+var COLX=[28,292,556,820], W=220;
+var HEADS=[
+  {col:0,label:"問題"},
+  {col:1,label:"なぜ ①",axis:"切り口: 発生メカニズム"},
+  {col:2,label:"なぜ ②"},
+  {col:3,label:"なぜ ③"}
+];
+var NODES=[
+  {id:"p0", col:0,y:264,h:92,cls:"problem",tag:"問題（定量で固定）",
+   text:"直近4PJ中3PJで、納期が1ヶ月以上遅延した",
+   sub:"元の訴え「プロジェクトがいつも遅れる」を定量化"},
+
+  {id:"A", col:1,y:96, h:70,tag:"計画",text:"当初の見積り工数が、実態より過小だった",contrib:"寄与 約30%"},
+  {id:"B", col:1,y:275,h:70,tag:"実行",text:"実行中に、作業量が計画外に増えた",contrib:"寄与 約55%",main:true},
+  {id:"C", col:1,y:468,h:70,tag:"統制",text:"発生した遅れの検知・是正が遅れた",contrib:"寄与 約15%"},
+
+  {id:"A1",col:2,y:55, h:64,text:"過去PJの実績工数が、見積りに参照されていない"},
+  {id:"A2",col:2,y:143,h:64,text:"受注前に、顧客予算へ合わせて工数を切り詰めている"},
+  {id:"B1",col:2,y:231,h:64,text:"要件定義の完了基準が曖昧なまま、開発に着手している"},
+  {id:"B2",col:2,y:326,h:64,text:"追加要望を、変更管理の手続きなしで受け入れている"},
+  {id:"C1",col:2,y:423,h:64,text:"進捗が自己申告のみで、成果物で確認されていない"},
+  {id:"C2",col:2,y:512,h:78,cls:"root",badge:"● 根本原因",
+   text:"遅延発生時のエスカレーション基準が決まっていない"},
+
+  {id:"A1a",col:3,y:48, h:78,cls:"root",badge:"● 根本原因",
+   text:"完了時に実績工数を記録・分析する工程が、標準プロセスにない"},
+  {id:"A2a",col:3,y:136,h:78,cls:"root",badge:"● 根本原因",
+   text:"見積りの最終承認が営業部門で完結し、PMレビューを通らない"},
+  {id:"B1a",col:3,y:240,h:78,cls:"root",badge:"● 根本原因",
+   text:"「要件定義完了」の判定基準が、社内標準として定義されていない",
+   action:"要件定義のDoD（完了の定義）を標準化し、キックオフで顧客と合意する"},
+  {id:"B2a",col:3,y:334,h:92,cls:"verify",badge:"◐ 要検証",
+   text:"変更管理の手順が、契約・キックオフで顧客と合意されていない",
+   sub:"検証: 直近PJの契約書・議事録を確認"},
+  {id:"C1a",col:3,y:440,h:78,cls:"root",badge:"● 根本原因",
+   text:"タスクごとの完了基準（成果物）が、WBSに定義されていない"}
+];
+var EDGES=[["p0","A"],["p0","B"],["p0","C"],
+  ["A","A1"],["A","A2"],["B","B1"],["B","B2"],["C","C1"],["C","C2"],
+  ["A1","A1a"],["A2","A2a"],["B1","B1a"],["B2","B2a"],["C1","C1a"]];
+var PATH_N=["B","B1","B1a"], PATH_E=["e-p0-B","e-B-B1","e-B1-B1a"];
+
+/* ============ ステージ構築 ============ */
+var stage=document.getElementById("stage");
+var outer=document.getElementById("stageOuter");
+var byId={};
+NODES.forEach(function(n){byId[n.id]=n;});
+
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+function buildStage(){
+  var html=[];
+  /* エッジ（SVG） */
+  html.push('<svg id="edges" aria-hidden="true">');
+  EDGES.forEach(function(e){
+    var p=byId[e[0]], c=byId[e[1]];
+    var x1=COLX[p.col]+W, y1=p.y+p.h/2, x2=COLX[c.col], y2=c.y+c.h/2;
+    var d = Math.abs(y1-y2)<3
+      ? "M"+x1+" "+y1+" L"+x2+" "+y2
+      : "M"+x1+" "+y1+" H"+(x1+(x2-x1)/2)+" V"+y2+" H"+x2;
+    var cls="edge"+(PATH_E.indexOf("e-"+e[0]+"-"+e[1])>=0?" pe":"");
+    html.push('<path id="e-'+e[0]+'-'+e[1]+'" class="'+cls+'" pathLength="1" d="'+d+'"/>');
+  });
+  html.push('</svg>');
+  /* 列見出し・凡例 */
+  HEADS.forEach(function(hd,i){
+    html.push('<div class="chead" id="head'+i+'" style="left:'+COLX[hd.col]+'px">'
+      +'<b>'+esc(hd.label)+'</b>'+(hd.axis?'　'+esc(hd.axis):'')+'</div>');
+  });
+  html.push('<div class="legend"><span class="mk">●</span> 対策可　<span class="mkv">◐</span> 要検証　<span class="mk">─</span> 本命パス</div>');
+  /* ノード */
+  NODES.forEach(function(n){
+    var cls="node"+(n.cls?" "+n.cls:"")+(PATH_N.indexOf(n.id)>=0?" pn":"");
+    html.push('<div class="'+cls+'" id="n-'+n.id+'" style="left:'+COLX[n.col]+'px;top:'+n.y+'px;width:'+W+'px;min-height:'+n.h+'px">');
+    if(n.tag)   html.push('<span class="ntag">'+esc(n.tag)+'</span>');
+    if(n.badge) html.push('<span class="nbadge">'+esc(n.badge)+'</span>');
+    html.push('<p>'+esc(n.text)+'</p>');
+    if(n.sub)   html.push('<span class="nsub">'+esc(n.sub)+'</span>');
+    if(n.contrib) html.push('<span class="contrib'+(n.main?" main":"")+'">'+esc(n.contrib)+'</span>');
+    if(n.action)  html.push('<span class="action"><span class="ntag">打ち手</span><p>'+esc(n.action)+'</p></span>');
+    html.push('</div>');
+  });
+  /* キャプション帯 */
+  html.push(
+    '<div class="caption">'+
+      '<div class="cap-main" id="capMain">'+
+        '<p class="cap-step" id="capStep">WHY-WHY-TREE</p>'+
+        '<p class="cap-title" id="capTitle">なぜなぜ分析 — 育つロジックツリー</p>'+
+        '<p class="cap-desc" id="capDesc">▶ 再生 で、展開 → 兄弟監査 → 停止判定 の階層ループを再生します。</p>'+
+      '</div>'+
+      '<div class="cap-log"><p class="lg-h">検証ログ<span class="lg-brand">why-why-tree prototype v0.1</span></p><ul id="log"></ul></div>'+
+    '</div>');
+  stage.className="stage";
+  stage.innerHTML=html.join("");
+}
+
+/* ============ 演出プリミティブ ============ */
+var SPEED={v:1}, instant=false;
+
+function el(id){return document.getElementById(id);}
+function cap(n,title,desc){
+  var m=el("capMain");
+  el("capStep").textContent="STEP "+n+" / 7";
+  el("capTitle").textContent=title;
+  el("capDesc").textContent=desc;
+  if(!instant){m.classList.remove("swap");void m.offsetWidth;m.classList.add("swap");}
+}
+function log(mark,text){
+  var ul=el("log");
+  var li=document.createElement("li");
+  var mk=document.createElement("span");
+  mk.className="mk"+(mark==="◐"?" brick":"");
+  mk.textContent=mark;
+  li.appendChild(mk);
+  li.appendChild(document.createTextNode(text));
+  ul.insertBefore(li,ul.firstChild);
+  var items=ul.querySelectorAll("li");
+  for(var i=0;i<items.length;i++){
+    items[i].classList.toggle("old",i>0);
+    if(i>1)ul.removeChild(items[i]);
+  }
+}
+function show(id){el("n-"+id).classList.add("in");}
+function edgeNode(id,parent){
+  el("e-"+parent+"-"+id).classList.add("in");
+  if(instant){show(id);}
+  else{setTimeout(function(){show(id);},200/SPEED.v);}
+}
+function head(i){el("head"+i).classList.add("in");}
+function flash(id){
+  var n=el("n-"+id);n.classList.add("flash");
+  setTimeout(function(){n.classList.remove("flash");},1100/SPEED.v);
+}
+
+/* ============ タイムライン（d = 直前イベントからの待ち, ms） ============ */
+var EVENTS=[
+ {d:200, r:function(){cap(1,"問題を定量で固定する","曖昧な訴えのままでは良い木は生えない。期間・件数・程度で言い直してから掘り始める。");head(0);show("p0");}},
+ {d:1600,r:function(){log("✓","問題定義 — あるべき（全PJ納期遵守）と現状（3/4が遅延）のギャップを数値で固定");}},
+
+ {d:1700,r:function(){cap(2,"なぜ① — 切り口を宣言して展開","子を書く前に分解の軸を宣言する。切り口「遅延の発生メカニズム」= 計画で小さく見積もる → 実行で増える → 統制で気づけない。");head(1);}},
+ {d:900, r:function(){edgeNode("A","p0");}},
+ {d:600, r:function(){edgeNode("B","p0");}},
+ {d:600, r:function(){edgeNode("C","p0");}},
+ {d:1200,r:function(){log("✓","粒度チェック — 兄弟3枝の抽象度が揃っている（いずれも工程レベル）");}},
+ {d:1500,r:function(){log("✓","網羅チェック — 子をすべて解消すれば親は消えるか → 発生・拡大・対応で漏れなし");}},
+
+ {d:1800,r:function(){cap(3,"なぜ② — 1歩ずつ掘る","「（子）。だから（親）」と逆読みして通る1歩だけ掘る。中間のなぜを挿入できたら飛躍として分割。");head(2);}},
+ {d:900, r:function(){edgeNode("A1","A");}},
+ {d:550, r:function(){edgeNode("A2","A");}},
+ {d:1200,r:function(){log("✓","逆読みチェック — 「実績が参照されない。だから見積りが過小」通る");}},
+ {d:1400,r:function(){edgeNode("B1","B");}},
+ {d:550, r:function(){edgeNode("B2","B");}},
+ {d:1200,r:function(){log("✓","言い換えチェック — 新ノードが既存ノードの同義文になっていない");}},
+ {d:1400,r:function(){edgeNode("C1","C");}},
+ {d:550, r:function(){edgeNode("C2","C");}},
+ {d:1100,r:function(){log("●","停止判定 — C2は対策を1文で書ける（遅延3日でPM報告を規定）→ 掘らずに打ち止め");flash("C2");}},
+
+ {d:2000,r:function(){cap(4,"なぜ③ — 停止条件に達するまで","展開の前に毎ノードで判定する: 対策可能● ／ 要検証◐ ／ 制御外○。「なぜ5回」は目安であって目的ではない。");head(3);}},
+ {d:900, r:function(){edgeNode("A1a","A1");}},
+ {d:550, r:function(){edgeNode("A2a","A2");}},
+ {d:550, r:function(){edgeNode("B1a","B1");}},
+ {d:550, r:function(){edgeNode("B2a","B2");}},
+ {d:550, r:function(){edgeNode("C1a","C1");}},
+ {d:1200,r:function(){log("●","停止判定 — 根本原因4件。それぞれ打ち手を1文で書けるため停止");}},
+ {d:1600,r:function(){log("◐","停止判定 — B2aは現場の事実が必要。断定せず検証タスク化（契約書・議事録）");flash("B2a");}},
+
+ {d:2000,r:function(){cap(5,"寄与度で重み付け","どの枝が遅延量を最も説明するか。全部を掘り切るのではなく、効く枝に絞る。");stage.classList.add("show-contrib");el("e-p0-B").classList.add("e-heavy");}},
+ {d:2200,r:function(){cap(6,"本命パスの特定","寄与度 × 制御可能性 × 実行容易性で「効く1本道」を選ぶ。他の枝は捨てずに減光。");stage.classList.add("focus");}},
+ {d:1200,r:function(){log("✓","本命パス — 実行起因 → 完了基準が曖昧なまま着手 → 社内標準の不在");}},
+ {d:2200,r:function(){cap(7,"根本原因を打ち手へ接続","原因当てで終わらせない。打ち手と検証計画に着地して、なぜなぜ分析は完了。");var a=el("n-B1a").querySelector(".action");if(a)a.classList.add("show");}},
+ {d:1500,r:function(){log("✓","完了 — 根本原因●4・要検証◐1・本命パス1本（3階層で停止）");}}
+];
+
+/* ============ 再生エンジン ============ */
+var idx=0,playing=false,timer=null;
+var btnPlay=el("btnPlay"),btnStep=el("btnStep"),btnReset=el("btnReset");
+
+function updatePlayBtn(){
+  btnPlay.textContent = playing ? "⏸ 一時停止" : (idx>=EVENTS.length ? "↺ もう一度" : "▶ 再生");
+}
+function scheduleNext(){
+  if(!playing)return;
+  if(idx>=EVENTS.length){playing=false;updatePlayBtn();return;}
+  var ev=EVENTS[idx];
+  timer=setTimeout(function(){idx++;ev.r();scheduleNext();},ev.d/SPEED.v);
+}
+function play(){
+  if(idx>=EVENTS.length){reset();}
+  playing=true;updatePlayBtn();scheduleNext();
+}
+function pause(){playing=false;clearTimeout(timer);updatePlayBtn();}
+function stepOnce(){
+  if(playing)pause();
+  if(idx<EVENTS.length){EVENTS[idx++].r();}
+  updatePlayBtn();
+}
+function reset(){
+  pause();idx=0;buildStage();updatePlayBtn();
+}
+function jumpEnd(){
+  pause();idx=0;buildStage();
+  instant=true;stage.classList.add("noanim");
+  while(idx<EVENTS.length){EVENTS[idx++].r();}
+  void stage.offsetWidth;
+  setTimeout(function(){stage.classList.remove("noanim");instant=false;},80);
+  updatePlayBtn();
+}
+
+btnPlay.addEventListener("click",function(){playing?pause():play();});
+btnStep.addEventListener("click",stepOnce);
+btnReset.addEventListener("click",function(){reset();play();});
+el("selSpeed").addEventListener("change",function(){SPEED.v=parseFloat(this.value)||1;});
+
+/* 録画モード */
+var chkRec=el("chkRec"),unrec=el("unrecord");
+function setRecord(on){
+  document.body.classList.toggle("record",on);
+  chkRec.checked=on;
+}
+chkRec.addEventListener("change",function(){setRecord(this.checked);});
+unrec.addEventListener("click",function(){setRecord(false);});
+
+/* キーボード */
+document.addEventListener("keydown",function(e){
+  var t=e.target.tagName;
+  if(t==="BUTTON"||t==="SELECT"||t==="INPUT")return;
+  if(e.key===" "){e.preventDefault();playing?pause():play();}
+  else if(e.key==="ArrowRight"){e.preventDefault();stepOnce();}
+  else if(e.key==="Escape"){setRecord(false);}
+});
+
+/* ステージのスケーリング */
+function fit(){
+  var sc=outer.clientWidth/1280;
+  stage.style.transform="scale("+sc+")";
+}
+if(window.ResizeObserver){new ResizeObserver(fit).observe(outer);}
+window.addEventListener("resize",fit);
+
+/* 初期化 */
+buildStage();fit();
+var wantEnd=/[?&#](end|final)\b/.test(location.search+location.hash);
+var reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+if(wantEnd||reduced){jumpEnd();}
+else{setTimeout(play,800);}
+})();
+</script>
+</body>
+</html>
