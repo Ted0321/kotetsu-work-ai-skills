@@ -16,6 +16,7 @@
 
 | スキル | 種別 | 一言 | パス |
 |---|---|---|---|
+| **なぜなぜ分析ツリー** `why-why-tree` | コピペ型／エージェント型 | 「なぜ5回」ではなく、型で掘って根本原因に着地する | [`skills/why-why-tree/`](./skills/why-why-tree/) |
 | **Deep Research Report** `deep-research-report` | コピペ型／エージェント型 | Deep Researchの長文を、会議に出せるレポートに編集する | [`skills/deep-research-report/`](./skills/deep-research-report/) |
 | **HTML資料デザイン** `html-report-design` | コピペ型／エージェント型 | AIのダサいHTML出力を、コンサル品質の配布資料にする | [`skills/html-report-design/`](./skills/html-report-design/) |
 | **Find Skills JA** `find-skills-ja` | エージェント型 | 日本語で聞くだけでスキルが見つかる | [`skills/find-skills-ja/`](./skills/find-skills-ja/) |

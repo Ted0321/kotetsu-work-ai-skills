@@ -1,0 +1,4 @@
+interface:
+  display_name: "なぜなぜ分析ツリー"
+  short_description: "対策が打てる根本原因まで、型付きロジックツリーで分解"
+  default_prompt: "Use $why-why-tree to run a why-why (root cause) analysis on this problem and deliver the typed logic tree."

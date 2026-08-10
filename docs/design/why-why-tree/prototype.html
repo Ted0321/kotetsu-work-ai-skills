@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>なぜなぜ分析 — 育つロジックツリー（why-why-tree プロトタイプ v0.1）</title>
+<title>なぜなぜ分析 — 育つロジックツリー（why-why-tree デモ v0.1）</title>
 </head>
 <body>
 <style>
@@ -179,7 +179,7 @@ body.record #unrecord{display:block}
     <p class="eyebrow">Kotetsu Work AI Skills — Why-Why-Tree / Design Prototype v0.1</p>
     <h1>なぜなぜ分析、検証しながら育つロジックツリー</h1>
     <p class="lead">サンプル問題「システム開発プロジェクトの納期遅延が常態化している」を、展開 → 兄弟監査 → 停止判定の階層ループで3階層まで深掘りした過程の再生。✓は演出ではなく、実際に実行される監査の記録。</p>
-    <div class="doc-meta"><span>15ノード・なぜ3階層</span><span>根本原因 ●4 ／ 要検証 ◐1</span><span>デザインは html-report-design 標準を継承</span></div>
+    <div class="doc-meta"><span>15ノード・なぜ3階層</span><span>根本原因 ●5 ／ 要検証 ◐1</span><span>デザインは html-report-design 標準を継承</span></div>
   </header>
 
   <div class="stage-outer" id="stageOuter">
@@ -395,7 +395,7 @@ var EVENTS=[
  {d:2200,r:function(){cap(6,"本命パスの特定","寄与度 × 制御可能性 × 実行容易性で「効く1本道」を選ぶ。他の枝は捨てずに減光。");stage.classList.add("focus");}},
  {d:1200,r:function(){log("✓","本命パス — 実行起因 → 完了基準が曖昧なまま着手 → 社内標準の不在");}},
  {d:2200,r:function(){cap(7,"根本原因を打ち手へ接続","原因当てで終わらせない。打ち手と検証計画に着地して、なぜなぜ分析は完了。");var a=el("n-B1a").querySelector(".action");if(a)a.classList.add("show");}},
- {d:1500,r:function(){log("✓","完了 — 根本原因●4・要検証◐1・本命パス1本（3階層で停止）");}}
+ {d:1500,r:function(){log("✓","完了 — 根本原因●5・要検証◐1・本命パス1本（3階層で停止）");}}
 ];
 
 /* ============ 再生エンジン ============ */
