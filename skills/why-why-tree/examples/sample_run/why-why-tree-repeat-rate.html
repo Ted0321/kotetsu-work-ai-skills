@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>なぜなぜ分析 — 型付きロジックツリー</title>
+<style>
+/* ============================================================
+   why-why-tree 出力テンプレート v0.1
+   デザインは kotetsu-work-ai-skills のハウス標準（html-report-design:
+   紙白・インク黒・グレー2段・濃紺1色・細罫。カード/影/角丸/グラデ禁止）。
+   ツリーは開いた瞬間に全体が表示される（アニメーションなし）。
+   レイアウト（列・行・エッジ経路）はこのファイルが自動計算する。
+   ============================================================ */
+:root{
+  --ink:#1a1a1a; --ink-2:#555555; --ink-3:#8e8e8e;
+  --accent:#173f66; --accent-tint:#eef3f8;
+  --hairline:#d9d9d9; --fill-gray:#e7e9ec;
+  --paper:#ffffff;
+  --edge:#c2c7cd; --node-border:#c9cdd2;
+  --brick:#a33c2e;
+}
+html{color-scheme:light}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Helvetica Neue",Arial,"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic Medium","Yu Gothic",Meiryo,sans-serif;
+  font-size:15px;line-height:1.9;border-top:6px solid var(--accent);
+  -webkit-font-smoothing:antialiased;
+}
+.page{max-width:1240px;margin:0 auto;padding:48px clamp(20px,4vw,44px) 88px}
+
+/* ---- ヘッダー ---- */
+.doc-header{padding-bottom:24px;border-bottom:1px solid var(--ink)}
+.eyebrow{font-size:11px;letter-spacing:.16em;color:var(--ink-3);text-transform:uppercase;margin:0 0 16px}
+h1{font-size:25px;line-height:1.5;letter-spacing:.02em;margin:0 0 10px;font-feature-settings:"palt" 1}
+.lead{font-size:13.5px;color:var(--ink-2);margin:0 0 6px;max-width:52em}
+.lead .raw{color:var(--ink-3)}
+.gap-line{font-size:12px;color:var(--ink-2);margin:0 0 18px}
+.gap-line b{font-weight:700;color:var(--ink)}
+.doc-meta{font-size:12px;color:var(--ink-3);display:flex;gap:24px;flex-wrap:wrap}
+
+/* ---- ツリーステージ ---- */
+.stage-outer{position:relative;width:100%;margin-top:30px;
+  background:var(--paper);border:1px solid var(--hairline);overflow:hidden}
+.stage{position:absolute;top:0;left:0;transform-origin:0 0}
+#edges{position:absolute;inset:0;pointer-events:none}
+.edge{fill:none;stroke:var(--edge);stroke-width:1.4}
+.edge.pe{stroke:var(--accent);stroke-width:2.4}
+
+.chead{position:absolute;top:12px;font-size:11px;letter-spacing:.14em;color:var(--ink-3);text-transform:uppercase}
+.chead b{color:var(--accent);font-weight:700;letter-spacing:.06em}
+.chead .ax{display:block;font-size:9.5px;letter-spacing:.03em;text-transform:none;color:var(--ink-3);line-height:1.5;margin-top:2px}
+.legend-line{text-align:right;font-size:10.5px;color:var(--ink-3);letter-spacing:.04em;margin:8px 0 0}
+.legend-line .mk{color:var(--accent);font-weight:700}
+.legend-line .mkv{color:var(--brick);font-weight:700}
+
+.node{position:absolute;box-sizing:border-box;background:var(--paper);
+  border:1px solid var(--node-border);padding:9px 11px 8px}
+.node p{margin:0;font-size:12px;line-height:1.55;letter-spacing:.01em}
+.ntag{display:block;font-size:9.5px;letter-spacing:.18em;color:var(--ink-3);text-transform:uppercase;margin-bottom:3px}
+.nbadge{display:block;font-size:9.5px;letter-spacing:.14em;margin-bottom:3px;font-weight:700}
+
+.node.problem{background:var(--ink);border-color:var(--ink)}
+.node.problem p{color:#fff;font-size:12.5px;font-weight:700}
+.node.problem .ntag{color:#9aa0a6}
+.node.root{background:var(--accent);border-color:var(--accent)}
+.node.root p{color:#fff}
+.node.root .nbadge{color:#c8d6e5}
+.node.verify .nbadge{color:var(--brick)}
+.node.given{background:var(--fill-gray);border-color:var(--fill-gray)}
+.node.given .nbadge{color:var(--ink-2)}
+.node.todo{border-style:dashed}
+.node.todo .nbadge{color:var(--ink-2)}
+.node.pn{border-color:var(--accent)}
+.node.pn:not(.root){border-width:1.5px;padding:8.5px 10.5px 7.5px}
+
+.contrib{position:absolute;right:8px;bottom:-11px;font-size:10px;letter-spacing:.04em;
+  padding:1px 7px;background:var(--paper);border:1px solid var(--node-border);color:var(--ink-3);
+  font-variant-numeric:tabular-nums}
+.contrib.main{background:var(--accent-tint);border-color:#b9cbdc;color:var(--accent);font-weight:700}
+
+/* ---- ツリー下のセクション ---- */
+.page>section{border-top:1px solid var(--hairline);padding-top:36px;margin-top:48px}
+h2{font-size:18px;letter-spacing:.03em;margin:0}
+h2 .no{color:var(--accent);margin-right:12px;font-variant-numeric:tabular-nums}
+.msg{font-size:14.5px;font-weight:600;line-height:1.8;margin:14px 0 20px;max-width:44em}
+
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;margin:20px 0 8px;font-size:13px;line-height:1.7}
+th{font-size:12px;font-weight:600;text-align:left;padding:9px 12px;
+  border-top:2px solid var(--ink);border-bottom:1px solid var(--ink);vertical-align:bottom}
+td{padding:9px 12px;border-bottom:1px solid var(--hairline);vertical-align:top}
+td.mkcell{white-space:nowrap;font-weight:700}
+td.mkcell.m-root{color:var(--accent)}
+td.mkcell.m-verify{color:var(--brick)}
+td.mkcell.m-given,td.mkcell.m-todo{color:var(--ink-2)}
+tr.hon td{border-top:1px solid var(--ink);border-bottom:2px solid var(--ink);background:var(--accent-tint)}
+tr.hon td:first-child{font-weight:700}
+.hon-tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--accent);
+  border:1px solid #b9cbdc;background:var(--paper);padding:0 6px;margin-left:8px;vertical-align:1px}
+
+.checks{list-style:none;margin:16px 0 0;padding:0;max-width:52em}
+.checks li{font-size:12.5px;line-height:1.8;margin-bottom:4px;color:var(--ink-2);padding-left:1.6em;position:relative}
+.checks li::before{content:"✓";position:absolute;left:0;color:var(--accent);font-weight:700}
+.note{font-size:12.5px;color:var(--ink-2);border-left:2px solid var(--hairline);
+  padding:2px 0 2px 14px;margin:22px 0 0;max-width:50em;line-height:1.8}
+.note b{color:var(--ink)}
+
+.doc-footer{margin-top:72px;padding-top:18px;border-top:1px solid var(--hairline);
+  font-size:11.5px;color:var(--ink-3);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+@media print{
+  @page{size:A4 landscape;margin:12mm}
+  body{border-top-width:4px}
+  .page{max-width:none;padding:0}
+  .page>section{break-inside:avoid;margin-top:36px;padding-top:24px}
+  .stage-outer{border:0}
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+  <header class="doc-header">
+    <p class="eyebrow" id="hEyebrow">Why-Why Analysis — 型付きロジックツリー</p>
+    <h1 id="hTitle"></h1>
+    <p class="lead" id="hLead"></p>
+    <p class="gap-line" id="hGap"></p>
+    <div class="doc-meta" id="hMeta"></div>
+  </header>
+
+  <div class="stage-outer" id="stageOuter"><div class="stage" id="stage"></div></div>
+  <p class="legend-line" id="legendLine"></p>
+
+  <section>
+    <h2><span class="no">01</span>根本原因と次の一手</h2>
+    <p class="msg" id="honmei"></p>
+    <div class="tbl"><table id="actTable"></table></div>
+    <p class="note" id="modeNote"></p>
+  </section>
+
+  <section>
+    <h2><span class="no">02</span>実行した監査</h2>
+    <ul class="checks" id="checkList"></ul>
+  </section>
+
+  <footer class="doc-footer">
+    <span id="fTitle"></span>
+    <span>why-why-tree — kotetsu-work-ai-skills</span>
+  </footer>
+</div>
+
+<script>
+/* ================================================================
+   TREE_DATA_START
+   スキルはこのブロックの TREE オブジェクトだけを分析結果に差し替える。
+   マーカーの外は1文字も変更しないこと（レイアウトは下の描画コードが
+   親子関係から自動計算する）。以下は完成見本を兼ねたサンプルデータ。
+   ================================================================ */
+var TREE = {
+  "title": "リピート購入率の低下 — なぜなぜ分析",
+  "date": "2026-08-10",
+  "mode": "仮説",
+  "problem": {
+    "raw": "最近リピーターが減ってる気がする",
+    "defined": "リピート購入率が半年で15%→8%に半減した",
+    "tobe": "リピート購入率15%水準の維持",
+    "asis": "直近半年で8%まで低下"
+  },
+  "axis1": "購買体験の時系列（初回体験→再訪→再購入）",
+  "nodes": [
+    { "id": "A", "parent": null, "tag": "初回体験", "text": "初回購入の体験が、再購入の意向を作れていない", "contrib": "寄与 約20%" },
+    { "id": "A1", "parent": "A", "status": "root", "text": "商品到着後のフォロー接点（使い方・案内）が設計されていない",
+      "action": "到着3日後のフォロー配信と使い方ガイド導線を設計する" },
+    { "id": "A2", "parent": "A", "status": "verify", "text": "初回注文の配送遅延・欠品が増えている",
+      "verify": "直近半年の物流KPI（納期遵守率・欠品率）で確認する" },
+    { "id": "B", "parent": null, "tag": "再訪導線", "text": "再訪のきっかけになる接点が減った", "contrib": "寄与 約60%" },
+    { "id": "B1", "parent": "B", "text": "メルマガ・LINEの定期配信が止まっている" },
+    { "id": "B1a", "parent": "B1", "text": "配信運用が特定担当者に属人化していた" },
+    { "id": "B1a1", "parent": "B1a", "status": "root", "text": "配信業務の手順書・引き継ぎプロセスが存在しない",
+      "action": "配信運用を手順書化し、代行できる体制（正副2名）にする" },
+    { "id": "B2", "parent": "B", "status": "given", "text": "SNSアルゴリズム変更で自然到達が下がった",
+      "note": "プラットフォーム側の変更。前提として受け入れ、自社接点（メール・LINE）の比重を上げる" },
+    { "id": "C", "parent": null, "tag": "購入障壁", "text": "再購入時の手間・負担が増えた", "contrib": "寄与 約20%" },
+    { "id": "C1", "parent": "C", "status": "root", "text": "会員ログイン必須化で購入手順が増えた",
+      "action": "ゲスト購入の復活か、ワンタップログインを導入する" },
+    { "id": "C2", "parent": "C", "status": "todo", "text": "値上げで競合との価格差が開いた",
+      "note": "値上げ幅と競合価格の推移データを確認したい（データ提供依頼）" }
+  ],
+  "criticalPath": ["B", "B1", "B1a", "B1a1"],
+  "rationale": "寄与が最大の再訪起因で、低下時期が配信停止と一致する見立て。運用の標準化だけで再開できるため",
+  "checks": [
+    "問題定義 — 「減ってる気がする」を期間・数値で固定（15%→8%）",
+    "粒度 — なぜ①を購買体験の時系列で統一（初回→再訪→再購入）",
+    "網羅 — 各分岐で「子を全部解消したら親は消えるか」を確認",
+    "逆読み — 全リーフ→問題まで「だから」で通ることを確認",
+    "禁じ手 — 言い換え・人格帰属・主語なし文が0件",
+    "停止判定 — 全リーフを型付きで停止（●3 ◐1 ○1 △1）"
+  ]
+};
+/* TREE_DATA_END ================================================== */
+
+(function(){
+"use strict";
+
+/* ---- 定数（レイアウト） ---- */
+var W=220, GAPX=72, MX=28, TOP=52, BOT=26;
+var CHARS_PER_LINE=16, LINE_H=19;
+
+var STATUS={
+  root:  {cls:"root",   badge:"● 根本原因", mark:"●", label:"対策可",  next:function(n){return n.action||"";}},
+  verify:{cls:"verify", badge:"◐ 要検証",   mark:"◐", label:"要検証",  next:function(n){return n.verify?("検証: "+n.verify):"";}},
+  given: {cls:"given",  badge:"○ 所与",     mark:"○", label:"所与",    next:function(n){return n.note||"制御可能範囲の外。打ち手の前提条件として扱う";}},
+  todo:  {cls:"todo",   badge:"△ 要調査",   mark:"△", label:"要調査",  next:function(n){return n.note||n.verify||"追加情報が必要";}}
+};
+
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+/* ---- 木の構造化 ---- */
+var byId={}, children={ROOT:[]};
+TREE.nodes.forEach(function(n){byId[n.id]=n;});
+TREE.nodes.forEach(function(n){
+  var p=(n.parent==null)?"ROOT":n.parent;
+  if(p!=="ROOT" && !byId[p]){p="ROOT";}          /* 親不明はなぜ①扱いに退避 */
+  (children[p]=children[p]||[]).push(n.id);
+});
+function level(id){var l=1,n=byId[id];while(n&&n.parent!=null&&byId[n.parent]){l++;n=byId[n.parent];}return l;}
+var maxL=1;
+TREE.nodes.forEach(function(n){var l=level(n.id);n._level=l;if(l>maxL)maxL=l;});
+
+/* リーフにスロットを割当（nodes[]の記載順を尊重したDFS） */
+var slots=0;
+function assign(id){
+  var kids=children[id]||[];
+  if(!kids.length){byId[id]._slot=slots++;return;}
+  kids.forEach(assign);
+}
+(children.ROOT||[]).forEach(assign);
+if(!slots)slots=1;
+
+/* ノード高さの見積り */
+function estH(n,isProblem){
+  var lines=Math.min(4,Math.max(1,Math.ceil(String(n.text||"").length/CHARS_PER_LINE)));
+  var h=18+lines*LINE_H;
+  if(isProblem)h+=14; else if(n.tag)h+=14;
+  if(n.status&&STATUS[n.status])h+=15;
+  return h;
+}
+var maxH=0;
+TREE.nodes.forEach(function(n){var h=estH(n,false);n._h=h;if(h>maxH)maxH=h;});
+var ROWH=Math.max(96,Math.min(140,maxH+24));
+
+/* 中心Yの計算（リーフ＝スロット中心、親＝子の平均） */
+function centerY(id){
+  var n=byId[id];
+  if(n._cy!=null)return n._cy;
+  var kids=children[id]||[];
+  var cy;
+  if(!kids.length){cy=TOP+n._slot*ROWH+ROWH/2;}
+  else{var s=0;kids.forEach(function(k){s+=centerY(k);});cy=s/kids.length;}
+  n._cy=cy;return cy;
+}
+TREE.nodes.forEach(function(n){centerY(n.id);});
+var rootKids=children.ROOT||[];
+var pCy=0;rootKids.forEach(function(k){pCy+=centerY(k);});
+pCy=rootKids.length?pCy/rootKids.length:(TOP+slots*ROWH/2);
+
+var stageW=MX*2+(maxL+1)*W+maxL*GAPX;
+var stageH=TOP+slots*ROWH+BOT;
+
+/* ---- 本命パス ---- */
+var pathSet={};(TREE.criticalPath||[]).forEach(function(id){pathSet[id]=true;});
+
+/* ---- 描画 ---- */
+var stage=document.getElementById("stage"), outer=document.getElementById("stageOuter");
+var html=[];
+
+/* エッジ */
+html.push('<svg id="edges" width="'+stageW+'" height="'+stageH+'" aria-hidden="true">');
+function edge(x1,y1,x2,y2,pe){
+  var d=Math.abs(y1-y2)<3?("M"+x1+" "+y1+" L"+x2+" "+y2)
+       :("M"+x1+" "+y1+" H"+(x1+(x2-x1)/2)+" V"+y2+" H"+x2);
+  html.push('<path class="edge'+(pe?" pe":"")+'" d="'+d+'"/>');
+}
+function colX(l){return MX+l*(W+GAPX);}
+var pH=estH({text:TREE.problem.defined},true);
+var pX=MX, pY=pCy-pH/2;
+TREE.nodes.forEach(function(n){
+  var px,py2;
+  if(n.parent!=null&&byId[n.parent]){
+    var p=byId[n.parent];
+    px=colX(p._level)+W;py2=p._cy;      /* 親ノードの右端中央から */
+  }else{
+    px=pX+W;py2=pCy;                    /* 問題ノードの右端中央から */
+  }
+  var pe=pathSet[n.id]&&(n.parent==null||pathSet[n.parent]);
+  edge(px,py2,colX(n._level),n._cy,pe);
+});
+html.push('</svg>');
+
+/* 列見出し・凡例 */
+var circled=["①","②","③","④","⑤","⑥","⑦"];
+for(var l=0;l<=maxL;l++){
+  var label=l===0?"問題":("なぜ "+(circled[l-1]||l));
+  var axis=(l===1&&TREE.axis1)?('<span class="ax">切り口: '+esc(TREE.axis1)+'</span>'):"";
+  html.push('<div class="chead" style="left:'+colX(l)+'px;width:'+(W+GAPX-12)+'px"><b>'+label+'</b>'+axis+'</div>');
+}
+
+/* 問題ノード */
+html.push('<div class="node problem" style="left:'+pX+'px;top:'+pY+'px;width:'+W+'px">'+
+  '<span class="ntag">問題（定量で固定）</span><p>'+esc(TREE.problem.defined)+'</p></div>');
+
+/* 原因ノード */
+TREE.nodes.forEach(function(n){
+  var x=MX+n._level*(W+GAPX), y=n._cy-n._h/2;
+  var st=n.status&&STATUS[n.status];
+  var cls="node"+(st?" "+st.cls:"")+(pathSet[n.id]?" pn":"");
+  var inner="";
+  if(n.tag)inner+='<span class="ntag">'+esc(n.tag)+'</span>';
+  if(st)inner+='<span class="nbadge">'+st.badge+'</span>';
+  inner+='<p>'+esc(n.text)+'</p>';
+  if(n.contrib)inner+='<span class="contrib'+(pathSet[n.id]?" main":"")+'">'+esc(n.contrib)+'</span>';
+  html.push('<div class="'+cls+'" style="left:'+x+'px;top:'+y+'px;width:'+W+'px">'+inner+'</div>');
+});
+
+stage.innerHTML=html.join("");
+stage.style.width=stageW+"px";stage.style.height=stageH+"px";
+
+/* ---- スケーリング（横幅に合わせて全体表示・拡大はしない） ---- */
+function fit(){
+  var w=outer.clientWidth||stageW;
+  var sc=Math.min(1,w/stageW);
+  stage.style.transform="scale("+sc+")";
+  outer.style.height=(stageH*sc)+"px";
+}
+fit();
+if(window.ResizeObserver)new ResizeObserver(fit).observe(outer);
+window.addEventListener("resize",fit);
+window.addEventListener("beforeprint",fit);
+
+/* 凡例（ステージ外・右寄せ。使われている型だけ表示） */
+var hasV=TREE.nodes.some(function(n){return n.status==="verify";});
+var hasG=TREE.nodes.some(function(n){return n.status==="given";});
+var hasT=TREE.nodes.some(function(n){return n.status==="todo";});
+document.getElementById("legendLine").innerHTML=
+  '<span class="mk">●</span> 対策可'+
+  (hasV?'　<span class="mkv">◐</span> 要検証':'')+
+  (hasG?'　○ 所与':'')+(hasT?'　△ 要調査':'')+
+  '　<span class="mk">─</span> 本命パス';
+
+/* ---- ヘッダー ---- */
+document.title=TREE.title||document.title;
+document.getElementById("hTitle").textContent=TREE.title||"なぜなぜ分析";
+document.getElementById("hLead").innerHTML=
+  '問題: <b>'+esc(TREE.problem.defined)+'</b>'+
+  (TREE.problem.raw?'　<span class="raw">（元の訴え「'+esc(TREE.problem.raw)+'」を定量化）</span>':'');
+var gapEl=document.getElementById("hGap");
+if(TREE.problem.tobe||TREE.problem.asis){
+  gapEl.innerHTML='あるべき: <b>'+esc(TREE.problem.tobe||"—")+'</b>　／　現状: <b>'+esc(TREE.problem.asis||"—")+'</b>';
+}else{gapEl.remove();}
+var leaves=TREE.nodes.filter(function(n){return n.status&&STATUS[n.status];});
+var nR=leaves.filter(function(n){return n.status==="root";}).length;
+var nV=leaves.filter(function(n){return n.status==="verify";}).length;
+var meta=[];
+if(TREE.date)meta.push(esc(TREE.date));
+meta.push((TREE.nodes.length+1)+"ノード・なぜ"+maxL+"階層");
+meta.push("根本原因 ●"+nR+(nV?"　要検証 ◐"+nV:""));
+meta.push(TREE.mode==="仮説"?"仮説ベース（現場での検証を前提とする）":"事実ベース");
+document.getElementById("hMeta").innerHTML=meta.map(function(m){return "<span>"+m+"</span>";}).join("");
+document.getElementById("fTitle").textContent=TREE.title||"";
+
+/* ---- 01 根本原因と次の一手 ---- */
+var honId=(TREE.criticalPath||[])[ (TREE.criticalPath||[]).length-1 ];
+var hon=honId&&byId[honId];
+document.getElementById("honmei").textContent = hon
+  ? "本命は「"+hon.text+"」。"+(TREE.rationale?TREE.rationale+"。":"")
+  : "型付きリーフごとに、次の一手を接続する。";
+var rows=['<tr><th style="width:84px">型</th><th>原因（リーフ）</th><th>次の一手</th></tr>'];
+/* スロット順（木の上から下）で並べる */
+leaves.sort(function(a,b){return (a._slot||0)-(b._slot||0);}).forEach(function(n){
+  var st=STATUS[n.status];
+  var honRow=(hon&&n.id===hon.id);
+  rows.push('<tr'+(honRow?' class="hon"':'')+'>'+
+    '<td class="mkcell m-'+n.status+'">'+st.mark+" "+st.label+'</td>'+
+    '<td>'+esc(n.text)+(honRow?'<span class="hon-tag">本命</span>':'')+'</td>'+
+    '<td>'+esc(st.next(n))+'</td></tr>');
+});
+document.getElementById("actTable").innerHTML=rows.join("");
+document.getElementById("modeNote").innerHTML = (TREE.mode==="仮説")
+  ? "<b>仮説ベースの分析。</b>各原因は現場の事実で検証してから対策に着手する。◐は検証が先、●も実行前に前提を確認する。"
+  : "事実ベースの分析。裏付けデータは分析ログを参照。";
+
+/* ---- 02 実行した監査 ---- */
+document.getElementById("checkList").innerHTML=(TREE.checks||[])
+  .map(function(c){return "<li>"+esc(c)+"</li>";}).join("");
+})();
+</script>
+</body>
+</html>

@@ -20,6 +20,7 @@ npx skills add Ted0321/kotetsu-work-ai-skills@why-why-tree
 導入後は「〜のなぜなぜ分析をして」で自動発火し、HTMLツリーまで出力する。
 
 例: [examples/sample_input_output.md](./examples/sample_input_output.md)
+完成出力の実例: [examples/sample_run/](./examples/sample_run/)（tree.json → why-why-tree-repeat-rate.html。マーカー差し替えだけで生成した実物）
 
 ## 出力されるもの
 
