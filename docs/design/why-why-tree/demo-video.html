@@ -177,6 +177,9 @@ h1{font-size:23px;line-height:1.5;margin:0 0 8px;color:var(--tx)}
 
 body.record .doc-header,body.record .controls,body.record .howto,body.record .doc-footer{display:none}
 body.record .page{padding-top:18px}
+/* キャプチャモード: ステージをビューポートに固定（自動録画・原寸収録用) */
+body.capture .stage-outer{position:fixed;inset:0;border:0;aspect-ratio:auto;z-index:5}
+body.record.capture #unrecord{display:none}
 #unrecord{display:none;position:fixed;right:14px;bottom:12px;z-index:9;
   font:inherit;font-size:11px;color:var(--tx2);background:#17191c;
   border:1px solid var(--panel-line);padding:5px 10px;cursor:pointer;opacity:.3}
@@ -500,7 +503,11 @@ if(window.ResizeObserver)new ResizeObserver(fit).observe(outer);
 window.addEventListener("resize",fit);
 
 buildStage();fit();
-var wantEnd=/[?&#](end|final)\b/.test(location.search+location.hash);
+var q=location.search+location.hash;
+var sp=q.match(/[?&]speed=([0-9.]+)/);
+if(sp){SPEED.v=parseFloat(sp[1])||1;var sel=el("selSpeed");if(sel)sel.value=String(SPEED.v);}
+if(/[?&#]capture\b/.test(q)){setRecord(true);document.body.classList.add("capture");fit();}
+var wantEnd=/[?&#](end|final)\b/.test(q);
 var reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 if(wantEnd||reduced){jumpEnd();}else{setTimeout(play,900);}
 })();
