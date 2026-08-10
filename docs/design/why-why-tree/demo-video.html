@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>なぜなぜ分析 — デモ動画ステージ v3（why-why-tree / 1920×1080）</title>
+<title>なぜなぜ分析 — デモ動画ステージ v3.1（why-why-tree / 1920×1080）</title>
 </head>
 <body>
 <style>
@@ -24,7 +24,7 @@
   --coral:#d97757; --green:#7cc08a; --redtx:#e08a8a; --blue:#4f8ee8; --pink:#d4608a;
   /* ツリーカード */
   --card:#faf9f5; --card-tx:#1f1e1b; --card-tx2:#6b6963;
-  --navy:#2f6099; --brick:#b0563f; --edge:#4a4944;
+  --ink-bdg:#454339; --edge:#55534d;
 }
 html{color-scheme:dark}
 body{
@@ -45,8 +45,8 @@ h1{font-size:23px;line-height:1.5;margin:0 0 8px}
 .noanim,.noanim *{transition:none !important;animation:none !important}
 
 /* ============ ウィンドウ・タイトルバー ============ */
-.tbar{position:absolute;left:0;top:0;right:0;height:48px}
-.tb-ic{position:absolute;top:14px;width:20px;height:20px;opacity:.8}
+.tbar{position:absolute;left:0;top:0;right:0;height:42px}
+.tb-ic{position:absolute;top:11px;width:20px;height:20px;opacity:.8}
 .ic-menu{left:26px}
 .ic-menu::before{content:"";position:absolute;left:2px;right:2px;top:4px;height:2px;background:var(--tx2);
   box-shadow:0 6px 0 var(--tx2),0 12px 0 var(--tx2)}
@@ -57,9 +57,9 @@ h1{font-size:23px;line-height:1.5;margin:0 0 8px}
   border:2px solid var(--tx2);border-radius:50%;box-sizing:border-box}
 .ic-search::after{content:"";position:absolute;left:12px;top:12px;width:7px;height:2px;
   background:var(--tx2);transform:rotate(45deg)}
-.tb-nav{position:absolute;top:11px;font-size:20px;color:var(--tx3)}
+.tb-nav{position:absolute;top:8px;font-size:20px;color:var(--tx3)}
 .tb-back{left:170px}.tb-fwd{left:212px}
-.win{position:absolute;top:0;height:48px;width:62px;display:flex;align-items:center;justify-content:center;
+.win{position:absolute;top:0;height:42px;width:62px;display:flex;align-items:center;justify-content:center;
   color:var(--tx2);font-size:15px}
 .win-min{right:124px}.win-max{right:62px}.win-close{right:0}
 .win-max::before{content:"";width:12px;height:12px;border:1.6px solid var(--tx2)}
@@ -67,8 +67,8 @@ h1{font-size:23px;line-height:1.5;margin:0 0 8px}
 .win-close::before{content:"✕"}
 
 /* ============ サイドバー（440px） ============ */
-.side{position:absolute;left:0;top:0;bottom:0;width:440px;box-sizing:border-box;
-  background:var(--side);border-right:1px solid #33322d;padding:56px 14px 16px;
+.side{position:absolute;left:0;top:0;bottom:0;width:432px;box-sizing:border-box;
+  background:var(--side);border-right:1px solid #33322d;padding:50px 14px 16px;
   display:flex;flex-direction:column}
 .sb-tabs{display:flex;gap:6px;background:var(--pillbg);border:1px solid #33322d;border-radius:14px;
   padding:5px;margin:0 4px 16px}
@@ -99,9 +99,9 @@ h1{font-size:23px;line-height:1.5;margin:0 0 8px}
 .sb-user .spark{margin-left:auto;color:var(--tx3);font-size:14px}
 
 /* ============ メイン領域 ============ */
-.main{position:absolute;left:440px;top:0;right:0;bottom:0;background:var(--app)}
+.main{position:absolute;left:432px;top:0;right:0;bottom:0;background:var(--app)}
 /* セッションヘッダー */
-.mh{position:absolute;left:0;top:48px;right:0;height:44px;display:flex;align-items:center;padding:0 28px;gap:12px}
+.mh{position:absolute;left:0;top:40px;right:0;height:40px;display:flex;align-items:center;padding:0 28px;gap:12px}
 .mh .cloud{width:20px;height:12px;position:relative;opacity:.75}
 .mh .cloud::before{content:"";position:absolute;inset:0;border:2px solid var(--tx2);border-radius:8px;border-bottom-width:2.5px}
 .mh .tt{font-size:14.5px;font-weight:600;color:var(--tx)}
@@ -109,7 +109,7 @@ h1{font-size:23px;line-height:1.5;margin:0 0 8px}
   padding:2px 10px;background:#2b2a26}
 .mh .mic{margin-left:auto;color:var(--tx3);font-size:14px;letter-spacing:14px}
 /* ステータス行 */
-.stat{position:absolute;left:28px;top:98px;display:flex;align-items:center;gap:9px;
+.stat{position:absolute;left:22px;top:84px;display:flex;align-items:center;gap:9px;
   font-size:12.5px;color:var(--tx2)}
 .stat .spin{width:13px;height:13px;color:var(--coral);font-size:13px;line-height:13px;
   animation:spin 1.6s linear infinite}
@@ -118,66 +118,66 @@ h1{font-size:23px;line-height:1.5;margin:0 0 8px}
 .stat.done .spin{animation:none;color:var(--green)}
 
 /* 列見出し */
-.chead{position:absolute;top:126px;font-size:10.5px;letter-spacing:.18em;color:var(--tx3);
+.chead{position:absolute;top:108px;font-size:10.5px;letter-spacing:.18em;color:var(--tx3);
   text-transform:uppercase;opacity:0;transition:opacity .3s}
 .chead b{color:var(--tx2);font-weight:700;letter-spacing:.1em}
 .chead .ax{display:inline;font-size:10px;letter-spacing:.02em;text-transform:none;margin-left:10px}
 .chead.in{opacity:1}
 
 /* エッジ */
-#edges{position:absolute;inset:0;width:1480px;height:1080px;pointer-events:none}
+#edges{position:absolute;inset:0;width:1488px;height:1080px;pointer-events:none}
 .edge{fill:none;stroke:var(--edge);stroke-width:1.5;stroke-dasharray:1;stroke-dashoffset:1;
   transition:stroke-dashoffset .28s ease,opacity .35s,stroke .3s,stroke-width .25s}
 .edge.in{stroke-dashoffset:0}
 
 /* ノード＝白カード */
-.node{position:absolute;box-sizing:border-box;background:var(--card);border-radius:9px;
-  padding:7px 11px 7px;box-shadow:0 2px 10px rgba(0,0,0,.35);
+.node{position:absolute;box-sizing:border-box;background:var(--card);border-radius:10px;
+  padding:9px 12px 8px;box-shadow:0 3px 14px rgba(0,0,0,.45);
   opacity:0;transform:translateY(6px) scale(.97);
   transition:opacity .22s ease,transform .22s ease,box-shadow .35s}
 .node.in{opacity:1;transform:none}
-.node p{margin:0;font-size:12px;line-height:1.45;letter-spacing:.01em;color:var(--card-tx)}
-.ntag{display:block;font-size:8.5px;letter-spacing:.2em;color:var(--card-tx2);text-transform:uppercase;margin-bottom:2px}
-.nbadge{display:block;font-size:8.5px;letter-spacing:.12em;margin-bottom:2px;font-weight:700;color:var(--navy)}
-.nsub{display:block;font-size:9px;line-height:1.4;color:var(--card-tx2);margin-top:3px}
+.node p{margin:0;font-size:13px;line-height:1.45;letter-spacing:.01em;color:var(--card-tx)}
+.ntag{display:block;font-size:9px;letter-spacing:.2em;color:var(--card-tx2);text-transform:uppercase;margin-bottom:2px}
+.nbadge{display:block;font-size:9px;letter-spacing:.12em;margin-bottom:2px;font-weight:700;color:var(--ink-bdg)}
+.nsub{display:block;font-size:9.5px;line-height:1.4;color:var(--card-tx2);margin-top:3px}
 
-.node.problem{border-left:4px solid var(--coral);box-shadow:0 3px 16px rgba(0,0,0,.5)}
-.node.problem p{font-size:13.5px;font-weight:700;line-height:1.45}
-.node.root{border-left:4px solid var(--navy)}
-.node.verify{border-left:4px solid var(--brick)}
-.node.verify .nbadge{color:var(--brick)}
-.node.given{background:#dedcd4}
+.node.problem{box-shadow:0 5px 22px rgba(0,0,0,.6)}
+.node.problem p{font-size:15px;font-weight:700;line-height:1.45}
+.node.root p{font-weight:700}
+.node.verify .nbadge{color:#8a877f}
+.node.given{background:#e6e4dd}
 .node.given .nbadge{color:var(--card-tx2)}
 .node.given p{color:#5a5852}
-.node.todo{background:#dedcd4;border:1.5px dashed #a09d94;border-radius:9px}
+.node.todo{background:#e6e4dd;border:1.5px dashed #a09d94;border-radius:9px}
 .node.todo .nbadge{color:var(--card-tx2)}
 .node.todo p{color:#5a5852}
 .node.flash{box-shadow:0 0 0 3px rgba(217,119,87,.5),0 3px 16px rgba(0,0,0,.5)}
 
 /* 打ち手カード */
-.node.act{background:#fbf1ea;border-left:4px solid var(--coral)}
-.node.act .ntag{color:var(--coral)}
-.node.act p{font-size:11.5px}
+.node.act .ntag{color:#8a877f}
+.node.act p{font-size:12.5px;font-weight:700}
 
 /* 本命の点灯（最後だけ） */
-.stage.hon .node:not(.pn):not(.problem){opacity:.5}
+.stage.hon .node:not(.pn):not(.problem){opacity:.45}
 .stage.hon .edge:not(.pe){opacity:.35}
 .stage.hon .chead{opacity:.4}
 .stage.hon .edge.pe{stroke:var(--coral);stroke-width:2.6}
 .stage.hon .node.pn{opacity:1}
-.stage.hon .node.act.pn{transform:scale(1.045);
-  box-shadow:0 0 0 3px rgba(217,119,87,.55),0 0 34px rgba(217,119,87,.5),0 4px 18px rgba(0,0,0,.5)}
+.stage.hon .node.act.pn{background:var(--coral);transform:scale(1.05);
+  box-shadow:0 0 0 3px rgba(217,119,87,.4),0 0 42px rgba(217,119,87,.55),0 6px 22px rgba(0,0,0,.5)}
+.stage.hon .node.act.pn p{color:#fff}
+.stage.hon .node.act.pn .ntag{color:rgba(255,255,255,.78)}
 
 .contrib{position:absolute;right:8px;bottom:-11px;font-size:9.5px;letter-spacing:.04em;
   padding:1px 8px;background:#2b2a26;border:1px solid var(--line);border-radius:999px;color:var(--tx2);
   font-variant-numeric:tabular-nums;opacity:0;transition:opacity .3s}
-.contrib.mn{background:#43302a;border-color:#7a4a38;color:#f0b8a0;font-weight:700}
+.contrib.mn{background:#35332e;border-color:#55534d;color:#e6e3db;font-weight:700}
 .stage.show-contrib .contrib{opacity:1}
 
 /* ============ 下部（ブランチバー・入力欄・アクション行） ============ */
-.fbar{position:absolute;left:440px;right:0;top:900px;bottom:0;background:var(--app)}
+.fbar{position:absolute;left:432px;right:0;top:948px;bottom:0;background:var(--app)}
 .fcol{position:absolute;left:50%;transform:translateX(-50%);width:980px}
-.gitbar{top:12px;height:42px;box-sizing:border-box;background:#2b2a26;border:1px solid var(--line);
+.gitbar{top:8px;height:34px;box-sizing:border-box;background:#2b2a26;border:1px solid var(--line);
   border-radius:10px;display:flex;align-items:center;gap:14px;padding:0 16px;font-size:12.5px;color:var(--tx2)}
 .gitbar .repo{color:var(--tx2)}
 .gitbar .br{color:var(--tx3)}
@@ -187,10 +187,10 @@ h1{font-size:23px;line-height:1.5;margin:0 0 8px}
 .gitbar .prbtn{background:#3a3833;border:1px solid var(--line);border-radius:8px;color:var(--tx);
   font-size:12.5px;padding:5px 14px;margin-left:12px}
 .gitbar .prbtn span{color:var(--tx3);margin-left:8px;font-size:10px}
-.inbox{top:64px;height:52px;box-sizing:border-box;border:1.5px solid #45443f;border-radius:14px;
+.inbox{top:48px;height:42px;box-sizing:border-box;border:1.5px solid #45443f;border-radius:14px;
   display:flex;align-items:center;padding:0 18px;font-size:14px;color:var(--tx3);background:#22211e}
 .inbox .ret{margin-left:auto;font-size:15px;color:var(--tx3)}
-.acts{top:126px;display:flex;align-items:center;gap:20px;font-size:13px;color:var(--tx2)}
+.acts{top:96px;display:flex;align-items:center;gap:20px;font-size:13px;color:var(--tx2)}
 .acts .plus{font-size:15px;color:var(--tx3)}
 .micq{position:relative;width:11px;height:15px;display:inline-block}
 .micq::before{content:"";position:absolute;left:3px;top:0;width:6px;height:9px;background:var(--tx3);border-radius:3px}
@@ -275,8 +275,8 @@ body.record.capture #unrecord{display:none}
 "use strict";
 
 /* ============ レイアウト定数（メイン領域=1480px内） ============ */
-var COLX=[28,267,506,745,984,1223], W=205;
-var TOP=148, ROWH=67;
+var COLX=[20,265,510,755,1000,1245], W=222;
+var TOP=126, ROWH=74;
 
 /* ============ ツリーデータ ============ */
 var NODES=[
@@ -361,10 +361,10 @@ function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"
 function estH(n,isP){
   var per=isP?15:15;
   var lines=Math.min(3,Math.max(1,Math.ceil(String(n.text||"").length/per)));
-  var h=15+lines*17;
-  if(n.tag||isP)h+=12;
-  if(n.badge)h+=12;
-  if(n.sub)h+=12;
+  var h=19+lines*19;
+  if(n.tag||isP)h+=13;
+  if(n.badge)h+=13;
+  if(n.sub)h+=13;
   return h;
 }
 
@@ -458,7 +458,7 @@ function buildStage(){
   });
   /* 打ち手カード */
   ACTS.forEach(function(a){
-    var ah=15+Math.min(3,Math.max(1,Math.ceil(a.text.length/15)))*17+12;
+    var ah=19+Math.min(3,Math.max(1,Math.ceil(a.text.length/15)))*19+13;
     h.push('<div class="node act'+(a.hon?" pn":"")+'" id="n-'+a.id+'" style="left:'+COLX[5]+'px;top:'+(a._cy-ah/2)+'px;width:'+W+'px">'+
       '<span class="ntag">打ち手</span><p>'+esc(a.text)+'</p></div>');
   });
