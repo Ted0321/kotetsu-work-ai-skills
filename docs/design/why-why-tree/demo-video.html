@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>なぜなぜ分析 — デモ動画ステージ v4（why-why-tree / 1920×1080）</title>
+<title>なぜなぜ分析 — デモ動画ステージ v4.1（why-why-tree / 1920×1080）</title>
 </head>
 <body>
 <style>
@@ -488,16 +488,18 @@ function buildStage(){
 
   stage.className="stage";
   stage.innerHTML=h.join("");
-  cam(430,554,1.6);
+  cam(430,554,1.7);
 }
 
 /* ============ 演出プリミティブ ============ */
 var SPEED={v:1}, instant=false;
 function el(id){return document.getElementById(id);}
-function cam(cx,cy,s){
+function cam(cx,cy,s,dur){
   cx=Math.max(744/s,Math.min(1488-744/s,cx));
   cy=Math.max(540/s,Math.min(1080-540/s,cy));
-  el("cam").style.transform="translate("+(744-cx*s)+"px,"+(540-cy*s)+"px) scale("+s+")";
+  var c=el("cam");
+  c.style.transitionDuration=((dur||1.05)/SPEED.v)+"s";
+  c.style.transform="translate("+(744-cx*s)+"px,"+(540-cy*s)+"px) scale("+s+")";
 }
 function stat(t,done){
   el("statTx").textContent=t;
@@ -518,53 +520,54 @@ function flash(id){
 var EVENTS=[
  {d:200, r:function(){stat("問題を定量で固定 —「いつも遅れる」→ 期間・件数・程度");head(0);show("p0");}},
 
- {d:900, r:function(){stat("なぜ① 切り口を宣言 — 計画→実行→統制→体制");head(1);cam(560,545,1.45);}},
+ {d:900, r:function(){stat("なぜ① 切り口を宣言 — 計画→実行→統制→体制");head(1);cam(560,330,1.5,.8);}},
  {d:300, r:function(){edgeNode("A","p0");}},
  {d:240, r:function(){edgeNode("B","p0");}},
- {d:240, r:function(){edgeNode("C","p0");}},
+ {d:240, r:function(){edgeNode("C","p0");cam(560,760,1.5,1.1);}},
  {d:240, r:function(){edgeNode("D","p0");}},
  {d:600, r:function(){stat("兄弟監査 ✓粒度 ✓網羅 — 4枝で発生源を覆う");}},
 
- {d:700, r:function(){stat("なぜ② 10枝へ展開 —「だから」逆読みで1歩ずつ");head(2);cam(760,540,1.3);}},
+ {d:700, r:function(){stat("なぜ② 10枝へ展開 —「だから」逆読みで1歩ずつ");head(2);cam(760,320,1.45,.9);}},
  {d:280, r:function(){edgeNode("A1","A");}},
  {d:190, r:function(){edgeNode("A2","A");}},
  {d:260, r:function(){edgeNode("B1","B");}},
  {d:190, r:function(){edgeNode("B2","B");}},
  {d:190, r:function(){edgeNode("B3","B");}},
- {d:260, r:function(){edgeNode("C1","C");}},
+ {d:260, r:function(){edgeNode("C1","C");cam(760,740,1.45,1.3);}},
  {d:190, r:function(){edgeNode("C2","C");}},
  {d:190, r:function(){edgeNode("C3","C");}},
  {d:260, r:function(){edgeNode("D1","D");}},
  {d:190, r:function(){edgeNode("D2","D");}},
  {d:600, r:function(){stat("停止判定 — C2は打ち手を1文で書ける → ● 早期打ち止め");flash("C2");}},
 
- {d:800, r:function(){stat("なぜ③ — 掘る前に毎ノード判定（●対策可/◐要検証/○制御外）");head(3);cam(920,540,1.35);}},
+ {d:800, r:function(){stat("なぜ③ — 掘る前に毎ノード判定（●対策可/◐要検証/○制御外）");head(3);cam(920,300,1.48,.9);}},
  {d:280, r:function(){edgeNode("A1a","A1");}},
  {d:180, r:function(){edgeNode("A2a","A2");}},
  {d:180, r:function(){edgeNode("B1a","B1");}},
  {d:180, r:function(){edgeNode("B2a","B2");}},
  {d:180, r:function(){edgeNode("B3a","B3");}},
- {d:180, r:function(){edgeNode("C1a","C1");}},
+ {d:180, r:function(){edgeNode("C1a","C1");cam(920,720,1.48,1.2);}},
  {d:180, r:function(){edgeNode("C3a","C3");}},
  {d:180, r:function(){edgeNode("D1a","D1");}},
  {d:180, r:function(){edgeNode("D2a","D2");}},
  {d:600, r:function(){stat("停止 — ●C1a対策可 ／ ○D1a制御外 ／ △D2a要調査");flash("C1a");}},
 
- {d:800, r:function(){stat("なぜ④ — 本丸の枝をもう1歩。「5回」は目安にすぎない");head(4);cam(957,520,1.4);}},
+ {d:800, r:function(){stat("なぜ④ — 本丸の枝をもう1歩。「5回」は目安にすぎない");head(4);cam(957,300,1.5,.9);}},
  {d:280, r:function(){edgeNode("A1a1","A1a");}},
  {d:200, r:function(){edgeNode("A2a1","A2a");}},
  {d:200, r:function(){edgeNode("B1a1","B1a");}},
- {d:200, r:function(){edgeNode("B2a1","B2a");}},
+ {d:200, r:function(){edgeNode("B2a1","B2a");cam(957,500,1.5,1.0);}},
  {d:200, r:function(){edgeNode("B3a1","B3a");}},
  {d:650, r:function(){stat("型付きリーフが出揃う — ●6 ◐2 ○1 △1");stage.classList.add("show-contrib");}},
 
- {d:900, r:function(){stat("打ち手へ接続 — 原因当てで終わらせない");head(5);cam(992,480,1.5);}},
+ {d:900, r:function(){stat("打ち手へ接続 — 原因当てで終わらせない");head(5);cam(992,300,1.55,.9);}},
  {d:300, r:function(){edgeNode("P1","A1a1");}},
  {d:220, r:function(){edgeNode("P2","A2a1");}},
- {d:220, r:function(){edgeNode("P3","B1a1");}},
+ {d:220, r:function(){edgeNode("P3","B1a1");cam(992,450,1.55,1.0);}},
  {d:220, r:function(){edgeNode("P4","B3a1");}},
 
- {d:1000,r:function(){stat("本命 — 寄与最大×即着手可: 要件定義DoDの標準化",true);stage.classList.add("hon");cam(744,540,1);}}
+ {d:1000,r:function(){stat("本命 — 寄与最大×即着手可: 要件定義DoDの標準化",true);stage.classList.add("hon");cam(744,540,1,1.1);}},
+ {d:1400,r:function(){cam(1488,330,1.25,2.0);}}
 ];
 
 /* ============ 再生エンジン ============ */
