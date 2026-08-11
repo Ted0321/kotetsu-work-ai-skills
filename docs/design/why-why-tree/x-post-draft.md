@@ -85,7 +85,7 @@ HTMLのツリー資料まで自動出力するフル版はリポジトリに: gi
 
 | 素材 | 出どころ |
 |---|---|
-| **動画（本番・v4.1確定）** | `docs/design/why-why-tree/demo-video.html` — カメラワーク版（ズームイン→縦スイープ→引き→本命発光）。`?capture=1&speed=1.5` をヘッドレス録画、約13.2秒 |
+| **動画（本番・v4.2確定）** | `docs/design/why-why-tree/demo-video.html` — サイドバーを実スクショ（2026-08-11）完全準拠に差し替え。冒頭は白フラッシュなしでアプリ画面から開始（headに背景色を先行指定＋静止1.1秒ホールド）。`?capture=1&speed=1.5` をヘッドレス録画、約13.7秒・1920×1080・H.264 |
 | 静止画（サムネ） | `demo-video.html?end=1` で最終フレーム直行 |
 | 静止画（実スキル出力・白） | `skills/why-why-tree/assets/tree-template.html` をブラウザで開いてキャプチャ |
 
