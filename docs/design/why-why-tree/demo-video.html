@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>なぜなぜ分析 — デモ動画ステージ v3.4（why-why-tree / 1920×1080）</title>
+<title>なぜなぜ分析 — デモ動画ステージ v4（why-why-tree / 1920×1080）</title>
 </head>
 <body>
 <style>
@@ -100,7 +100,12 @@ h1{font-size:23px;line-height:1.5;margin:0 0 8px}
 .sb-user .spark{margin-left:auto;color:var(--tx3);font-size:14px}
 
 /* ============ メイン領域 ============ */
-.main{position:absolute;left:432px;top:0;right:0;bottom:0;background:var(--app)}
+.main{position:absolute;left:432px;top:0;right:0;bottom:0;background:var(--app);overflow:hidden}
+.camera{position:absolute;inset:0;transform-origin:0 0;will-change:transform;
+  transition:transform 1.05s cubic-bezier(.3,0,.16,1)}
+.mh,.stat{z-index:5}
+.main::after{content:"";position:absolute;left:0;right:0;top:0;height:84px;
+  background:linear-gradient(180deg,var(--app) 58%,transparent);z-index:3;pointer-events:none}
 /* セッションヘッダー */
 .mh{position:absolute;left:0;top:34px;right:0;height:36px;display:flex;align-items:center;padding:0 28px;gap:12px}
 .mh .cloud{width:20px;height:12px;position:relative;opacity:.75}
@@ -182,7 +187,7 @@ h1{font-size:23px;line-height:1.5;margin:0 0 8px}
 .stage.show-contrib .contrib{opacity:1}
 
 /* ============ 下部（ブランチバー・入力欄・アクション行） ============ */
-.fbar{position:absolute;left:432px;right:0;top:948px;bottom:0;background:var(--app)}
+.fbar{position:absolute;left:432px;right:0;top:948px;bottom:0;z-index:4;background:var(--app)}
 .fcol{position:absolute;left:50%;transform:translateX(-50%);width:980px}
 .gitbar{top:8px;height:34px;box-sizing:border-box;background:#2b2a26;border:1px solid var(--line);
   border-radius:10px;display:flex;align-items:center;gap:14px;padding:0 16px;font-size:12.5px;color:var(--tx2)}
@@ -415,6 +420,7 @@ function buildStage(){
   h.push('<div class="mh"><span class="cloud"></span><span class="tt">納期遅延の真因分析</span>'+
     '<span class="repo">kotetsu-work-ai-skills</span><span class="mic">⧉ ⋮</span></div>');
   h.push('<div class="stat" id="stat"><span class="spin" id="spin">✳</span><span id="statTx">スキル why-why-tree を起動しています…</span></div>');
+  h.push('<div class="camera" id="cam">');
 
   /* エッジ */
   h.push('<svg id="edges" aria-hidden="true">');
@@ -468,6 +474,7 @@ function buildStage(){
       '<span class="ntag">打ち手</span><p>'+esc(a.text)+'</p></div>');
   });
   h.push('</div>');
+  h.push('</div>');
 
   /* --- 下部（アプリのフッターUI） --- */
   h.push('<div class="fbar">'+
@@ -481,11 +488,17 @@ function buildStage(){
 
   stage.className="stage";
   stage.innerHTML=h.join("");
+  cam(430,554,1.6);
 }
 
 /* ============ 演出プリミティブ ============ */
 var SPEED={v:1}, instant=false;
 function el(id){return document.getElementById(id);}
+function cam(cx,cy,s){
+  cx=Math.max(744/s,Math.min(1488-744/s,cx));
+  cy=Math.max(540/s,Math.min(1080-540/s,cy));
+  el("cam").style.transform="translate("+(744-cx*s)+"px,"+(540-cy*s)+"px) scale("+s+")";
+}
 function stat(t,done){
   el("statTx").textContent=t;
   if(done){el("stat").classList.add("done");el("spin").textContent="✔";}
@@ -505,14 +518,14 @@ function flash(id){
 var EVENTS=[
  {d:200, r:function(){stat("問題を定量で固定 —「いつも遅れる」→ 期間・件数・程度");head(0);show("p0");}},
 
- {d:900, r:function(){stat("なぜ① 切り口を宣言 — 計画→実行→統制→体制");head(1);}},
+ {d:900, r:function(){stat("なぜ① 切り口を宣言 — 計画→実行→統制→体制");head(1);cam(560,545,1.45);}},
  {d:300, r:function(){edgeNode("A","p0");}},
  {d:240, r:function(){edgeNode("B","p0");}},
  {d:240, r:function(){edgeNode("C","p0");}},
  {d:240, r:function(){edgeNode("D","p0");}},
  {d:600, r:function(){stat("兄弟監査 ✓粒度 ✓網羅 — 4枝で発生源を覆う");}},
 
- {d:700, r:function(){stat("なぜ② 10枝へ展開 —「だから」逆読みで1歩ずつ");head(2);}},
+ {d:700, r:function(){stat("なぜ② 10枝へ展開 —「だから」逆読みで1歩ずつ");head(2);cam(760,540,1.3);}},
  {d:280, r:function(){edgeNode("A1","A");}},
  {d:190, r:function(){edgeNode("A2","A");}},
  {d:260, r:function(){edgeNode("B1","B");}},
@@ -525,7 +538,7 @@ var EVENTS=[
  {d:190, r:function(){edgeNode("D2","D");}},
  {d:600, r:function(){stat("停止判定 — C2は打ち手を1文で書ける → ● 早期打ち止め");flash("C2");}},
 
- {d:800, r:function(){stat("なぜ③ — 掘る前に毎ノード判定（●対策可/◐要検証/○制御外）");head(3);}},
+ {d:800, r:function(){stat("なぜ③ — 掘る前に毎ノード判定（●対策可/◐要検証/○制御外）");head(3);cam(920,540,1.35);}},
  {d:280, r:function(){edgeNode("A1a","A1");}},
  {d:180, r:function(){edgeNode("A2a","A2");}},
  {d:180, r:function(){edgeNode("B1a","B1");}},
@@ -537,7 +550,7 @@ var EVENTS=[
  {d:180, r:function(){edgeNode("D2a","D2");}},
  {d:600, r:function(){stat("停止 — ●C1a対策可 ／ ○D1a制御外 ／ △D2a要調査");flash("C1a");}},
 
- {d:800, r:function(){stat("なぜ④ — 本丸の枝をもう1歩。「5回」は目安にすぎない");head(4);}},
+ {d:800, r:function(){stat("なぜ④ — 本丸の枝をもう1歩。「5回」は目安にすぎない");head(4);cam(957,520,1.4);}},
  {d:280, r:function(){edgeNode("A1a1","A1a");}},
  {d:200, r:function(){edgeNode("A2a1","A2a");}},
  {d:200, r:function(){edgeNode("B1a1","B1a");}},
@@ -545,13 +558,13 @@ var EVENTS=[
  {d:200, r:function(){edgeNode("B3a1","B3a");}},
  {d:650, r:function(){stat("型付きリーフが出揃う — ●6 ◐2 ○1 △1");stage.classList.add("show-contrib");}},
 
- {d:900, r:function(){stat("打ち手へ接続 — 原因当てで終わらせない");head(5);}},
+ {d:900, r:function(){stat("打ち手へ接続 — 原因当てで終わらせない");head(5);cam(992,480,1.5);}},
  {d:300, r:function(){edgeNode("P1","A1a1");}},
  {d:220, r:function(){edgeNode("P2","A2a1");}},
  {d:220, r:function(){edgeNode("P3","B1a1");}},
  {d:220, r:function(){edgeNode("P4","B3a1");}},
 
- {d:1000,r:function(){stat("本命 — 寄与最大×即着手可: 要件定義DoDの標準化",true);stage.classList.add("hon");}}
+ {d:1000,r:function(){stat("本命 — 寄与最大×即着手可: 要件定義DoDの標準化",true);stage.classList.add("hon");cam(744,540,1);}}
 ];
 
 /* ============ 再生エンジン ============ */
