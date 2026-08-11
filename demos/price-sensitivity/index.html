@@ -1,0 +1,788 @@
+<title>値上げ感度シミュレーター</title>
+<style>
+  :root {
+    color-scheme: light;
+    --plane:        #f9f9f7;
+    --surface:      #fcfcfb;
+    --rail:         #f2f1ed;
+    --ink:          #0b0b0b;
+    --ink-2:        #52514e;
+    --muted:        #898781;
+    --grid:         #e1e0d9;
+    --axis:         #c3c2b7;
+    --hairline:     rgba(11, 11, 11, 0.10);
+    --up:           #2a78d6;
+    --down:         #e34948;
+    --total:        #52514e;
+    --good:         #006300;
+    --bad:          #c02f2f;
+    --focus:        #2a78d6;
+    --font-sans: system-ui, -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN",
+                 "Hiragino Sans", "Yu Gothic UI", Meiryo, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --plane:    #0d0d0d;
+      --surface:  #1a1a19;
+      --rail:     #171716;
+      --ink:      #ffffff;
+      --ink-2:    #c3c2b7;
+      --muted:    #898781;
+      --grid:     #2c2c2a;
+      --axis:     #383835;
+      --hairline: rgba(255, 255, 255, 0.10);
+      --up:       #3987e5;
+      --down:     #e66767;
+      --total:    #c3c2b7;
+      --good:     #0ca30c;
+      --bad:      #e66767;
+      --focus:    #3987e5;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --plane:    #0d0d0d;
+    --surface:  #1a1a19;
+    --rail:     #171716;
+    --ink:      #ffffff;
+    --ink-2:    #c3c2b7;
+    --muted:    #898781;
+    --grid:     #2c2c2a;
+    --axis:     #383835;
+    --hairline: rgba(255, 255, 255, 0.10);
+    --up:       #3987e5;
+    --down:     #e66767;
+    --total:    #c3c2b7;
+    --good:     #0ca30c;
+    --bad:      #e66767;
+    --focus:    #3987e5;
+  }
+
+  body {
+    margin: 0;
+    background: var(--plane);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  * { box-sizing: border-box; }
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 3px; }
+
+  .app { max-width: 1240px; margin: 0 auto; padding: 28px 24px 56px; }
+
+  .masthead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 16px;
+              padding-bottom: 16px; border-bottom: 1px solid var(--hairline); }
+  .masthead h1 { font-size: 21px; font-weight: 650; letter-spacing: .01em; margin: 0; }
+  .masthead p { margin: 0; color: var(--ink-2); font-size: 13.5px; }
+
+  .eyebrow { font-size: 10.5px; font-weight: 650; letter-spacing: .13em;
+             text-transform: uppercase; color: var(--muted); }
+
+  .layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 20px; margin-top: 20px; }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+
+  /* ---- control rail ---- */
+  .rail { background: var(--rail); border: 1px solid var(--hairline); border-radius: 10px;
+          padding: 18px 16px; align-self: start; display: flex; flex-direction: column; gap: 20px; }
+  .presets { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
+  .presets button {
+    font: inherit; font-size: 12px; font-weight: 550; line-height: 1.3;
+    padding: 8px 6px; cursor: pointer; color: var(--ink);
+    background: var(--surface); border: 1px solid var(--hairline); border-radius: 6px;
+    transition: border-color .15s, background .15s;
+  }
+  .presets button:hover { border-color: var(--focus); }
+  .presets button[aria-pressed="true"] { border-color: var(--focus); box-shadow: inset 0 0 0 1px var(--focus); }
+
+  .ctrl + .ctrl { margin-top: 16px; }
+  .ctrl-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .ctrl-head label { font-size: 12.5px; font-weight: 550; color: var(--ink-2); }
+  .ctrl-val { font-size: 15px; font-weight: 650; font-variant-numeric: tabular-nums; }
+  .ctrl-note { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  input[type="range"] { width: 100%; margin: 6px 0 0; accent-color: var(--focus); cursor: grab; }
+  input[type="range"]:active { cursor: grabbing; }
+  .scale { display: flex; justify-content: space-between; font-size: 10.5px;
+           color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  .reset { font: inherit; font-size: 12px; padding: 7px 10px; cursor: pointer;
+           color: var(--ink-2); background: transparent;
+           border: 1px solid var(--hairline); border-radius: 6px; }
+  .reset:hover { color: var(--ink); border-color: var(--axis); }
+
+  /* ---- results ---- */
+  .results { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+  .tiles { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 12px; }
+  @media (max-width: 720px) { .tiles { grid-template-columns: 1fr 1fr; } }
+  .tile { background: var(--surface); border: 1px solid var(--hairline);
+          border-radius: 10px; padding: 14px 16px; min-width: 0; }
+  .tile .label { font-size: 11.5px; color: var(--ink-2); }
+  .tile .value { font-weight: 650; letter-spacing: -.015em; margin-top: 2px;
+                 font-size: 26px; line-height: 1.15; }
+  .tile.hero .value { font-size: 48px; }
+  .tile .unit { font-size: 13px; font-weight: 500; color: var(--ink-2); margin-left: 3px; }
+  .tile .delta { font-size: 12px; font-weight: 550; margin-top: 4px; color: var(--ink-2);
+                 font-variant-numeric: tabular-nums; }
+  .tile .delta.good { color: var(--good); }
+  .tile .delta.bad  { color: var(--bad); }
+
+  .card { background: var(--surface); border: 1px solid var(--hairline);
+          border-radius: 10px; padding: 16px 18px 12px; min-width: 0; }
+  .card-head { display: flex; flex-wrap: wrap; justify-content: space-between;
+               align-items: baseline; gap: 4px 16px; margin-bottom: 6px; }
+  .card-head h2 { font-size: 14px; font-weight: 650; margin: 0; letter-spacing: .01em; }
+  .card-head .sub { font-size: 11.5px; color: var(--muted); }
+  .two-up { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 900px) { .two-up { grid-template-columns: 1fr; } }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 11.5px; color: var(--ink-2); }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .swatch { width: 9px; height: 9px; border-radius: 2px; flex: none; }
+
+  .chart { width: 100%; display: block; overflow-x: auto; }
+  svg { display: block; max-width: 100%; }
+  .tick { font-size: 10.5px; fill: var(--muted); font-variant-numeric: tabular-nums; }
+  .cat  { font-size: 11px; fill: var(--ink-2); }
+  .dlab { font-size: 11px; fill: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .note { font-size: 11px; color: var(--muted); margin: 8px 0 2px; }
+
+  /* ---- tooltip ---- */
+  #tip { position: fixed; z-index: 20; pointer-events: none; opacity: 0;
+         transition: opacity .1s; background: var(--surface); color: var(--ink);
+         border: 1px solid var(--axis); border-radius: 7px; padding: 8px 10px;
+         font-size: 12px; line-height: 1.45; box-shadow: 0 4px 16px rgba(0,0,0,.16);
+         max-width: 240px; }
+  #tip .t-lab { color: var(--ink-2); font-size: 11px; }
+  #tip .t-val { font-weight: 650; font-variant-numeric: tabular-nums; }
+
+  details { background: var(--surface); border: 1px solid var(--hairline);
+            border-radius: 10px; padding: 12px 18px; }
+  summary { cursor: pointer; font-size: 13px; font-weight: 550; }
+  .tablewrap { overflow-x: auto; margin-top: 10px; }
+  table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+  th, td { text-align: right; padding: 6px 10px; border-bottom: 1px solid var(--hairline);
+           font-variant-numeric: tabular-nums; white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; font-variant-numeric: normal; }
+  thead th { color: var(--ink-2); font-weight: 550; font-size: 11.5px; }
+  tbody tr:last-child td { border-bottom: none; font-weight: 650; }
+
+  footer { margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--hairline);
+           font-size: 11.5px; color: var(--muted); }
+  footer p { margin: 0 0 4px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+  }
+</style>
+
+<div class="app">
+  <header class="masthead">
+    <div>
+      <div class="eyebrow">感度分析 · 価格 × 数量 × 原価</div>
+      <h1>値上げしたら、利益はどうなるか</h1>
+    </div>
+    <p>左のつまみを動かすと、営業利益の内訳・最適点・効きどころが同時に更新されます。</p>
+  </header>
+
+  <div class="layout">
+    <aside class="rail">
+      <div>
+        <div class="eyebrow">シナリオ</div>
+        <div class="presets" id="presets"></div>
+      </div>
+
+      <div>
+        <div class="eyebrow">前提を動かす</div>
+        <div id="controls"></div>
+      </div>
+
+      <button class="reset" id="reset" type="button">現状値に戻す</button>
+    </aside>
+
+    <div class="results">
+      <div class="tiles" id="tiles"></div>
+
+      <section class="card">
+        <div class="card-head">
+          <h2>営業利益ブリッジ</h2>
+          <div class="legend">
+            <span><i class="swatch" style="background:var(--up)"></i>増益要因</span>
+            <span><i class="swatch" style="background:var(--down)"></i>減益要因</span>
+            <span><i class="swatch" style="background:var(--total)"></i>合計</span>
+          </div>
+        </div>
+        <div class="chart" id="c-bridge"></div>
+      </section>
+
+      <div class="two-up">
+        <section class="card">
+          <div class="card-head">
+            <h2>値上げ率と営業利益</h2>
+            <div class="sub">いまの位置と、利益が最大になる点</div>
+          </div>
+          <div class="chart" id="c-curve"></div>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <h2>効きどころ</h2>
+            <div class="legend">
+              <span><i class="swatch" style="background:var(--up)"></i>改善</span>
+              <span><i class="swatch" style="background:var(--down)"></i>悪化</span>
+            </div>
+          </div>
+          <div class="chart" id="c-tornado"></div>
+        </section>
+      </div>
+
+      <details>
+        <summary>数値で見る</summary>
+        <div class="tablewrap"><table id="datatable"></table></div>
+      </details>
+    </div>
+  </div>
+
+  <footer>
+    <p>数量は「値上げ率 × 価格弾力性」で線形に反応するものとしています。実務では弾力性は一定ではないため、示された最適点は幅を持って読んでください。</p>
+    <p>金額は百万円。固定費・変動費単価は現状値からの変動率で操作します。</p>
+  </footer>
+</div>
+
+<div id="tip" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  "use strict";
+
+  /* ---------------- model ---------------- */
+  const BASE = { q: 100000, p: 12000, c: 7200, F: 360e6 };
+
+  const CONTROLS = [
+    { key:'dp',  label:'値上げ率',     min:-10, max:30,  step:0.5, def:5,    unit:'%',
+      note:'現状の販売単価からの変動' },
+    { key:'eps', label:'価格弾力性',   min:-3,  max:-0.2, step:0.1, def:-1.2, unit:'',
+      note:'1%値上げすると数量が何%減るか' },
+    { key:'dc',  label:'変動費単価',   min:-10, max:40,  step:1,   def:0,    unit:'%',
+      note:'原材料・物流などの変動' },
+    { key:'dF',  label:'固定費',       min:-20, max:20,  step:1,   def:0,    unit:'%',
+      note:'人件費・設備などの変動' },
+  ];
+
+  const PRESETS = [
+    { name:'現状のまま',     s:{ dp:0,  eps:-1.2, dc:0,  dF:0 } },
+    { name:'5%値上げ',       s:{ dp:5,  eps:-1.2, dc:0,  dF:0 } },
+    { name:'原材料が20%高騰', s:{ dp:0,  eps:-1.2, dc:20, dF:0 } },
+    { name:'高騰を価格転嫁',  s:{ dp:12, eps:-1.2, dc:20, dF:0 } },
+  ];
+
+  const DEFAULTS = Object.fromEntries(CONTROLS.map(c => [c.key, c.def]));
+  let state = { ...DEFAULTS };
+
+  function compute(s) {
+    const p1 = BASE.p * (1 + s.dp / 100);
+    const q1 = Math.max(0, BASE.q * (1 + s.eps * s.dp / 100));
+    const c1 = BASE.c * (1 + s.dc / 100);
+    const F1 = BASE.F * (1 + s.dF / 100);
+    const prof0 = BASE.q * (BASE.p - BASE.c) - BASE.F;
+    const prof1 = q1 * (p1 - c1) - F1;
+    const cm = p1 - c1;
+    return {
+      p1, q1, c1, F1, cm,
+      rev0: BASE.p * BASE.q,
+      rev1: p1 * q1,
+      prof0, prof1,
+      priceEff: q1 * (p1 - BASE.p),
+      volEff:   (q1 - BASE.q) * (BASE.p - BASE.c),
+      costEff:  -q1 * (c1 - BASE.c),
+      fixEff:   -(F1 - BASE.F),
+      margin0:  prof0 / (BASE.p * BASE.q),
+      margin1:  p1 * q1 > 0 ? prof1 / (p1 * q1) : 0,
+      bep0:     BASE.F / (BASE.p - BASE.c),
+      bep1:     cm > 0 ? F1 / cm : null,
+    };
+  }
+
+  /* ---------------- formatting ---------------- */
+  const MINUS = "−";
+  const nf = (v, d = 0) => Math.abs(v).toLocaleString('ja-JP',
+    { minimumFractionDigits: d, maximumFractionDigits: d });
+  const sgn = v => (v < -1e-9 ? MINUS : '');
+  const mm  = (v, d = 0) => sgn(v) + nf(v / 1e6, d);
+  const mmS = (v, d = 0) => (v >= 0 ? '+' : MINUS) + nf(v / 1e6, d);
+  const pct = (v, d = 1) => sgn(v) + nf(v, d) + '%';
+  const pctS = (v, d = 1) => (v >= 0 ? '+' : MINUS) + nf(v, d) + '%';
+
+  /* ---------------- svg helpers ---------------- */
+  const NS = 'http://www.w3.org/2000/svg';
+  const el = (n, a = {}) => {
+    const e = document.createElementNS(NS, n);
+    for (const k in a) if (a[k] !== null && a[k] !== undefined) e.setAttribute(k, a[k]);
+    return e;
+  };
+  const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+  // rounded only on the data-end; square where it meets the baseline
+  function barPath(x, y, w, h, r, roundTop, roundBottom) {
+    if (h < 0.6) return `M${x},${y}h${w}v0.6h${-w}Z`;
+    const rr = Math.max(0, Math.min(r, w / 2, h / 2));
+    const rt = roundTop ? rr : 0, rb = roundBottom ? rr : 0;
+    let d = `M${x},${y + rt}`;
+    d += rt ? `A${rt},${rt} 0 0 1 ${x + rt},${y}` : '';
+    d += `L${x + w - rt},${y}`;
+    d += rt ? `A${rt},${rt} 0 0 1 ${x + w},${y + rt}` : '';
+    d += `L${x + w},${y + h - rb}`;
+    d += rb ? `A${rb},${rb} 0 0 1 ${x + w - rb},${y + h}` : '';
+    d += `L${x + rb},${y + h}`;
+    d += rb ? `A${rb},${rb} 0 0 1 ${x},${y + h - rb}` : '';
+    return d + 'Z';
+  }
+  // horizontal variant: rounded at the far (data) end only
+  function hBarPath(x, y, w, h, r, roundRight, roundLeft) {
+    if (Math.abs(w) < 0.6) return `M${x},${y}v${h}h0.6v${-h}Z`;
+    const rr = Math.max(0, Math.min(r, Math.abs(w) / 2, h / 2));
+    const rR = roundRight ? rr : 0, rL = roundLeft ? rr : 0;
+    let d = `M${x + rL},${y}`;
+    d += `L${x + w - rR},${y}`;
+    d += rR ? `A${rR},${rR} 0 0 1 ${x + w},${y + rR}` : '';
+    d += `L${x + w},${y + h - rR}`;
+    d += rR ? `A${rR},${rR} 0 0 1 ${x + w - rR},${y + h}` : '';
+    d += `L${x + rL},${y + h}`;
+    d += rL ? `A${rL},${rL} 0 0 1 ${x},${y + h - rL}` : '';
+    d += `L${x},${y + rL}`;
+    d += rL ? `A${rL},${rL} 0 0 1 ${x + rL},${y}` : '';
+    return d + 'Z';
+  }
+
+  function niceTicks(lo, hi, count = 5) {
+    const span = hi - lo || 1;
+    const raw = span / count;
+    const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    const norm = raw / mag;
+    const step = (norm >= 5 ? 10 : norm >= 2 ? 5 : norm >= 1 ? 2 : 1) * mag;
+    const out = [];
+    for (let t = Math.ceil(lo / step) * step; t <= hi + 1e-9; t += step) out.push(t);
+    return out;
+  }
+
+  /* ---------------- tooltip ---------------- */
+  const tip = document.getElementById('tip');
+  function showTip(evt, html) {
+    tip.innerHTML = html;
+    tip.style.opacity = '1';
+    const pad = 14, r = tip.getBoundingClientRect();
+    let x = evt.clientX + pad, y = evt.clientY - r.height - 10;
+    if (x + r.width > innerWidth - 8) x = evt.clientX - r.width - pad;
+    if (y < 8) y = evt.clientY + pad;
+    tip.style.left = x + 'px';
+    tip.style.top = y + 'px';
+  }
+  const hideTip = () => { tip.style.opacity = '0'; };
+  function hit(target, html) {
+    target.style.cursor = 'default';
+    target.addEventListener('pointermove', e => showTip(e, html));
+    target.addEventListener('pointerleave', hideTip);
+  }
+
+  /* ---------------- chart 1: profit bridge ---------------- */
+  function drawBridge(box, m) {
+    const W = Math.max(520, box.clientWidth), H = 320;
+    const M = { t: 30, r: 16, b: 52, l: 62 };
+    const pw = W - M.l - M.r, ph = H - M.t - M.b;
+
+    const steps = [
+      { name: '現状',       val: m.prof0,   type: 'total' },
+      { name: '価格効果',   val: m.priceEff, type: 'delta' },
+      { name: '数量効果',   val: m.volEff,   type: 'delta' },
+      { name: '変動費効果', val: m.costEff,  type: 'delta' },
+      { name: '固定費効果', val: m.fixEff,   type: 'delta' },
+      { name: 'シナリオ',   val: m.prof1,   type: 'total' },
+    ];
+
+    // running positions
+    let run = 0;
+    const bars = steps.map(s => {
+      if (s.type === 'total') { const b = { ...s, from: 0, to: s.val }; run = s.val; return b; }
+      const from = run; run += s.val;
+      return { ...s, from, to: run };
+    });
+
+    const vals = bars.flatMap(b => [b.from, b.to]).concat([0]);
+    let lo = Math.min(...vals), hi = Math.max(...vals);
+    const pad = (hi - lo) * 0.16 || 1;
+    lo -= pad; hi += pad;
+    const y = v => M.t + ph - (v - lo) / (hi - lo) * ph;
+
+    const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, width: W, height: H,
+      role: 'img', 'aria-label': '営業利益ブリッジ' });
+
+    for (const t of niceTicks(lo, hi, 5)) {
+      svg.appendChild(el('line', { x1: M.l, x2: W - M.r, y1: y(t), y2: y(t),
+        stroke: t === 0 ? cssv('--axis') : cssv('--grid'), 'stroke-width': 1 }));
+      const lb = el('text', { x: M.l - 10, y: y(t) + 3.5, 'text-anchor': 'end', class: 'tick' });
+      lb.textContent = nf(t / 1e6, 0) === '0' ? '0' : mm(t, 0);
+      svg.appendChild(lb);
+    }
+
+    const band = pw / bars.length, bw = Math.min(24, band * 0.55);
+    bars.forEach((b, i) => {
+      const cx = M.l + band * (i + 0.5), x = cx - bw / 2;
+      const top = Math.min(y(b.from), y(b.to));
+      const h = Math.abs(y(b.to) - y(b.from));
+      const rising = b.to >= b.from;
+      // an effect too small to register at this scale is neither a gain nor a loss
+      const negligible = b.type === 'delta' && Math.abs(b.val) < 0.5e6;
+      const color = b.type === 'total' ? cssv('--total')
+                  : negligible ? cssv('--axis')
+                  : (rising ? cssv('--up') : cssv('--down'));
+
+      svg.appendChild(el('path', { d: barPath(x, top, bw, h, 4, rising, !rising), fill: color }));
+
+      // connector to the next bar — stops 2px short of each bar (the surface gap)
+      if (i < bars.length - 1) {
+        svg.appendChild(el('line', {
+          x1: cx + bw / 2 + 2, x2: M.l + band * (i + 1.5) - bw / 2 - 2,
+          y1: y(b.to), y2: y(b.to), stroke: cssv('--axis'), 'stroke-width': 1 }));
+      }
+
+      const lab = el('text', { x: cx, y: top - 8, 'text-anchor': 'middle', class: 'dlab' });
+      lab.textContent = b.type === 'total' ? mm(b.val, 0)
+                      : negligible ? '0' : mmS(b.val, 0);
+      svg.appendChild(lab);
+
+      const cat = el('text', { x: cx, y: H - M.b + 20, 'text-anchor': 'middle', class: 'cat' });
+      cat.textContent = b.name;
+      svg.appendChild(cat);
+
+      const hz = el('rect', { x: M.l + band * i, y: M.t, width: band, height: ph, fill: 'transparent' });
+      hit(hz, `<div class="t-lab">${b.name}</div><div class="t-val">${
+        b.type === 'total' ? mm(b.val, 0) : mmS(b.val, 0)}百万円</div>`);
+      svg.appendChild(hz);
+    });
+
+    const unit = el('text', { x: M.l - 10, y: M.t - 12, 'text-anchor': 'end', class: 'tick' });
+    unit.textContent = '百万円';
+    svg.appendChild(unit);
+
+    box.replaceChildren(svg);
+  }
+
+  /* ---------------- chart 2: sensitivity curve ---------------- */
+  function drawCurve(box, m) {
+    const W = Math.max(320, box.clientWidth), H = 268;
+    const M = { t: 26, r: 18, b: 46, l: 58 };
+    const pw = W - M.l - M.r, ph = H - M.t - M.b;
+    const cfg = CONTROLS[0];
+
+    const pts = [];
+    const N = 160;
+    for (let i = 0; i <= N; i++) {
+      const dp = cfg.min + (cfg.max - cfg.min) * i / N;
+      pts.push({ dp, prof: compute({ ...state, dp }).prof1 });
+    }
+    const best = pts.reduce((a, b) => (b.prof > a.prof ? b : a));
+
+    let lo = Math.min(...pts.map(p => p.prof), 0);
+    let hi = Math.max(...pts.map(p => p.prof), 0);
+    const pad = (hi - lo) * 0.14 || 1;
+    lo -= pad; hi += pad;
+    const X = v => M.l + (v - cfg.min) / (cfg.max - cfg.min) * pw;
+    const Y = v => M.t + ph - (v - lo) / (hi - lo) * ph;
+
+    const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, width: W, height: H,
+      role: 'img', 'aria-label': '値上げ率と営業利益の関係' });
+
+    for (const t of niceTicks(lo, hi, 4)) {
+      svg.appendChild(el('line', { x1: M.l, x2: W - M.r, y1: Y(t), y2: Y(t),
+        stroke: Math.abs(t) < 1e-9 ? cssv('--axis') : cssv('--grid'), 'stroke-width': 1 }));
+      const lb = el('text', { x: M.l - 9, y: Y(t) + 3.5, 'text-anchor': 'end', class: 'tick' });
+      lb.textContent = mm(t, 0);
+      svg.appendChild(lb);
+    }
+    for (const t of [-10, 0, 10, 20, 30]) {
+      const lb = el('text', { x: X(t), y: H - M.b + 18, 'text-anchor': 'middle', class: 'tick' });
+      lb.textContent = (t > 0 ? '+' : '') + t + '%';
+      svg.appendChild(lb);
+    }
+
+    svg.appendChild(el('path', {
+      d: pts.map((p, i) => `${i ? 'L' : 'M'}${X(p.dp).toFixed(2)},${Y(p.prof).toFixed(2)}`).join(''),
+      fill: 'none', stroke: cssv('--up'), 'stroke-width': 2,
+      'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+
+    // profit-maximising point — hollow marker, direct-labelled
+    svg.appendChild(el('circle', { cx: X(best.dp), cy: Y(best.prof), r: 5,
+      fill: cssv('--surface'), stroke: cssv('--up'), 'stroke-width': 2 }));
+    const bl = el('text', {
+      x: Math.min(X(best.dp), W - M.r - 4), y: Math.max(Y(best.prof) - 12, M.t + 10),
+      'text-anchor': X(best.dp) > W - M.r - 60 ? 'end' : 'middle', class: 'dlab' });
+    bl.textContent = `最適 ${pctS(best.dp, 1)}`;
+    svg.appendChild(bl);
+
+    // current position
+    const cur = m.prof1;
+    svg.appendChild(el('line', { x1: X(state.dp), x2: X(state.dp), y1: M.t, y2: M.t + ph,
+      stroke: cssv('--axis'), 'stroke-width': 1 }));
+    svg.appendChild(el('circle', { cx: X(state.dp), cy: Y(cur), r: 6,
+      fill: cssv('--up'), stroke: cssv('--surface'), 'stroke-width': 2 }));
+
+    const unit = el('text', { x: M.l - 9, y: M.t - 10, 'text-anchor': 'end', class: 'tick' });
+    unit.textContent = '百万円';
+    svg.appendChild(unit);
+    const xlab = el('text', { x: M.l + pw / 2, y: H - 8, 'text-anchor': 'middle', class: 'cat' });
+    xlab.textContent = '値上げ率';
+    svg.appendChild(xlab);
+
+    const hz = el('rect', { x: M.l, y: M.t, width: pw, height: ph, fill: 'transparent' });
+    hz.addEventListener('pointermove', e => {
+      const bb = svg.getBoundingClientRect();
+      const sx = (e.clientX - bb.left) * (W / bb.width);
+      const dp = cfg.min + (sx - M.l) / pw * (cfg.max - cfg.min);
+      const p = pts.reduce((a, b) => (Math.abs(b.dp - dp) < Math.abs(a.dp - dp) ? b : a));
+      showTip(e, `<div class="t-lab">値上げ率 ${pctS(p.dp, 1)}</div>
+                  <div class="t-val">営業利益 ${mm(p.prof, 0)}百万円</div>`);
+    });
+    hz.addEventListener('pointerleave', hideTip);
+    svg.appendChild(hz);
+
+    box.replaceChildren(svg);
+  }
+
+  /* ---------------- chart 3: tornado ---------------- */
+  const SWINGS = [
+    { key: 'dp',  label: '値上げ率',   delta: 3,   fmt: v => pctS(v, 1) },
+    { key: 'dc',  label: '変動費単価', delta: 5,   fmt: v => pctS(v, 0) },
+    { key: 'eps', label: '価格弾力性', delta: 0.5, fmt: v => (v >= 0 ? '+' : MINUS) + nf(v, 1) },
+    { key: 'dF',  label: '固定費',     delta: 5,   fmt: v => pctS(v, 0) },
+  ];
+
+  function drawTornado(box, m) {
+    const W = Math.max(320, box.clientWidth), H = 268;
+    const M = { t: 26, r: 54, b: 44, l: 84 };
+    const pw = W - M.l - M.r, ph = H - M.t - M.b;
+    const cur = m.prof1;
+
+    const rows = SWINGS.map(s => {
+      const cfg = CONTROLS.find(c => c.key === s.key);
+      const lo = Math.max(cfg.min, state[s.key] - s.delta);
+      const hi = Math.min(cfg.max, state[s.key] + s.delta);
+      const a = compute({ ...state, [s.key]: lo }).prof1;
+      const b = compute({ ...state, [s.key]: hi }).prof1;
+      return { ...s, lo, hi, min: Math.min(a, b), max: Math.max(a, b),
+               atLo: a, atHi: b, swing: Math.abs(b - a) };
+    }).sort((x, y) => y.swing - x.swing);
+
+    const span = Math.max(...rows.map(r => Math.max(cur - r.min, r.max - cur)), 1);
+    const X = v => M.l + pw / 2 + (v - cur) / span * (pw / 2) * 0.92;
+
+    const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, width: W, height: H,
+      role: 'img', 'aria-label': '各要因が営業利益に与える影響' });
+
+    svg.appendChild(el('line', { x1: X(cur), x2: X(cur), y1: M.t - 6, y2: M.t + ph,
+      stroke: cssv('--axis'), 'stroke-width': 1 }));
+    const cl = el('text', { x: X(cur), y: M.t - 12, 'text-anchor': 'middle', class: 'tick' });
+    cl.textContent = `いま ${mm(cur, 0)}`;
+    svg.appendChild(cl);
+
+    const band = ph / rows.length, bh = Math.min(24, band * 0.5);
+    rows.forEach((r, i) => {
+      const yc = M.t + band * (i + 0.5) - bh / 2;
+
+      const name = el('text', { x: M.l - 12, y: yc + bh / 2 + 4, 'text-anchor': 'end', class: 'cat' });
+      name.textContent = r.label;
+      svg.appendChild(name);
+
+      // downside (left of centre) and upside (right) — 2px surface gap at the centre
+      const dn = Math.min(r.min, cur), up = Math.max(r.max, cur);
+      if (cur - dn > 1e-6) {
+        const x0 = X(dn), x1 = X(cur) - 1;
+        svg.appendChild(el('path', {
+          d: hBarPath(x1, yc, x0 - x1, bh, 4, false, true), fill: cssv('--down') }));
+      }
+      if (up - cur > 1e-6) {
+        const x0 = X(cur) + 1, x1 = X(up);
+        svg.appendChild(el('path', {
+          d: hBarPath(x0, yc, x1 - x0, bh, 4, true, false), fill: cssv('--up') }));
+      }
+
+      const sw = el('text', { x: W - M.r + 8, y: yc + bh / 2 + 4, 'text-anchor': 'start', class: 'dlab' });
+      sw.textContent = nf(r.swing / 1e6, 0);
+      svg.appendChild(sw);
+
+      const hz = el('rect', { x: M.l, y: M.t + band * i, width: pw, height: band, fill: 'transparent' });
+      hit(hz, `<div class="t-lab">${r.label} ${r.fmt(r.lo)} 〜 ${r.fmt(r.hi)}</div>
+               <div class="t-val">${mm(r.min, 0)} 〜 ${mm(r.max, 0)}百万円</div>
+               <div class="t-lab">振れ幅 ${nf(r.swing / 1e6, 0)}百万円</div>`);
+      svg.appendChild(hz);
+    });
+
+    const foot = el('text', { x: W - M.r + 8, y: M.t - 12, 'text-anchor': 'start', class: 'tick' });
+    foot.textContent = '振れ幅';
+    svg.appendChild(foot);
+    const xlab = el('text', { x: M.l + pw / 2, y: H - 10, 'text-anchor': 'middle', class: 'tick' });
+    xlab.textContent = '各前提を単独で動かしたときの営業利益（百万円）';
+    svg.appendChild(xlab);
+
+    box.replaceChildren(svg);
+  }
+
+  /* ---------------- tiles & table ---------------- */
+  function drawTiles(m) {
+    const dProf = m.prof1 - m.prof0, dRev = m.rev1 - m.rev0;
+    const dMar = (m.margin1 - m.margin0) * 100;
+    const dBep = m.bep1 === null ? null : m.bep1 - m.bep0;
+    // no movement is neither good nor bad — it gets the neutral ink
+    const tone = (v, eps, upIsGood = true) =>
+      v === null ? '' : Math.abs(v) < eps ? '' : ((v > 0) === upIsGood ? 'good' : 'bad');
+
+    const items = [
+      { hero: true, label: 'シナリオの営業利益', value: mm(m.prof1, 0), unit: '百万円',
+        delta: Math.abs(dProf) < 0.5e6 ? '±0百万円'
+          : `${mmS(dProf, 0)}百万円（${pctS(dProf / Math.abs(m.prof0) * 100, 1)}）`,
+        tone: tone(dProf, 0.5e6) },
+      { label: '売上高', value: mm(m.rev1, 0), unit: '百万円',
+        delta: Math.abs(dRev) < 0.5e6 ? '±0百万円' : `${mmS(dRev, 0)}百万円`,
+        tone: tone(dRev, 0.5e6) },
+      { label: '営業利益率', value: pct(m.margin1 * 100, 1), unit: '',
+        delta: Math.abs(dMar) < 0.05 ? '±0.0pt' : `${pctS(dMar, 1)}pt`,
+        tone: tone(dMar, 0.05) },
+      { label: '損益分岐点数量', value: m.bep1 ? nf(m.bep1, 0) : '—', unit: '個',
+        delta: dBep === null ? '—'
+          : Math.abs(dBep) < 0.5 ? '±0個'
+          : `${dBep < 0 ? MINUS : '+'}${nf(Math.abs(dBep), 0)}個`,
+        tone: tone(dBep, 0.5, false) },
+    ];
+    document.getElementById('tiles').replaceChildren(...items.map(it => {
+      const d = document.createElement('div');
+      d.className = 'tile' + (it.hero ? ' hero' : '');
+      d.innerHTML = `<div class="label">${it.label}</div>
+        <div class="value">${it.value}${it.unit ? `<span class="unit">${it.unit}</span>` : ''}</div>
+        <div class="delta ${it.tone}">${it.delta} <span style="color:var(--muted)">現状比</span></div>`;
+      return d;
+    }));
+  }
+
+  function drawTable(m) {
+    const rows = [
+      ['販売単価',       nf(BASE.p, 0) + ' 円',        nf(m.p1, 0) + ' 円'],
+      ['販売数量',       nf(BASE.q, 0) + ' 個',        nf(m.q1, 0) + ' 個'],
+      ['売上高',         mm(m.rev0, 0),                mm(m.rev1, 0)],
+      ['変動費単価',     nf(BASE.c, 0) + ' 円',        nf(m.c1, 0) + ' 円'],
+      ['限界利益単価',   nf(BASE.p - BASE.c, 0) + ' 円', nf(m.cm, 0) + ' 円'],
+      ['固定費',         mm(BASE.F, 0),                mm(m.F1, 0)],
+      ['損益分岐点数量', nf(m.bep0, 0) + ' 個',        m.bep1 ? nf(m.bep1, 0) + ' 個' : '—'],
+      ['営業利益率',     pct(m.margin0 * 100, 1),      pct(m.margin1 * 100, 1)],
+      ['営業利益',       mm(m.prof0, 0),               mm(m.prof1, 0)],
+    ];
+    document.getElementById('datatable').innerHTML =
+      `<caption class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">現状とシナリオの比較</caption>
+       <thead><tr><th scope="col">項目</th><th scope="col">現状</th><th scope="col">シナリオ</th></tr></thead>
+       <tbody>${rows.map(r =>
+         `<tr><th scope="row" style="font-weight:500">${r[0]}</th><td>${r[1]}</td><td>${r[2]}</td></tr>`
+       ).join('')}</tbody>`;
+  }
+
+  /* ---------------- controls ---------------- */
+  function buildControls() {
+    const wrap = document.getElementById('controls');
+    wrap.replaceChildren(...CONTROLS.map(c => {
+      const d = document.createElement('div');
+      d.className = 'ctrl';
+      const dec = c.step < 1 ? 1 : 0;
+      d.innerHTML = `
+        <div class="ctrl-head">
+          <label for="r-${c.key}">${c.label}</label>
+          <span class="ctrl-val" id="v-${c.key}"></span>
+        </div>
+        <div class="ctrl-note">${c.note}</div>
+        <input type="range" id="r-${c.key}" min="${c.min}" max="${c.max}"
+               step="${c.step}" value="${state[c.key]}"
+               aria-label="${c.label}">
+        <div class="scale"><span>${nf(c.min, dec) && (c.min < 0 ? MINUS : '') + nf(c.min, dec)}${c.unit}</span>
+        <span>${(c.max < 0 ? MINUS : '') + nf(c.max, dec)}${c.unit}</span></div>`;
+      d.querySelector('input').addEventListener('input', e => {
+        state[c.key] = parseFloat(e.target.value);
+        syncPresets();
+        render();
+      });
+      return d;
+    }));
+  }
+
+  function buildPresets() {
+    const wrap = document.getElementById('presets');
+    wrap.replaceChildren(...PRESETS.map((p, i) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = p.name;
+      b.dataset.idx = i;
+      b.addEventListener('click', () => { animateTo(p.s); });
+      return b;
+    }));
+  }
+
+  function syncPresets() {
+    const same = s => Object.keys(s).every(k => Math.abs(s[k] - state[k]) < 1e-9);
+    document.querySelectorAll('#presets button').forEach((b, i) => {
+      b.setAttribute('aria-pressed', same(PRESETS[i].s) ? 'true' : 'false');
+    });
+  }
+
+  function syncInputs() {
+    CONTROLS.forEach(c => {
+      const r = document.getElementById('r-' + c.key);
+      if (r && parseFloat(r.value) !== state[c.key]) r.value = state[c.key];
+      const dec = c.step < 1 ? 1 : 0;
+      const v = state[c.key];
+      const txt = c.key === 'eps'
+        ? (v < 0 ? MINUS : '') + nf(v, 1)
+        : (v > 0 ? '+' : v < 0 ? MINUS : '') + nf(v, dec) + c.unit;
+      document.getElementById('v-' + c.key).textContent = txt;
+    });
+  }
+
+  // eased transition between scenarios, so a preset click reads on camera
+  let raf = null;
+  function animateTo(target) {
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) { state = { ...state, ...target }; syncPresets(); render(); return; }
+    if (raf) cancelAnimationFrame(raf);
+    const from = { ...state }, t0 = performance.now(), dur = 620;
+    const ease = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+    const tick = now => {
+      const t = Math.min(1, (now - t0) / dur), k = ease(t);
+      for (const key in target) state[key] = from[key] + (target[key] - from[key]) * k;
+      render();
+      if (t < 1) raf = requestAnimationFrame(tick);
+      else { state = { ...state, ...target }; syncPresets(); render(); raf = null; }
+    };
+    raf = requestAnimationFrame(tick);
+  }
+
+  /* ---------------- render ---------------- */
+  function render() {
+    const m = compute(state);
+    syncInputs();
+    drawTiles(m);
+    drawBridge(document.getElementById('c-bridge'), m);
+    drawCurve(document.getElementById('c-curve'), m);
+    drawTornado(document.getElementById('c-tornado'), m);
+    drawTable(m);
+  }
+
+  buildPresets();
+  buildControls();
+  syncPresets();
+  render();
+
+  document.getElementById('reset').addEventListener('click', () => animateTo({ ...DEFAULTS }));
+
+  let rt = null;
+  new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(render, 80); })
+    .observe(document.querySelector('.results'));
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', render);
+  new MutationObserver(render).observe(document.documentElement,
+    { attributes: true, attributeFilter: ['data-theme'] });
+})();
+</script>
