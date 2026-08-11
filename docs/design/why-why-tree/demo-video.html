@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>なぜなぜ分析 — デモ動画ステージ v3.2（why-why-tree / 1920×1080）</title>
+<title>なぜなぜ分析 — デモ動画ステージ v3.3（why-why-tree / 1920×1080）</title>
 </head>
 <body>
 <style>
@@ -69,20 +69,20 @@ h1{font-size:23px;line-height:1.5;margin:0 0 8px}
 
 /* ============ サイドバー（440px） ============ */
 .side{position:absolute;left:0;top:0;bottom:0;width:432px;box-sizing:border-box;
-  background:var(--side);border-right:1px solid #33322d;padding:46px 12px 14px;
+  background:var(--side);border-right:1px solid #33322d;padding:48px 14px 16px;
   display:flex;flex-direction:column}
-.sb-tabs{display:flex;gap:6px;background:var(--pillbg);border:1px solid #33322d;border-radius:12px;
-  padding:4px;margin:0 4px 14px}
-.sb-tab{flex:1;text-align:center;font-size:13.5px;color:var(--tx2);padding:8px 0;border-radius:9px}
-.sb-tab.on{background:var(--pill-on);color:var(--tx);font-weight:600}
+.sb-tabs{display:flex;gap:6px;background:var(--pillbg);border:1px solid #33322d;border-radius:13px;
+  padding:5px;margin:0 4px 18px}
+.sb-tab{flex:1;text-align:center;font-size:14px;color:var(--tx2);padding:10px 0;border-radius:10px}
+.sb-tab.on{background:var(--pill-on);color:var(--tx);font-weight:600;border:1px solid #55534b;margin:-1px}
 .sb-tab .cd{font-family:ui-monospace,Menlo,monospace;font-size:13px;margin-right:8px}
-.sb-mi{display:flex;align-items:center;gap:14px;font-size:13.5px;color:var(--tx);
-  padding:7px 12px;border-radius:9px}
+.sb-mi{display:flex;align-items:center;gap:16px;font-size:14.5px;color:var(--tx);
+  padding:8px 12px;border-radius:9px}
 .sb-mi .gl{width:18px;text-align:center;color:var(--tx2);font-size:14px}
-.sb-sec{display:flex;align-items:center;font-size:11px;color:var(--tx3);margin:14px 12px 3px;letter-spacing:.04em}
+.sb-sec{display:flex;align-items:center;font-size:11.5px;color:var(--tx3);margin:18px 12px 4px;letter-spacing:.04em}
 .sb-sec .sic{margin-left:auto;font-size:12px;opacity:.8}
-.sb-it{display:flex;align-items:center;gap:11px;font-size:13.5px;color:var(--tx2);
-  padding:7px 12px;border-radius:8px;line-height:1.45;white-space:nowrap;overflow:hidden}
+.sb-it{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--tx2);
+  padding:8px 12px;border-radius:9px;line-height:1.45;white-space:nowrap;overflow:hidden}
 .sb-it .bu{width:8px;height:8px;border-radius:50%;flex:0 0 auto;border:1.6px solid #6f6d66;box-sizing:border-box}
 .sb-it .chip{flex:0 0 auto;width:21px;height:21px;border-radius:6px;display:flex;align-items:center;
   justify-content:center;font-size:12px;color:#fff}
@@ -94,7 +94,7 @@ h1{font-size:23px;line-height:1.5;margin:0 0 8px}
 .sb-user{display:flex;align-items:center;gap:12px;padding:12px 10px 0;border-top:1px solid #33322d}
 .sb-user .av{width:30px;height:30px;border-radius:50%;background:#3a3833;color:var(--coral);
   display:flex;align-items:center;justify-content:center;font-size:16px}
-.sb-user .nm{font-size:14px;color:var(--tx);font-weight:600}
+.sb-user .nm{font-size:14.5px;color:var(--tx);font-weight:600}
 .sb-user .pl{font-size:13px;color:var(--tx3)}
 .sb-user .cv{color:var(--tx3);font-size:11px;margin-left:2px}
 .sb-user .spark{margin-left:auto;color:var(--tx3);font-size:14px}
@@ -102,7 +102,7 @@ h1{font-size:23px;line-height:1.5;margin:0 0 8px}
 /* ============ メイン領域 ============ */
 .main{position:absolute;left:432px;top:0;right:0;bottom:0;background:var(--app)}
 /* セッションヘッダー */
-.mh{position:absolute;left:0;top:40px;right:0;height:40px;display:flex;align-items:center;padding:0 28px;gap:12px}
+.mh{position:absolute;left:0;top:34px;right:0;height:36px;display:flex;align-items:center;padding:0 28px;gap:12px}
 .mh .cloud{width:20px;height:12px;position:relative;opacity:.75}
 .mh .cloud::before{content:"";position:absolute;inset:0;border:2px solid var(--tx2);border-radius:8px;border-bottom-width:2.5px}
 .mh .tt{font-size:14.5px;font-weight:600;color:var(--tx)}
@@ -110,7 +110,7 @@ h1{font-size:23px;line-height:1.5;margin:0 0 8px}
   padding:2px 10px;background:#2b2a26}
 .mh .mic{margin-left:auto;color:var(--tx3);font-size:14px;letter-spacing:14px}
 /* ステータス行 */
-.stat{position:absolute;left:22px;top:84px;display:flex;align-items:center;gap:9px;
+.stat{position:absolute;left:24px;top:74px;display:flex;align-items:center;gap:9px;
   font-size:12.5px;color:var(--tx2)}
 .stat .spin{width:13px;height:13px;color:var(--coral);font-size:13px;line-height:13px;
   animation:spin 1.6s linear infinite}
@@ -119,7 +119,7 @@ h1{font-size:23px;line-height:1.5;margin:0 0 8px}
 .stat.done .spin{animation:none;color:var(--green)}
 
 /* 列見出し */
-.chead{position:absolute;top:108px;font-size:10.5px;letter-spacing:.18em;color:var(--tx3);
+.chead{position:absolute;top:92px;font-size:10.5px;letter-spacing:.18em;color:var(--tx3);
   text-transform:uppercase;opacity:0;transition:opacity .3s}
 .chead b{color:var(--tx2);font-weight:700;letter-spacing:.1em}
 .chead .dot{display:inline-block;width:8px;height:8px;border-radius:2.5px;margin-right:8px;vertical-align:.5px}
@@ -138,7 +138,7 @@ h1{font-size:23px;line-height:1.5;margin:0 0 8px}
   opacity:0;transform:translateY(6px) scale(.97);
   transition:opacity .22s ease,transform .22s ease,box-shadow .35s}
 .node.in{opacity:1;transform:none}
-.node p{margin:0;font-size:12px;line-height:1.42;letter-spacing:.01em;color:var(--card-tx)}
+.node p{margin:0;font-size:11.5px;line-height:1.42;letter-spacing:.01em;color:var(--card-tx)}
 .ntag{display:block;font-size:9px;letter-spacing:.2em;color:var(--card-tx2);text-transform:uppercase;margin-bottom:2px}
 .nbadge{display:block;font-size:9px;letter-spacing:.12em;margin-bottom:2px;font-weight:700;color:var(--ink-bdg)}
 .nsub{display:block;font-size:9.5px;line-height:1.4;color:var(--card-tx2);margin-top:3px}
@@ -148,7 +148,7 @@ h1{font-size:23px;line-height:1.5;margin:0 0 8px}
 .node.lv2{border-left:4px solid var(--lv2)}
 .node.lv3{border-left:4px solid var(--lv3)}
 .node.lv4{border-left:4px solid var(--lv4)}
-.node.problem p{font-size:13.5px;font-weight:700;line-height:1.45}
+.node.problem p{font-size:13px;font-weight:700;line-height:1.45}
 .node.root p{font-weight:700}
 .node.verify .nbadge{color:#8a877f}
 .node.given{background:#e6e4dd}
@@ -162,7 +162,7 @@ h1{font-size:23px;line-height:1.5;margin:0 0 8px}
 /* 打ち手カード */
 .node.act{border-left:4px solid #6f6d66}
 .node.act .ntag{color:#8a877f}
-.node.act p{font-size:11.5px;font-weight:700}
+.node.act p{font-size:11px;font-weight:700}
 
 /* 本命の点灯（最後だけ） */
 .stage.hon .node:not(.pn):not(.problem){opacity:.45}
@@ -282,8 +282,8 @@ body.record.capture #unrecord{display:none}
 "use strict";
 
 /* ============ レイアウト定数（メイン領域=1480px内） ============ */
-var COLX=[22,269,516,763,1010,1257], W=204;
-var TOP=126, ROWH=74;
+var COLX=[24,274,524,774,1024,1274], W=190;
+var TOP=110, ROWH=82;
 
 /* ============ ツリーデータ ============ */
 var NODES=[
@@ -294,8 +294,6 @@ var NODES=[
  {id:"A2", p:"A",  text:"受注前に、顧客予算へ合わせて工数を圧縮"},
  {id:"A2a",p:"A2", text:"見積りの最終承認が、営業部門で完結"},
  {id:"A2a1",p:"A2a",st:"root",badge:"● 根本原因",text:"受注判定に採算・納期リスクの基準がない"},
- {id:"A3", p:"A",  text:"リスクバッファが、一律に削られる"},
- {id:"A3a",p:"A3",st:"verify",badge:"◐ 要検証",text:"過去の遅延コストが可視化されていない"},
 
  {id:"B",  p:null,tag:"実行",text:"実行中に、作業量が計画外に増えた",contrib:"寄与 約45%",main:true},
  {id:"B1", p:"B",  text:"要件定義が曖昧なまま、開発に着手"},
@@ -366,12 +364,12 @@ var stage=document.getElementById("stage");
 var outer=document.getElementById("stageOuter");
 function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 function estH(n,isP){
-  var per=isP?15:15;
+  var per=14;
   var lines=Math.min(3,Math.max(1,Math.ceil(String(n.text||"").length/per)));
-  var h=15+lines*17;
-  if(n.tag||isP)h+=11;
-  if(n.badge)h+=11;
-  if(n.sub)h+=11;
+  var h=14+lines*16;
+  if(n.tag||isP)h+=10;
+  if(n.badge)h+=10;
+  if(n.sub)h+=10;
   return h;
 }
 
@@ -465,7 +463,7 @@ function buildStage(){
   });
   /* 打ち手カード */
   ACTS.forEach(function(a){
-    var ah=15+Math.min(3,Math.max(1,Math.ceil(a.text.length/15)))*17+11;
+    var ah=14+Math.min(3,Math.max(1,Math.ceil(a.text.length/14)))*16+10;
     h.push('<div class="node act'+(a.hon?" pn":"")+'" id="n-'+a.id+'" style="left:'+COLX[5]+'px;top:'+(a._cy-ah/2)+'px;width:'+W+'px">'+
       '<span class="ntag">打ち手</span><p>'+esc(a.text)+'</p></div>');
   });
@@ -514,10 +512,9 @@ var EVENTS=[
  {d:240, r:function(){edgeNode("D","p0");}},
  {d:600, r:function(){stat("兄弟監査 ✓粒度 ✓網羅 — 4枝で発生源を覆う");}},
 
- {d:700, r:function(){stat("なぜ② 11枝へ展開 —「だから」逆読みで1歩ずつ");head(2);}},
+ {d:700, r:function(){stat("なぜ② 10枝へ展開 —「だから」逆読みで1歩ずつ");head(2);}},
  {d:280, r:function(){edgeNode("A1","A");}},
  {d:190, r:function(){edgeNode("A2","A");}},
- {d:190, r:function(){edgeNode("A3","A");}},
  {d:260, r:function(){edgeNode("B1","B");}},
  {d:190, r:function(){edgeNode("B2","B");}},
  {d:190, r:function(){edgeNode("B3","B");}},
@@ -531,7 +528,6 @@ var EVENTS=[
  {d:800, r:function(){stat("なぜ③ — 掘る前に毎ノード判定（●対策可/◐要検証/○制御外）");head(3);}},
  {d:280, r:function(){edgeNode("A1a","A1");}},
  {d:180, r:function(){edgeNode("A2a","A2");}},
- {d:180, r:function(){edgeNode("A3a","A3");}},
  {d:180, r:function(){edgeNode("B1a","B1");}},
  {d:180, r:function(){edgeNode("B2a","B2");}},
  {d:180, r:function(){edgeNode("B3a","B3");}},
@@ -547,7 +543,7 @@ var EVENTS=[
  {d:200, r:function(){edgeNode("B1a1","B1a");}},
  {d:200, r:function(){edgeNode("B2a1","B2a");}},
  {d:200, r:function(){edgeNode("B3a1","B3a");}},
- {d:650, r:function(){stat("型付きリーフが出揃う — ●6 ◐3 ○1 △1");stage.classList.add("show-contrib");}},
+ {d:650, r:function(){stat("型付きリーフが出揃う — ●6 ◐2 ○1 △1");stage.classList.add("show-contrib");}},
 
  {d:900, r:function(){stat("打ち手へ接続 — 原因当てで終わらせない");head(5);}},
  {d:300, r:function(){edgeNode("P1","A1a1");}},
