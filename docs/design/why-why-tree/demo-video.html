@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>なぜなぜ分析 — デモ動画ステージ v3.1（why-why-tree / 1920×1080）</title>
+<title>なぜなぜ分析 — デモ動画ステージ v3.2（why-why-tree / 1920×1080）</title>
 </head>
 <body>
 <style>
@@ -24,7 +24,8 @@
   --coral:#d97757; --green:#7cc08a; --redtx:#e08a8a; --blue:#4f8ee8; --pink:#d4608a;
   /* ツリーカード */
   --card:#faf9f5; --card-tx:#1f1e1b; --card-tx2:#6b6963;
-  --ink-bdg:#454339; --edge:#55534d;
+  --ink-bdg:#454339; --edge:#615f58;
+  --lv1:#d97757; --lv2:#d9a441; --lv3:#4fa389; --lv4:#5b8dd6;
 }
 html{color-scheme:dark}
 body{
@@ -68,20 +69,20 @@ h1{font-size:23px;line-height:1.5;margin:0 0 8px}
 
 /* ============ サイドバー（440px） ============ */
 .side{position:absolute;left:0;top:0;bottom:0;width:432px;box-sizing:border-box;
-  background:var(--side);border-right:1px solid #33322d;padding:50px 14px 16px;
+  background:var(--side);border-right:1px solid #33322d;padding:46px 12px 14px;
   display:flex;flex-direction:column}
-.sb-tabs{display:flex;gap:6px;background:var(--pillbg);border:1px solid #33322d;border-radius:14px;
-  padding:5px;margin:0 4px 16px}
-.sb-tab{flex:1;text-align:center;font-size:14.5px;color:var(--tx2);padding:10px 0;border-radius:10px}
+.sb-tabs{display:flex;gap:6px;background:var(--pillbg);border:1px solid #33322d;border-radius:12px;
+  padding:4px;margin:0 4px 14px}
+.sb-tab{flex:1;text-align:center;font-size:13.5px;color:var(--tx2);padding:8px 0;border-radius:9px}
 .sb-tab.on{background:var(--pill-on);color:var(--tx);font-weight:600}
 .sb-tab .cd{font-family:ui-monospace,Menlo,monospace;font-size:13px;margin-right:8px}
-.sb-mi{display:flex;align-items:center;gap:15px;font-size:14.5px;color:var(--tx);
-  padding:8px 12px;border-radius:9px}
+.sb-mi{display:flex;align-items:center;gap:14px;font-size:13.5px;color:var(--tx);
+  padding:7px 12px;border-radius:9px}
 .sb-mi .gl{width:18px;text-align:center;color:var(--tx2);font-size:14px}
-.sb-sec{display:flex;align-items:center;font-size:11.5px;color:var(--tx3);margin:15px 12px 4px;letter-spacing:.04em}
+.sb-sec{display:flex;align-items:center;font-size:11px;color:var(--tx3);margin:14px 12px 3px;letter-spacing:.04em}
 .sb-sec .sic{margin-left:auto;font-size:12px;opacity:.8}
-.sb-it{display:flex;align-items:center;gap:11px;font-size:14px;color:var(--tx2);
-  padding:8px 12px;border-radius:9px;line-height:1.45;white-space:nowrap;overflow:hidden}
+.sb-it{display:flex;align-items:center;gap:11px;font-size:13.5px;color:var(--tx2);
+  padding:7px 12px;border-radius:8px;line-height:1.45;white-space:nowrap;overflow:hidden}
 .sb-it .bu{width:8px;height:8px;border-radius:50%;flex:0 0 auto;border:1.6px solid #6f6d66;box-sizing:border-box}
 .sb-it .chip{flex:0 0 auto;width:21px;height:21px;border-radius:6px;display:flex;align-items:center;
   justify-content:center;font-size:12px;color:#fff}
@@ -93,7 +94,7 @@ h1{font-size:23px;line-height:1.5;margin:0 0 8px}
 .sb-user{display:flex;align-items:center;gap:12px;padding:12px 10px 0;border-top:1px solid #33322d}
 .sb-user .av{width:30px;height:30px;border-radius:50%;background:#3a3833;color:var(--coral);
   display:flex;align-items:center;justify-content:center;font-size:16px}
-.sb-user .nm{font-size:14.5px;color:var(--tx);font-weight:600}
+.sb-user .nm{font-size:14px;color:var(--tx);font-weight:600}
 .sb-user .pl{font-size:13px;color:var(--tx3)}
 .sb-user .cv{color:var(--tx3);font-size:11px;margin-left:2px}
 .sb-user .spark{margin-left:auto;color:var(--tx3);font-size:14px}
@@ -121,6 +122,7 @@ h1{font-size:23px;line-height:1.5;margin:0 0 8px}
 .chead{position:absolute;top:108px;font-size:10.5px;letter-spacing:.18em;color:var(--tx3);
   text-transform:uppercase;opacity:0;transition:opacity .3s}
 .chead b{color:var(--tx2);font-weight:700;letter-spacing:.1em}
+.chead .dot{display:inline-block;width:8px;height:8px;border-radius:2.5px;margin-right:8px;vertical-align:.5px}
 .chead .ax{display:inline;font-size:10px;letter-spacing:.02em;text-transform:none;margin-left:10px}
 .chead.in{opacity:1}
 
@@ -131,18 +133,22 @@ h1{font-size:23px;line-height:1.5;margin:0 0 8px}
 .edge.in{stroke-dashoffset:0}
 
 /* ノード＝白カード */
-.node{position:absolute;box-sizing:border-box;background:var(--card);border-radius:10px;
-  padding:9px 12px 8px;box-shadow:0 3px 14px rgba(0,0,0,.45);
+.node{position:absolute;box-sizing:border-box;background:var(--card);border-radius:9px;
+  padding:7px 11px 6px;box-shadow:0 3px 14px rgba(0,0,0,.45);
   opacity:0;transform:translateY(6px) scale(.97);
   transition:opacity .22s ease,transform .22s ease,box-shadow .35s}
 .node.in{opacity:1;transform:none}
-.node p{margin:0;font-size:13px;line-height:1.45;letter-spacing:.01em;color:var(--card-tx)}
+.node p{margin:0;font-size:12px;line-height:1.42;letter-spacing:.01em;color:var(--card-tx)}
 .ntag{display:block;font-size:9px;letter-spacing:.2em;color:var(--card-tx2);text-transform:uppercase;margin-bottom:2px}
 .nbadge{display:block;font-size:9px;letter-spacing:.12em;margin-bottom:2px;font-weight:700;color:var(--ink-bdg)}
 .nsub{display:block;font-size:9.5px;line-height:1.4;color:var(--card-tx2);margin-top:3px}
 
 .node.problem{box-shadow:0 5px 22px rgba(0,0,0,.6)}
-.node.problem p{font-size:15px;font-weight:700;line-height:1.45}
+.node.lv1{border-left:4px solid var(--lv1)}
+.node.lv2{border-left:4px solid var(--lv2)}
+.node.lv3{border-left:4px solid var(--lv3)}
+.node.lv4{border-left:4px solid var(--lv4)}
+.node.problem p{font-size:13.5px;font-weight:700;line-height:1.45}
 .node.root p{font-weight:700}
 .node.verify .nbadge{color:#8a877f}
 .node.given{background:#e6e4dd}
@@ -154,8 +160,9 @@ h1{font-size:23px;line-height:1.5;margin:0 0 8px}
 .node.flash{box-shadow:0 0 0 3px rgba(217,119,87,.5),0 3px 16px rgba(0,0,0,.5)}
 
 /* 打ち手カード */
+.node.act{border-left:4px solid #6f6d66}
 .node.act .ntag{color:#8a877f}
-.node.act p{font-size:12.5px;font-weight:700}
+.node.act p{font-size:11.5px;font-weight:700}
 
 /* 本命の点灯（最後だけ） */
 .stage.hon .node:not(.pn):not(.problem){opacity:.45}
@@ -275,7 +282,7 @@ body.record.capture #unrecord{display:none}
 "use strict";
 
 /* ============ レイアウト定数（メイン領域=1480px内） ============ */
-var COLX=[20,265,510,755,1000,1245], W=222;
+var COLX=[22,269,516,763,1010,1257], W=204;
 var TOP=126, ROWH=74;
 
 /* ============ ツリーデータ ============ */
@@ -324,9 +331,9 @@ var PATH_N=["B","B1","B1a","B1a1","P3"];
 var PATH_E=["e-p0-B","e-B-B1","e-B1-B1a","e-B1a-B1a1","e-B1a1-P3"];
 var HEADS=[
  {col:0,label:"問題"},
- {col:1,label:"なぜ ①",axis:"切り口: 計画→実行→統制→体制"},
- {col:2,label:"なぜ ②"},{col:3,label:"なぜ ③"},{col:4,label:"なぜ ④"},
- {col:5,label:"打ち手"}
+ {col:1,label:"なぜ ①",dot:"var(--lv1)",axis:"切り口: 計画→実行→統制→体制"},
+ {col:2,label:"なぜ ②",dot:"var(--lv2)"},{col:3,label:"なぜ ③",dot:"var(--lv3)"},{col:4,label:"なぜ ④",dot:"var(--lv4)"},
+ {col:5,label:"打ち手",dot:"#6f6d66"}
 ];
 
 /* ============ 構造計算 ============ */
@@ -361,10 +368,10 @@ function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"
 function estH(n,isP){
   var per=isP?15:15;
   var lines=Math.min(3,Math.max(1,Math.ceil(String(n.text||"").length/per)));
-  var h=19+lines*19;
-  if(n.tag||isP)h+=13;
-  if(n.badge)h+=13;
-  if(n.sub)h+=13;
+  var h=15+lines*17;
+  if(n.tag||isP)h+=11;
+  if(n.badge)h+=11;
+  if(n.sub)h+=11;
   return h;
 }
 
@@ -433,7 +440,7 @@ function buildStage(){
 
   /* 列見出し */
   HEADS.forEach(function(hd,i){
-    h.push('<div class="chead" id="head'+i+'" style="left:'+COLX[hd.col]+'px"><b>'+esc(hd.label)+'</b>'+
+    h.push('<div class="chead" id="head'+i+'" style="left:'+COLX[hd.col]+'px">'+(hd.dot?'<span class="dot" style="background:'+hd.dot+'"></span>':'')+'<b>'+esc(hd.label)+'</b>'+
       (hd.axis?'<span class="ax">'+esc(hd.axis)+'</span>':'')+'</div>');
   });
 
@@ -446,7 +453,7 @@ function buildStage(){
 
   /* 原因ノード */
   NODES.forEach(function(n){
-    var cls="node"+(n.st?" "+({root:"root",verify:"verify",given:"given",todo:"todo"})[n.st]:"")+
+    var cls="node lv"+Math.min(n.lv,4)+(n.st?" "+({root:"root",verify:"verify",given:"given",todo:"todo"})[n.st]:"")+
       (PATH_N.indexOf(n.id)>=0?" pn":"");
     h.push('<div class="'+cls+'" id="n-'+n.id+'" style="left:'+COLX[n.lv]+'px;top:'+(n._cy-estH(n)/2)+'px;width:'+W+'px">');
     if(n.tag)h.push('<span class="ntag">'+esc(n.tag)+'</span>');
@@ -458,7 +465,7 @@ function buildStage(){
   });
   /* 打ち手カード */
   ACTS.forEach(function(a){
-    var ah=19+Math.min(3,Math.max(1,Math.ceil(a.text.length/15)))*19+13;
+    var ah=15+Math.min(3,Math.max(1,Math.ceil(a.text.length/15)))*17+11;
     h.push('<div class="node act'+(a.hon?" pn":"")+'" id="n-'+a.id+'" style="left:'+COLX[5]+'px;top:'+(a._cy-ah/2)+'px;width:'+W+'px">'+
       '<span class="ntag">打ち手</span><p>'+esc(a.text)+'</p></div>');
   });
