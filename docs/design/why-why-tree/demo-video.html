@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>なぜなぜ分析 — デモ動画ステージ v4.2（why-why-tree / 1920×1080）</title>
+<title>なぜなぜ分析 — デモ動画ステージ v4.3（why-why-tree / 1920×1080）</title>
 <style>html{background:#262521}</style>
 </head>
 <body>
@@ -87,16 +87,15 @@ h1{font-size:23px;line-height:1.5;margin:0 0 8px}
   padding:7.5px 12px;border-radius:9px}
 .ig{flex:0 0 auto;width:19px;height:19px;display:flex;align-items:center;justify-content:center}
 .sb-mi .pls{width:19px;text-align:center;color:var(--ic);font-size:16px;line-height:1}
-.sb-sec{display:flex;align-items:center;font-size:11.5px;color:#807d75;margin:23px 12px 5px;letter-spacing:.04em}
+.sb-sec{display:flex;align-items:center;font-size:12px;color:#8a877f;margin:20px 12px 6px;letter-spacing:.03em}
 .sb-sec .sic{margin-left:auto;display:flex;opacity:.9}
-.sb-sec .chev{margin-left:7px;font-size:13px;line-height:1;color:#807d75}
+.sb-sec .chev{margin-left:8px;font-size:12px;line-height:1;color:#6e6b64}
 .sb-it{display:flex;align-items:center;gap:13px;font-size:14px;color:#b3b0a8;
   padding:8px 12px;border-radius:9px;line-height:1.45;white-space:nowrap;overflow:hidden}
-.sb-it .bu{width:9px;height:9px;border-radius:50%;flex:0 0 auto;border:1.5px solid #6b6961;
-  box-sizing:border-box;margin:0 5px}
-.sb-it .ig{margin:0 -1px 0 0}
+.sb-it .bu{width:8px;height:8px;border-radius:50%;flex:0 0 auto;background:#5b8dd6;margin:0 5px}
+.sb-it .bu.hollow{background:none;border:1.5px solid #6b6961;box-sizing:border-box}
 .sb-it.on{background:var(--row-on);color:#eceae3}
-.sb-thumb{position:absolute;right:3px;top:293px;width:4px;height:167px;border-radius:2px;background:#3a3833}
+.sb-more{font-size:13.5px;color:#8a877f;padding:7px 12px 0 46px}
 .side .spacer{flex:1}
 .sb-user{display:flex;align-items:center;gap:11px;padding:12px 8px 2px}
 .sb-user .av{width:31px;height:31px;border-radius:50%;background:#3f3c36;color:#d6d3cb;
@@ -206,6 +205,7 @@ h1{font-size:23px;line-height:1.5;margin:0 0 8px}
 .gitbar .prbtn{background:#3a3833;border:1px solid var(--line);border-radius:8px;color:var(--tx);
   font-size:12.5px;padding:5px 14px;margin-left:12px}
 .gitbar .prbtn span{color:var(--tx3);margin-left:8px;font-size:10px}
+.gitbar .xbtn{color:var(--tx3);font-size:12px;margin-left:12px}
 .inbox{top:48px;height:42px;box-sizing:border-box;border:1.5px solid #45443f;border-radius:14px;
   display:flex;align-items:center;padding:0 18px;font-size:14px;color:var(--tx3);background:#22211e}
 .inbox .ret{margin-left:auto;font-size:15px;color:var(--tx3)}
@@ -250,9 +250,9 @@ body.record.capture #unrecord{display:none}
 <div class="page">
 
   <header class="doc-header">
-    <p class="eyebrow">why-why-tree — Demo Video Stage v4.2 (1920×1080)</p>
+    <p class="eyebrow">why-why-tree — Demo Video Stage v4.3 (1920×1080)</p>
     <h1>なぜなぜ分析デモ — Claude Code アプリ再現（サイドバー実スクショ完全準拠）</h1>
-    <p class="lead">サイドバーはユーザー提供スクリーンショット（2026-08-11）の項目・アイコン・選択状態をそのまま再現。メインは黒×白カードのツリー、高速テンポ、最後に本命の打ち手だけ点灯。録画は冒頭静止1.1秒→白フレームをトリムして「いきなりアプリ画面」から始める。</p>
+    <p class="lead">サイドバーはユーザー提供スクリーンショット（2026-08-12）準拠。セッション一覧を畳み、開いている1件だけを見せる。メインは黒×白カードのツリー、高速テンポ、最後に本命の打ち手だけ点灯。録画は冒頭静止1.1秒→白フレームをトリムして「いきなりアプリ画面」から始める。</p>
   </header>
 
   <div class="stage-outer" id="stageOuter">
@@ -414,26 +414,20 @@ function buildStage(){
   h.push('<div class="sb-mi"><span class="ig">'+IC.clock+'</span>ルーティン</div>');
   h.push('<div class="sb-mi"><span class="ig">'+IC.case+'</span>カスタマイズ</div>');
   h.push('<div class="sb-mi"><span class="ig">'+IC.down+'</span>もっと見る</div>');
+  /* セッション一覧は畳んだ状態にする。開いている1件だけを見せ、他は日付見出しのみ。
+     「一目でClaude Codeと分かる」に必要な情報だけ残し、視線を右のツリーへ通す */
   h.push('<p class="sb-sec">ルーティン</p>');
-  h.push('<div class="sb-it"><span class="ig">'+IC.hand+'</span>Session title refresh</div>');
-  h.push('<p class="sb-sec">本日<span class="sic">'+IC.sort+'</span></p>');
-  h.push('<div class="sb-it on"><span class="bu"></span>なぜなぜ分析スキルの設計提案</div>');
-  h.push('<div class="sb-it"><span class="bu"></span>X投稿ネタ：AI活用Tips</div>');
-  h.push('<p class="sb-sec">8月9日</p>');
-  h.push('<div class="sb-it"><span class="ig">'+IC.branch+'</span>Claude HTML出力のデザイン改善</div>');
-  h.push('<p class="sb-sec">8月7日</p>');
-  h.push('<div class="sb-it"><span class="bu"></span>Claude Code 起業・アプリ売却事例</div>');
-  h.push('<p class="sb-sec">8月6日</p>');
-  h.push('<div class="sb-it"><span class="bu"></span>Claude Code デスクトップショートカット集</div>');
-  h.push('<div class="sb-it"><span class="bu"></span>Claude Fable 5とGPT-5.6の並行実行</div>');
-  h.push('<div class="sb-it"><span class="bu"></span>Claude Code をパソコン閉じても実行継続</div>');
-  h.push('<div class="sb-it"><span class="bu"></span>Codex/Claude 併用時の課題と解決策</div>');
-  h.push('<div class="sb-it"><span class="ig">'+IC.img+'</span>ロジックツリー投稿のリプ文作成</div>');
-  h.push('<div class="sb-it"><span class="bu"></span>Codex キャッシュ自動クリーンアップ</div>');
-  h.push('<p class="sb-sec">8月5日<span class="chev">›</span></p>');
+  h.push('<div class="sb-it"><span class="bu"></span>Session title refresh</div>');
+  h.push('<p class="sb-sec">本日<span class="chev">›</span><span class="sic">'+IC.sort+'</span></p>');
+  h.push('<div class="sb-it on"><span class="bu hollow"></span>なぜなぜ分析スキルの設計提案</div>');
+  h.push('<p class="sb-sec">昨日<span class="chev">›</span></p>');
+  h.push('<p class="sb-sec">8月9日<span class="chev">›</span></p>');
+  h.push('<p class="sb-sec">8月7日<span class="chev">›</span></p>');
+  h.push('<p class="sb-sec">8月6日<span class="chev">›</span></p>');
+  h.push('<p class="sb-sec">古い順<span class="chev">›</span></p>');
+  h.push('<div class="sb-more">もっと表示</div>');
   h.push('<div class="spacer"></div>');
   h.push('<div class="sb-user"><div class="av">K</div><div class="nm">Kotetsu</div><div class="pl">・Max</div><div class="cv">⌄</div><div class="spark">✻</div></div>');
-  h.push('<div class="sb-thumb"></div>');
   h.push('</div>');
 
   /* --- メイン --- */
@@ -503,12 +497,12 @@ function buildStage(){
 
   /* --- 下部（アプリのフッターUI） --- */
   h.push('<div class="fbar">'+
-    '<div class="fcol gitbar"><span class="repo">kotetsu-work-ai-skills</span><span class="br">claude/why-analysis…</span>'+
-    '<span class="diff"><span class="add">+118</span><span class="del">−0</span></span>'+
-    '<span class="prbtn">PRを作成<span>⌄</span></span></div>'+
+    '<div class="fcol gitbar"><span class="repo">kotetsu-work-ai-skills</span><span class="br">claude/why-analysis-skill-design-29g5fr</span>'+
+    '<span class="diff"><span class="add">+4,144</span><span class="del">−0</span></span>'+
+    '<span class="prbtn">PRを作成<span>⌄</span></span><span class="xbtn">✕</span></div>'+
     '<div class="fcol inbox">/ でコマンド<span class="ret">⏎</span></div>'+
     '<div class="fcol acts"><span>編集を受け入れる</span><span class="plus">＋</span><span class="micq"></span><span>⌄</span>'+
-    '<span class="rt"><span class="mdl">Fable 5</span><span>最大</span><span class="spin2" id="spin2"></span></span></div>'+
+    '<span class="rt"><span class="mdl">Opus 5</span><span>超高</span><span class="spin2" id="spin2"></span></span></div>'+
     '</div>');
 
   stage.className="stage";
