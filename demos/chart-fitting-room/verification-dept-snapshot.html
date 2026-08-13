@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>部門データ 10形式ビュー</title>
+<style>
+:root{
+  --bg:#f4f6f8; --card:#ffffff; --ink:#171c22; --ink2:#5a6673;
+  --line:#e5e9ee; --rule:#cfd6de; --sep:#eef1f4;
+  --g1:#1f6feb; --g2:#c2410c; --g3:#0f5f59; --g4:#6b21a8;
+  --onfill:#ffffff;
+  --r0:#eef1f5; --r1:#cfd8e3; --r2:#a5b4c8; --r3:#6f84a0; --r4:#3d5372;
+  --spot:#171c22; --chip:#eef1f4;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1216; --card:#161b21; --ink:#e7ecf2; --ink2:#9caab8;
+    --line:#232a32; --rule:#333d48; --sep:#1d232a;
+    --g1:#60a5fa; --g2:#fb923c; --g3:#2dd4bf; --g4:#a855f7;
+    --onfill:#0e1216;
+    --r0:#1a2027; --r1:#2b3542; --r2:#445468; --r3:#6b829d; --r4:#9db3cd;
+    --spot:#e7ecf2; --chip:#1d232a;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1216; --card:#161b21; --ink:#e7ecf2; --ink2:#9caab8;
+  --line:#232a32; --rule:#333d48; --sep:#1d232a;
+  --g1:#60a5fa; --g2:#fb923c; --g3:#2dd4bf; --g4:#a855f7;
+  --onfill:#0e1216;
+  --r0:#1a2027; --r1:#2b3542; --r2:#445468; --r3:#6b829d; --r4:#9db3cd;
+  --spot:#e7ecf2; --chip:#1d232a;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;max-width:100%;overflow-x:hidden}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Kaku Gothic ProN","Hiragino Sans",Meiryo,"Noto Sans JP",system-ui,sans-serif;
+  font-size:14px; line-height:1.7; font-variant-numeric:tabular-nums;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1080px;margin:0 auto;padding:28px 20px 72px}
+h1{font-size:21px;line-height:1.45;margin:0 0 6px;letter-spacing:.01em}
+h2{font-size:13px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink2);margin:40px 0 12px;font-weight:600}
+h3{font-size:14.5px;margin:0;font-weight:650;letter-spacing:.01em}
+p{margin:0 0 8px}
+.lead{font-size:15px;color:var(--ink);margin:0 0 4px}
+.sub{font-size:12.5px;color:var(--ink2)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.dl{display:grid;grid-template-columns:104px 1fr;gap:2px 14px;font-size:12.5px;margin:0}
+.dl dt{color:var(--ink2)}
+.dl dd{margin:0}
+.tag{display:inline-block;background:var(--chip);border-radius:4px;padding:1px 6px;font-size:11.5px;color:var(--ink2);margin-right:4px}
+/* legend */
+.legend{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start}
+.lg{display:flex;gap:7px;align-items:flex-start;font-size:12.5px}
+.sw{width:11px;height:11px;border-radius:2px;flex:0 0 auto;margin-top:5px}
+.lg b{font-weight:600;display:block}
+.lg span{color:var(--ink2);font-size:11.5px;display:block;line-height:1.5}
+.lg .ramp{display:flex;gap:2px;margin-top:5px}
+.lg .ramp i{width:16px;height:11px;display:block;border-radius:1px}
+/* purpose selector */
+.purp{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+button{font:inherit;color:inherit;cursor:pointer}
+.pb{background:var(--card);border:1px solid var(--rule);border-radius:999px;padding:7px 14px;font-size:13px;transition:background .35s ease,border-color .35s ease,color .35s ease}
+.pb:hover{border-color:var(--ink2)}
+.pb[aria-pressed="true"]{background:var(--spot);color:var(--bg);border-color:var(--spot)}
+.why{font-size:13px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--spot);border-radius:6px;padding:12px 14px;min-height:24px}
+.why em{font-style:normal;color:var(--ink2);font-size:12px;display:block;margin-bottom:2px}
+/* grid */
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+@media (max-width:900px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 20px 16px;
+  opacity:1;transition:opacity .35s ease,box-shadow .35s ease,border-color .35s ease,transform .35s ease}
+.card.dim{opacity:.24}
+.card.spot{border-color:var(--spot);box-shadow:0 0 0 1px var(--spot)}
+.chead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:2px}
+.form{font-size:11.5px;color:var(--ink2);white-space:nowrap}
+.csub{font-size:11.5px;color:var(--ink2);margin:0 0 10px}
+.cbody{margin:2px 0 10px}
+.cnote{font-size:12px;color:var(--ink2);margin:0;padding-top:10px;border-top:1px solid var(--sep);line-height:1.65}
+/* svg */
+svg.chart{display:block;width:100%;height:auto;margin:0 auto}
+svg text{fill:var(--ink);font-family:inherit;font-variant-numeric:tabular-nums}
+svg .mut{fill:var(--ink2)}
+svg .grid{stroke:var(--line);stroke-width:1;shape-rendering:crispEdges}
+svg .axis{stroke:var(--rule);stroke-width:1;shape-rendering:crispEdges}
+svg .ref{stroke:var(--ink2);stroke-width:1;shape-rendering:crispEdges}
+/* dropped */
+.drop{display:grid;gap:10px}
+.drop div{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:11px 14px;font-size:13px}
+.drop b{font-weight:650}
+.drop span{color:var(--ink2)}
+/* table */
+details{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:2px 18px}
+summary{cursor:pointer;padding:12px 0;font-size:13.5px;font-weight:600}
+.tw{overflow-x:auto;padding-bottom:12px}
+table{border-collapse:collapse;font-size:12.5px;min-width:660px;width:100%}
+th,td{padding:6px 10px;text-align:right;border-bottom:1px solid var(--sep);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th:nth-child(2),td:nth-child(2){text-align:left}
+thead th{color:var(--ink2);font-weight:600;border-bottom:1px solid var(--rule)}
+tfoot td{border-top:1px solid var(--rule);border-bottom:none;font-weight:650}
+tfoot td.small{font-weight:400;color:var(--ink2)}
+.note{font-size:12px;color:var(--ink2);margin:10px 0 14px}
+.tt{position:fixed;top:16px;right:16px;background:var(--card);border:1px solid var(--rule);border-radius:999px;padding:5px 12px;font-size:12px;z-index:5}
+</style>
+</head>
+<body>
+<button class="tt" id="themeBtn" type="button">テーマ切替</button>
+<div class="wrap">
+
+<header>
+  <p class="sub" style="margin-bottom:4px">部門別の組織データ ／ 12部門・従業員1,476人・1時点のスナップショット（従業員数・一人当たり売上・営業利益率・満足度・離職率）</p>
+  <h1>離職率25%以上の2部門に全社の37.9%（560人）が在籍し、その2部門は満足度でも下位1・2位を占める。</h1>
+  <p class="sub">同じ12行のデータを、成立する10通りの形式で描いた。どれで見せるかで言えることが変わる。</p>
+</header>
+
+<h2>このデータをこう読みました（手順1・診断）</h2>
+<div class="panel">
+  <dl class="dl">
+    <dt>時間軸</dt><dd>なし（0時点）。期・年月にあたる列が存在しない → 折れ線・スロープ・積み上げ・ウォーターフォールはこの時点で全滅。</dd>
+    <dt>カテゴリ軸</dt><dd>部門12水準（名義尺度）。第2のカテゴリ軸は<b>データ上には無い</b>。wide形式の6列を「指標軸」と読めばヒートマップだけは成立する。部門名から付けた機能グループ4つは筆者の解釈なので、図形の軸には使わず<b>色にだけ</b>使う。</dd>
+    <dt>測度</dt><dd>5本。加算できるのは<b>従業員数だけ</b>（合計1,476人）。一人当たり売上・営業利益率・満足度・離職率は分母が部門ごとに違う比率／スコアで<b>加算不可</b>と判定した。<br>ただし「従業員数 × 一人当たり売上」は外延量に戻るため、<b>推計部門売上（合計33,543百万円）</b>を派生させて加算可能な測度を1本だけ確保した。管理部門にも一人当たり売上が付いているので、この列は全社按分後の値と見られる。</dd>
+    <dt>正負</dt><dd>混ざらない。全列が正値（最小は法務の営業利益率2%）。増減の青／赤は出番なし。</dd>
+    <dt>標本数</dt><dd>部門としては12点でヒストグラムには足りない。「従業員1,476人を所属部門の離職率で階級分けする」と読み替えたときだけ成立させた。</dd>
+  </dl>
+</div>
+
+<h2>凡例（ページ全体で共通）</h2>
+<div class="panel legend">
+  <div class="lg"><span class="sw" style="background:var(--g1)"></span><div><b>営業・マーケ</b><span>法人営業／個人営業／マーケティング　488人</span></div></div>
+  <div class="lg"><span class="sw" style="background:var(--g2)"></span><div><b>顧客対応</b><span>カスタマーサクセス／カスタマーサポート　415人</span></div></div>
+  <div class="lg"><span class="sw" style="background:var(--g3)"></span><div><b>開発・技術</b><span>プロダクト開発／基盤エンジニアリング／データ分析／情報システム　455人</span></div></div>
+  <div class="lg"><span class="sw" style="background:var(--g4)"></span><div><b>コーポレート</b><span>人事／経理財務／法務　118人</span></div></div>
+  <div class="lg"><div><b>濃淡（ヒートマップ）</b><span>薄い＝列内で低い／濃い＝列内で高い。良し悪しの向きではない</span><span class="ramp"><i style="background:var(--r0)"></i><i style="background:var(--r1)"></i><i style="background:var(--r2)"></i><i style="background:var(--r3)"></i><i style="background:var(--r4)"></i></span></div></div>
+  <div class="lg"><div><b>バブルの面積</b><span>従業員数（最大＝カスタマーサポート320人）</span></div></div>
+</div>
+
+<h2>誰に、何を言いたいですか</h2>
+<div class="purp" id="purp"></div>
+<div class="why" id="why"></div>
+
+<h2 id="chartsHead">成立する10形式</h2>
+<div class="grid2" id="grid"></div>
+
+<h2>落とした形式の申告（手順3）</h2>
+<div class="drop">
+  <div><b>ウォーターフォール</b> — <span>営業利益率は足し算で分解できず、比較する2時点もないため、増減の内訳そのものが定義できない。</span></div>
+  <div><b>ファネル</b> — <span>営業→カスタマーサクセス→サポートは工程順に見えるが、この12行は工程の残存数ではなく並列の部門で、単調減少が保証されない。</span></div>
+  <div><b>ブレット</b> — <span>目標・予算にあたる列が1つもなく、実績と比べる相手をデータから作れない（全社平均は目標ではない）。</span></div>
+</div>
+
+<h2>数値で見る</h2>
+<details id="dataDetails">
+  <summary>元データ表（12部門・全列）を開く</summary>
+  <div class="tw" id="tableHost"></div>
+  <p class="note" id="verify"></p>
+</details>
+
+</div>
+<script>
+"use strict";
+/* ============================ データ ============================ */
+var GROUPS=[
+  {name:"営業・マーケ",v:"--g1"},
+  {name:"顧客対応",v:"--g2"},
+  {name:"開発・技術",v:"--g3"},
+  {name:"コーポレート",v:"--g4"}
+];
+var D=[
+  {d:"法人営業",           g:0,hc:180,rpe:42,mgn:12,sat:3.2,trn:18},
+  {d:"個人営業",           g:0,hc:240,rpe:18,mgn: 6,sat:2.8,trn:26},
+  {d:"カスタマーサクセス", g:1,hc: 95,rpe:22,mgn:15,sat:3.9,trn:11},
+  {d:"プロダクト開発",     g:2,hc:210,rpe:31,mgn:22,sat:4.1,trn: 8},
+  {d:"基盤エンジニアリング",g:2,hc:140,rpe:28,mgn:19,sat:4.0,trn: 9},
+  {d:"データ分析",         g:2,hc: 45,rpe:35,mgn:24,sat:4.3,trn: 6},
+  {d:"マーケティング",     g:0,hc: 68,rpe:39,mgn: 9,sat:3.4,trn:17},
+  {d:"人事",               g:3,hc: 52,rpe: 8,mgn: 3,sat:3.6,trn:12},
+  {d:"経理財務",           g:3,hc: 44,rpe: 7,mgn: 2,sat:3.5,trn: 7},
+  {d:"法務",               g:3,hc: 22,rpe: 6,mgn: 2,sat:3.8,trn: 5},
+  {d:"情報システム",       g:2,hc: 60,rpe: 9,mgn: 4,sat:3.1,trn:15},
+  {d:"カスタマーサポート", g:1,hc:320,rpe:11,mgn: 5,sat:2.4,trn:34}
+];
+D.forEach(function(r){ r.rev=r.hc*r.rpe; });
+var TOT_HC=D.reduce(function(s,r){return s+r.hc;},0);      /* 1476 */
+var TOT_REV=D.reduce(function(s,r){return s+r.rev;},0);    /* 33543 */
+var W_TRN=D.reduce(function(s,r){return s+r.hc*r.trn;},0)/TOT_HC;
+var W_SAT=D.reduce(function(s,r){return s+r.hc*r.sat;},0)/TOT_HC;
+var W_MGN=D.reduce(function(s,r){return s+r.rev*r.mgn;},0)/TOT_REV;
+function median(a){var b=a.slice().sort(function(x,y){return x-y;});var m=b.length>>1;return b.length%2?b[m]:(b[m-1]+b[m])/2;}
+var MED_MGN=median(D.map(function(r){return r.mgn;}));   /* 7.5  */
+var MED_SAT=median(D.map(function(r){return r.sat;}));   /* 3.55 */
+
+/* ============================ 共通ヘルパー ============================ */
+var NS="http://www.w3.org/2000/svg";
+function S(tag,a){var e=document.createElementNS(NS,tag);for(var k in a){if(a[k]!==null&&a[k]!==undefined)e.setAttribute(k,a[k]);}return e;}
+function root(w,h){var s=S("svg",{viewBox:"0 0 "+w+" "+h,width:w,height:h});s.setAttribute("class","chart");s.style.maxWidth=w+"px";return s;}
+function T(x,y,s,o){o=o||{};var e=S("text",{x:x,y:y,"text-anchor":o.a||"start","font-size":o.fs||10.5,"font-weight":o.w||400,transform:o.tr||null});if(o.mut)e.setAttribute("class","mut");e.textContent=s;return e;}
+function L(x1,y1,x2,y2,cls){return S("line",{x1:x1,y1:y1,x2:x2,y2:y2,"class":cls||"grid"});}
+function gcol(i){return "var("+GROUPS[i].v+")";}
+function sc(d0,d1,r0,r1){var k=(r1-r0)/(d1-d0);return function(v){return r0+(v-d0)*k;};}
+function est(str,fs){var w=0;for(var i=0;i<str.length;i++){w+=(str.charCodeAt(i)<128?0.6:1.0)*fs;}return w;}
+function ticks(min,max,step){var out=[],v=min;for(;v<=max+1e-9;v+=step)out.push(Math.round(v*1000)/1000);return out;}
+function n0(v){return v.toLocaleString("ja-JP");}
+function n1(v){return v.toFixed(1);}
+function pct(v,t){return (v/t*100).toFixed(1)+"%";}
+
+var CARDS=[];
+function card(o){CARDS.push(o);}
+
+/* ============================ 1. 横棒ランキング ============================ */
+card({
+  id:"rank", title:"部門別の人員規模", form:"横棒ランキング",
+  sub:"従業員数（加算可）／降順",
+  note:"言えること: 12部門の人数の順位と絶対量が、目盛りに対して正確に読める。言えないこと: 全体1,476人に占める比率の感覚と、その人数が多すぎるのか適正なのかは、この図だけでは何も言えない。",
+  draw:function(){
+    var W=480,PL=112,PR=44,band=22,bh=13,TOP=30,H=TOP+D.length*band+16;
+    var s=root(W,H);
+    var rows=D.slice().sort(function(a,b){return b.hc-a.hc;});
+    var x=sc(0,340,PL,W-PR);
+    ticks(0,300,100).forEach(function(t){
+      s.appendChild(L(x(t),TOP-8,x(t),TOP+rows.length*band-4));
+      s.appendChild(T(x(t),TOP-14,n0(t),{a:"middle",fs:10,mut:1}));
+    });
+    s.appendChild(T(0,14,"従業員数（人）",{fs:10,mut:1}));
+    rows.forEach(function(r,i){
+      var yy=TOP+i*band, cy=yy+band/2-2;
+      s.appendChild(T(PL-8,cy+3.5,r.d,{a:"end",fs:10.5}));
+      s.appendChild(S("rect",{x:PL,y:cy-bh/2,width:Math.max(1,x(r.hc)-PL),height:bh,style:"fill:"+gcol(r.g)}));
+      if(i<3||i===rows.length-1) s.appendChild(T(x(r.hc)+6,cy+3.5,n0(r.hc),{fs:10.5,w:650}));
+    });
+    s.appendChild(L(PL,TOP+rows.length*band-4,W-PR,TOP+rows.length*band-4,"axis"));
+    return s;
+  }
+});
+
+/* ============================ 2. ドットプロット ============================ */
+card({
+  id:"dot", title:"部門別の離職率", form:"ドットプロット",
+  sub:"離職率（加算不可）／昇順・基準線は人数加重の全社平均",
+  note:"言えること: 12部門が5%〜34%のどこに散らばり、全社平均18.8%の左右どちらにいるかが1本の目盛りで読める。言えないこと: 率は加算できないので、点をいくら眺めても全社の離職率はここからは合成できず、部門の大きさも無視されている。",
+  draw:function(){
+    var W=480,PL=112,PR=40,band=21,TOP=34,H=TOP+D.length*band+30;
+    var s=root(W,H);
+    var rows=D.slice().sort(function(a,b){return a.trn-b.trn;});
+    var x=sc(0,36,PL,W-PR), base=TOP+rows.length*band;
+    ticks(0,30,10).forEach(function(t){
+      s.appendChild(L(x(t),TOP-10,x(t),base));
+      s.appendChild(T(x(t),base+15,t+"%",{a:"middle",fs:10,mut:1}));
+    });
+    s.appendChild(T(0,12,"離職率（%）",{fs:10,mut:1}));
+    var ax=x(W_TRN);
+    s.appendChild(L(ax,TOP-10,ax,base,"ref"));
+    s.appendChild(T(ax,TOP-16,"全社加重平均 "+n1(W_TRN)+"%",{a:"middle",fs:10,mut:1}));
+    rows.forEach(function(r,i){
+      var cy=TOP+i*band+band/2;
+      s.appendChild(T(PL-8,cy+3.5,r.d,{a:"end",fs:10.5}));
+      s.appendChild(L(PL,cy,x(r.trn)-6,cy));
+      s.appendChild(S("circle",{cx:x(r.trn),cy:cy,r:5,style:"fill:"+gcol(r.g)}));
+      if(i===0||i===rows.length-1) s.appendChild(T(x(r.trn)+9,cy+3.5,r.trn+"%",{fs:10.5,w:650}));
+    });
+    s.appendChild(L(PL,base,W-PR,base,"axis"));
+    return s;
+  }
+});
+
+/* ============================ 3. パレート ============================ */
+card({
+  id:"pareto", title:"推計部門売上の集中度", form:"パレート",
+  sub:"推計部門売上＝従業員数×一人当たり売上（加算可）／棒＝構成比・線＝累積、同一の%目盛り",
+  note:"言えること: 上から数えて何部門で全体の何%に届くか（上位4部門で66.5%、上位5部門で77.0%）という集中の度合いが読める。言えないこと: 2軸を禁じて棒と線を同じ%目盛りに載せているため、部門ごとの金額差は圧縮されて読み取りにくい。",
+  draw:function(){
+    var W=480,PL=42,PR=12,TOP=26,PH=150,BOT=92,H=TOP+PH+BOT;
+    var s=root(W,H);
+    var rows=D.slice().sort(function(a,b){return b.rev-a.rev;});
+    var bw=(W-PL-PR)/rows.length, y=sc(0,100,TOP+PH,TOP);
+    ticks(0,100,25).forEach(function(t){
+      s.appendChild(L(PL,y(t),W-PR,y(t)));
+      s.appendChild(T(PL-6,y(t)+3.5,t+"%",{a:"end",fs:10,mut:1}));
+    });
+    s.appendChild(T(PL,12,"全社売上に占める割合／累積（同一目盛り）",{fs:10,mut:1}));
+    var cum=0,pts=[];
+    rows.forEach(function(r,i){
+      var share=r.rev/TOT_REV*100; cum+=share;
+      var cx=PL+i*bw+bw/2;
+      s.appendChild(S("rect",{x:cx-11,y:y(share),width:22,height:TOP+PH-y(share),style:"fill:"+gcol(r.g)}));
+      pts.push([cx,y(cum)]);
+      r._cum=cum;
+      s.appendChild(T(cx-3,TOP+PH+7,r.d,{a:"end",fs:9,tr:"rotate(-55 "+(cx-3)+" "+(TOP+PH+7)+")"}));
+    });
+    s.appendChild(S("polyline",{points:pts.map(function(p){return p[0]+","+p[1];}).join(" "),
+      style:"fill:none;stroke:var(--ink2);stroke-width:2;stroke-linejoin:round"}));
+    pts.forEach(function(p,i){ if(i===3||i===rows.length-1) s.appendChild(S("circle",{cx:p[0],cy:p[1],r:4.5,style:"fill:var(--ink2)"})); });
+    s.appendChild(T(pts[3][0]+10,pts[3][1]+18,"上位4部門で "+rows[3]._cum.toFixed(1)+"%",{fs:10.5,w:650}));
+    s.appendChild(L(PL,TOP+PH,W-PR,TOP+PH,"axis"));
+    return s;
+  }
+});
+
+/* ============================ 4. ツリーマップ ============================ */
+function squarify(items,x,y,w,h){
+  var out=[],nodes=items.slice(),rx=x,ry=y,rw=w,rh=h;
+  function worst(row,short,scale){
+    var s=0,mx=0,mn=Infinity;
+    for(var i=0;i<row.length;i++){var a=row[i].v*scale;s+=a;if(a>mx)mx=a;if(a<mn)mn=a;}
+    return Math.max(short*short*mx/(s*s), s*s/(short*short*mn));
+  }
+  var guard=0;
+  while(nodes.length && guard++<200){
+    var total=0; nodes.forEach(function(n){total+=n.v;});
+    var scale=(rw*rh)/total, short=Math.min(rw,rh);
+    var row=[nodes[0]],i=1;
+    while(i<nodes.length && worst(row.concat([nodes[i]]),short,scale)<=worst(row,short,scale)){ row.push(nodes[i]); i++; }
+    var rowSum=0; row.forEach(function(n){rowSum+=n.v;});
+    var area=rowSum*scale;
+    if(rw<=rh){
+      var rowH=area/rw,cx=rx;
+      row.forEach(function(n){var nw=(n.v/rowSum)*rw; out.push({n:n,x:cx,y:ry,w:nw,h:rowH}); cx+=nw;});
+      ry+=rowH; rh-=rowH;
+    }else{
+      var rowW=area/rh,cy=ry;
+      row.forEach(function(n){var nh=(n.v/rowSum)*rh; out.push({n:n,x:rx,y:cy,w:rowW,h:nh}); cy+=nh;});
+      rx+=rowW; rw-=rowW;
+    }
+    nodes=nodes.slice(row.length);
+  }
+  return out;
+}
+card({
+  id:"tree", title:"人員1,476人の構成", form:"ツリーマップ",
+  sub:"従業員数（加算可）／面積＝人数、色＝機能グループ、隙間は2px",
+  note:"言えること: 誰が全体の何割を占めるか（顧客対応の2部門だけで28.1%）が、入れ子の関係を保ったまま面積で一望できる。言えないこと: 面積の比較精度は棒に劣り、経理財務44人が法務22人のちょうど2倍だということは、縦横比の違うタイルからは読み取れない。",
+  draw:function(){
+    var W=480,H=286,s=root(W,H);
+    var gv=GROUPS.map(function(g,i){
+      var mem=D.filter(function(r){return r.g===i;}).sort(function(a,b){return b.hc-a.hc;});
+      var sum=0; mem.forEach(function(m){sum+=m.hc;});
+      return {v:sum,gi:i,mem:mem};
+    }).sort(function(a,b){return b.v-a.v;});
+    squarify(gv,0,0,W,H).forEach(function(gb){
+      var gx=gb.x+2,gy=gb.y+2,gw=gb.w-4,gh=gb.h-4;
+      squarify(gb.n.mem.map(function(m){return {v:m.hc,r:m};}),gx,gy,gw,gh).forEach(function(t){
+        var x=t.x+1,y=t.y+1,w=Math.max(0,t.w-2),h=Math.max(0,t.h-2),r=t.n.r;
+        s.appendChild(S("rect",{x:x,y:y,width:w,height:h,rx:2,style:"fill:"+gcol(r.g)}));
+        var cnt=n0(r.hc)+"人";
+        if(w>=56&&h>=32&&est(r.d,9.5)<=w-12){
+          var tx=x+7;
+          s.appendChild(T(tx,y+16,r.d,{fs:9.5,w:600})).setAttribute("style","fill:var(--onfill)");
+          s.appendChild(T(tx,y+29,cnt,{fs:10.5,w:650})).setAttribute("style","fill:var(--onfill);fill-opacity:.85");
+        }else if(h>=44&&w>=17){
+          var vx=x+w/2+4, vy=y+h-7, t=r.d+" "+cnt, fs=9.5;
+          if(est(t,fs)>h-12){fs=8.5;}
+          if(est(t,fs)>h-12){t=cnt;}
+          if(est(t,fs)<=h-12)
+            s.appendChild(T(vx,vy,t,{fs:fs,w:600,tr:"rotate(-90 "+vx+" "+vy+")"})).setAttribute("style","fill:var(--onfill)");
+        }else if(w>=34&&h>=16){
+          s.appendChild(T(x+5,y+13,n0(r.hc),{fs:9.5,w:650})).setAttribute("style","fill:var(--onfill)");
+        }
+      });
+    });
+    return s;
+  }
+});
+
+/* ============================ 5. ヒストグラム ============================ */
+var BINS=[[0,5],[5,10],[10,15],[15,20],[20,25],[25,30],[30,35]];
+var BINPOP=BINS.map(function(b){
+  var n=0; D.forEach(function(r){ if(r.trn>=b[0] && (r.trn<b[1] || (b[1]===35&&r.trn<=35))) n+=r.hc; });
+  return n;
+});
+card({
+  id:"hist", title:"従業員1,476人が置かれた離職率", form:"ヒストグラム",
+  sub:"標本＝従業員1,476人（部門12点では足りないため人単位に読み替え）／階級幅5ポイント",
+  note:"言えること: 人単位で見ると分布は2つの山に割れ、461人（31.2%）が離職率10%未満の部門に、560人（37.9%）が25%以上の部門にいる。言えないこと: どの部門がどちらの山なのかは図から消えており、同じ階級の中の差も潰れている。",
+  draw:function(){
+    var W=480,PL=46,PR=14,TOP=26,PH=150,H=TOP+PH+52,s=root(W,H);
+    var band=(W-PL-PR)/BINS.length, y=sc(0,500,TOP+PH,TOP);
+    ticks(0,500,100).forEach(function(t){
+      s.appendChild(L(PL,y(t),W-PR,y(t)));
+      s.appendChild(T(PL-6,y(t)+3.5,n0(t),{a:"end",fs:10,mut:1}));
+    });
+    s.appendChild(T(0,12,"従業員数（人）",{fs:10,mut:1}));
+    BINS.forEach(function(b,i){
+      var cx=PL+i*band+band/2, v=BINPOP[i];
+      if(v>0) s.appendChild(S("rect",{x:cx-12,y:y(v),width:24,height:TOP+PH-y(v),style:"fill:var(--r3)"}));
+      else if(i>0) s.appendChild(T(cx,TOP+PH-6,"該当なし",{a:"middle",fs:9,mut:1}));
+      s.appendChild(T(cx,TOP+PH+15,b[0]+"–"+b[1],{a:"middle",fs:9.5,mut:1}));
+      if(v===Math.max.apply(null,BINPOP)||i===BINS.length-1) s.appendChild(T(cx,y(v)-6,n0(v)+"人",{a:"middle",fs:10.5,w:650}));
+    });
+    s.appendChild(T((W-PL-PR)/2+PL,TOP+PH+32,"所属部門の離職率（%）",{a:"middle",fs:10,mut:1}));
+    s.appendChild(L(PL,TOP+PH,W-PR,TOP+PH,"axis"));
+    return s;
+  }
+});
+
+/* ============================ 6. 散布図 ============================ */
+var RG=(function(){
+  var n=D.length,mx=0,my=0;
+  D.forEach(function(r){mx+=r.sat;my+=r.trn;}); mx/=n; my/=n;
+  var sxy=0,sxx=0,syy=0;
+  D.forEach(function(r){var a=r.sat-mx,b=r.trn-my;sxy+=a*b;sxx+=a*a;syy+=b*b;});
+  return {b:sxy/sxx,a:my-(sxy/sxx)*mx,r:sxy/Math.sqrt(sxx*syy)};
+})();
+card({
+  id:"scatter", title:"満足度と離職率の関係", form:"散布図",
+  sub:"満足度（5点満点）× 離職率（%）／どちらも加算不可・回帰直線つき",
+  note:"言えること: 満足度が1点下がるごとに離職率がおよそ14ポイント上がる強い逆相関（r=-0.91）があり、両端にカスタマーサポートとデータ分析が立っている。言えないこと: どちらが原因かは言えず、部門の人数もこの図では一切効いていない（12点はすべて同じ大きさ）。",
+  draw:function(){
+    var W=480,PL=46,PR=16,TOP=24,PH=224,H=TOP+PH+46,s=root(W,H);
+    var x=sc(2.2,4.5,PL,W-PR), y=sc(0,36,TOP+PH,TOP);
+    ticks(0,30,10).forEach(function(t){
+      s.appendChild(L(PL,y(t),W-PR,y(t)));
+      s.appendChild(T(PL-6,y(t)+3.5,t+"%",{a:"end",fs:10,mut:1}));
+    });
+    [2.5,3.0,3.5,4.0,4.5].forEach(function(t){
+      s.appendChild(L(x(t),TOP,x(t),TOP+PH));
+      s.appendChild(T(x(t),TOP+PH+15,t.toFixed(1),{a:"middle",fs:10,mut:1}));
+    });
+    s.appendChild(T(0,12,"離職率（%）",{fs:10,mut:1}));
+    s.appendChild(T((W-PL-PR)/2+PL,TOP+PH+34,"従業員満足度（5点満点）",{a:"middle",fs:10,mut:1}));
+    var x1=2.25,x2=4.25;
+    s.appendChild(S("line",{x1:x(x1),y1:y(RG.a+RG.b*x1),x2:x(x2),y2:y(RG.a+RG.b*x2),
+      style:"stroke:var(--ink2);stroke-width:2;stroke-linecap:round"}));
+    D.forEach(function(r){ s.appendChild(S("circle",{cx:x(r.sat),cy:y(r.trn),r:6,style:"fill:"+gcol(r.g)})); });
+    var cs=D[11], da=D[5];
+    s.appendChild(T(x(cs.sat)+11,y(cs.trn)+4,"カスタマーサポート 34%",{fs:10.5,w:650}));
+    s.appendChild(T(W-PR,y(da.trn)+28,"データ分析 6%",{a:"end",fs:10.5,w:650}));
+    s.appendChild(T(W-PR,TOP+14,"r = "+RG.r.toFixed(2),{a:"end",fs:11.5,w:650}));
+    s.appendChild(T(W-PR,TOP+28,"回帰直線の傾き "+RG.b.toFixed(1)+"pt / 満足度1点",{a:"end",fs:9.5,mut:1}));
+    s.appendChild(L(PL,TOP+PH,W-PR,TOP+PH,"axis"));
+    return s;
+  }
+});
+
+/* ============================ 7. バブル ============================ */
+card({
+  id:"bubble", title:"効率・収益性・規模を同時に", form:"バブル",
+  sub:"一人当たり売上 × 営業利益率 × 面積＝従業員数（3測度）",
+  note:"言えること: 320人という最大の人員が一人当たり売上11百万円・利益率5%の位置に張り付いている、という規模と効率のねじれが1枚で見える。言えないこと: 左下で管理系4部門が重なって個別には読めず、面積の絶対量（何人か）は目測では出せない。",
+  draw:function(){
+    var W=480,PL=46,PR=16,TOP=24,PH=224,H=TOP+PH+46,s=root(W,H);
+    var x=sc(0,45,PL,W-PR), y=sc(0,26,TOP+PH,TOP), k=20/Math.sqrt(320);
+    ticks(0,25,5).forEach(function(t){
+      s.appendChild(L(PL,y(t),W-PR,y(t)));
+      s.appendChild(T(PL-6,y(t)+3.5,t+"%",{a:"end",fs:10,mut:1}));
+    });
+    ticks(0,40,10).forEach(function(t){
+      s.appendChild(L(x(t),TOP,x(t),TOP+PH));
+      s.appendChild(T(x(t),TOP+PH+15,t,{a:"middle",fs:10,mut:1}));
+    });
+    s.appendChild(T(0,12,"営業利益率（%）",{fs:10,mut:1}));
+    s.appendChild(T((W-PL-PR)/2+PL,TOP+PH+34,"一人当たり売上（百万円）",{a:"middle",fs:10,mut:1}));
+    D.slice().sort(function(a,b){return b.hc-a.hc;}).forEach(function(r){
+      s.appendChild(S("circle",{cx:x(r.rpe),cy:y(r.mgn),r:Math.sqrt(r.hc)*k,
+        style:"fill:"+gcol(r.g)+";fill-opacity:.55;stroke:"+gcol(r.g)+";stroke-width:1.5"}));
+    });
+    var pd=D[3],cs=D[11],ho=D[0];
+    s.appendChild(T(x(pd.rpe)-20,y(pd.mgn)-18,"プロダクト開発 210人",{a:"end",fs:10.5,w:650}));
+    s.appendChild(T(x(ho.rpe)-18,y(ho.mgn)-16,"法人営業 180人",{a:"end",fs:10.5,w:650}));
+    s.appendChild(L(PL+52,TOP+26,x(cs.rpe)-8,y(cs.mgn)-20,"ref"));
+    s.appendChild(T(PL+6,TOP+20,"カスタマーサポート 320人",{fs:10.5,w:650}));
+    s.appendChild(L(PL,TOP+PH,W-PR,TOP+PH,"axis"));
+    return s;
+  }
+});
+
+/* ============================ 8. 2×2マトリクス ============================ */
+var QUAD=(function(){
+  var q={tr:[],br:[],tl:[],bl:[]};
+  D.forEach(function(r){
+    var right=r.mgn>MED_MGN, up=r.sat>MED_SAT;
+    q[(up?"t":"b")+(right?"r":"l")].push(r);
+  });
+  var o={};
+  ["tr","br","tl","bl"].forEach(function(k){
+    var n=0; q[k].forEach(function(r){n+=r.hc;});
+    o[k]={n:q[k].length,hc:n,share:n/TOT_HC*100};
+  });
+  return o;
+})();
+card({
+  id:"quad", title:"収益性と満足度で12部門を仕分ける", form:"2×2マトリクス",
+  sub:"営業利益率 × 従業員満足度／しきい値は12部門の中央値（7.5% と 3.55）＝上下・左右が6部門ずつに割れる位置",
+  note:"言えること: 12部門が4つの打ち手グループに割れ、両方が下位の象限だけで全社の45.0%（664人）を抱えていると分かる。言えないこと: 中央値をまたぐかどうかしか見ていないので（経理財務は満足度3.5で境界を0.05下回るだけ）、象限内の順位も差の大きさも言えない。",
+  draw:function(){
+    var W=480,PL=46,PR=16,TOP=24,PH=224,H=TOP+PH+46,s=root(W,H);
+    var x=sc(0,26,PL,W-PR), y=sc(2.2,4.5,TOP+PH,TOP);
+    ticks(0,25,5).forEach(function(t){
+      s.appendChild(L(x(t),TOP,x(t),TOP+PH));
+      s.appendChild(T(x(t),TOP+PH+15,t+"%",{a:"middle",fs:10,mut:1}));
+    });
+    [2.5,3.0,3.5,4.0,4.5].forEach(function(t){
+      s.appendChild(L(PL,y(t),W-PR,y(t)));
+      s.appendChild(T(PL-6,y(t)+3.5,t.toFixed(1),{a:"end",fs:10,mut:1}));
+    });
+    s.appendChild(T(0,12,"従業員満足度（5点満点）",{fs:10,mut:1}));
+    s.appendChild(T((W-PL-PR)/2+PL,TOP+PH+34,"営業利益率（%）",{a:"middle",fs:10,mut:1}));
+    var mx=x(MED_MGN), my=y(MED_SAT);
+    s.appendChild(L(mx,TOP,mx,TOP+PH,"ref"));
+    s.appendChild(L(PL,my,W-PR,my,"ref"));
+    s.appendChild(T(mx,TOP+PH+15,"中央値7.5",{a:"middle",fs:9,mut:1}));
+    s.appendChild(T(W-PR-2,my-6,"中央値 3.55",{a:"end",fs:9,mut:1}));
+    function cap(ax,ay,anc,l1,l2){
+      s.appendChild(T(ax,ay,l1,{a:anc,fs:9.5,w:650,mut:1}));
+      s.appendChild(T(ax,ay+11,l2,{a:anc,fs:9,mut:1}));
+    }
+    cap(PL+4,TOP+16,"start","満足度だけ上位",QUAD.tl.n+"部門・"+n0(QUAD.tl.hc)+"人");
+    cap(mx+8,TOP+16,"start","両方とも上位",QUAD.tr.n+"部門・"+n0(QUAD.tr.hc)+"人（"+QUAD.tr.share.toFixed(1)+"%）");
+    cap(PL+4,TOP+114,"start","両方とも下位",QUAD.bl.n+"部門・"+n0(QUAD.bl.hc)+"人（"+QUAD.bl.share.toFixed(1)+"%）");
+    cap(W-PR-4,TOP+PH-24,"end","稼ぐが満足度は下位",QUAD.br.n+"部門・"+n0(QUAD.br.hc)+"人（"+QUAD.br.share.toFixed(1)+"%）");
+    D.forEach(function(r){ s.appendChild(S("circle",{cx:x(r.mgn),cy:y(r.sat),r:6,style:"fill:"+gcol(r.g)})); });
+    s.appendChild(T(x(D[5].mgn)-11,y(D[5].sat)+4,"データ分析",{a:"end",fs:10.5,w:650}));
+    s.appendChild(T(x(D[11].mgn)+11,y(D[11].sat)+4,"カスタマーサポート",{fs:10.5,w:650}));
+    s.appendChild(L(PL,TOP+PH,W-PR,TOP+PH,"axis"));
+    return s;
+  }
+});
+
+/* ============================ 9. ヒートマップ ============================ */
+var METRICS=[
+  {k:"hc", n:"従業員数", u:"人",   f:function(v){return n0(v);}},
+  {k:"rpe",n:"一人当たり売上",u:"百万円",f:function(v){return v;}},
+  {k:"mgn",n:"営業利益率",u:"%",  f:function(v){return v;}},
+  {k:"sat",n:"満足度",   u:"5点", f:function(v){return v.toFixed(1);}},
+  {k:"trn",n:"離職率",   u:"%",   f:function(v){return v;}}
+];
+card({
+  id:"heat", title:"部門 × 指標のパターン", form:"ヒートマップ",
+  sub:"第2の軸は指標の5列／濃さ＝その列の中での順位（1色の明暗5段階）・行は離職率の低い順",
+  note:"言えること: 1部門を横に読むと強み弱みのパターンが分かり、離職率で並べ替えると満足度の濃淡がほぼ裏返しに並ぶ、という列同士の連動が見える。言えないこと: 濃さは列内の順位でしかないので絶対水準の差（満足度4.3と4.1の僅差も1段違いに見える）は読めず、良し悪しの向きも色からは分からない。",
+  draw:function(){
+    var W=480,LBL=118,CW=70,HEAD=42,RH=19,s=root(W,HEAD+D.length*RH+10);
+    var rows=D.slice().sort(function(a,b){return a.trn-b.trn;});
+    var ranks={};
+    METRICS.forEach(function(m){
+      var sorted=D.slice().sort(function(a,b){return a[m.k]-b[m.k];});
+      ranks[m.k]={};
+      sorted.forEach(function(r,i){ ranks[m.k][r.d]=i; });
+    });
+    METRICS.forEach(function(m,c){
+      var cx=LBL+c*CW+CW/2;
+      s.appendChild(T(cx,HEAD-26,m.n,{a:"middle",fs:9}));
+      s.appendChild(T(cx,HEAD-14,"（"+m.u+"）",{a:"middle",fs:8.5,mut:1}));
+    });
+    rows.forEach(function(r,i){
+      var yy=HEAD+i*RH;
+      s.appendChild(T(LBL-8,yy+13,r.d,{a:"end",fs:10.5}));
+      METRICS.forEach(function(m,c){
+        var step=Math.min(4,Math.floor((ranks[m.k][r.d]+0.5)/D.length*5));
+        s.appendChild(S("rect",{x:LBL+c*CW+1,y:yy+1,width:CW-2,height:RH-2,
+          style:"fill:var(--r"+step+")"}));
+      });
+    });
+    return s;
+  }
+});
+
+/* ============================ 10. レンジプロット ============================ */
+var RANGES=GROUPS.map(function(g,i){
+  var mem=D.filter(function(r){return r.g===i;}).sort(function(a,b){return a.trn-b.trn;});
+  var hc=0,w=0; mem.forEach(function(m){hc+=m.hc;w+=m.hc*m.trn;});
+  return {gi:i,name:g.name,hc:hc,lo:mem[0],hi:mem[mem.length-1],wm:w/hc,n:mem.length};
+}).sort(function(a,b){return b.wm-a.wm;});
+card({
+  id:"range", title:"グループの中でどれだけ開くか", form:"レンジプロット",
+  sub:"機能グループ内の離職率 最小〜最大／◆＝人数加重平均・単位は全行とも%",
+  note:"言えること: 同じグループでも離職率が最大23ポイント開く（顧客対応は11%〜34%）ため、グループ単位の平均で語ると実態を外すと分かる。言えないこと: 両端の2部門しか写らないので、間の部門がどう分布しているか、2部門しかないグループの『幅』が単なる差でしかないことは、この図からは判別できない。",
+  draw:function(){
+    var W=480,PL=118,PR=44,TOP=36,band=44,H=TOP+RANGES.length*band+30,s=root(W,H);
+    var x=sc(0,36,PL,W-PR), base=TOP+RANGES.length*band;
+    ticks(0,30,10).forEach(function(t){
+      s.appendChild(L(x(t),TOP-12,x(t),base));
+      s.appendChild(T(x(t),base+16,t+"%",{a:"middle",fs:10,mut:1}));
+    });
+    s.appendChild(T(0,14,"離職率（%）",{fs:10,mut:1}));
+    RANGES.forEach(function(g,i){
+      var cy=TOP+i*band+22, col=gcol(g.gi);
+      s.appendChild(T(PL-10,cy,g.name,{a:"end",fs:11,w:600}));
+      s.appendChild(T(PL-10,cy+12,g.n+"部門・"+n0(g.hc)+"人",{a:"end",fs:9,mut:1}));
+      s.appendChild(S("line",{x1:x(g.lo.trn),y1:cy+4,x2:x(g.hi.trn),y2:cy+4,
+        style:"stroke:"+col+";stroke-width:2;stroke-linecap:round"}));
+      s.appendChild(S("circle",{cx:x(g.lo.trn),cy:cy+4,r:4.5,style:"fill:"+col}));
+      s.appendChild(S("circle",{cx:x(g.hi.trn),cy:cy+4,r:4.5,style:"fill:"+col}));
+      var d=6.5,mxp=x(g.wm);
+      s.appendChild(S("polygon",{points:[mxp,cy+4-d,mxp+d,cy+4,mxp,cy+4+d,mxp-d,cy+4].join(" "),
+        style:"fill:"+col+";stroke:var(--card);stroke-width:1.5"}));
+      s.appendChild(T(x(g.lo.trn),cy-9,g.lo.d,{a:"middle",fs:9,mut:1}));
+      s.appendChild(T(x(g.hi.trn),cy-9,g.hi.d,{a:"middle",fs:9,mut:1}));
+      s.appendChild(T(x(g.lo.trn)-9,cy+8,g.lo.trn+"%",{a:"end",fs:10.5,w:650}));
+      s.appendChild(T(x(g.hi.trn)+9,cy+8,g.hi.trn+"%",{a:"start",fs:10.5,w:650}));
+      s.appendChild(T(mxp,cy+22,n1(g.wm)+"%",{a:"middle",fs:9,mut:1}));
+    });
+    s.appendChild(L(PL,base,W-PR,base,"axis"));
+    return s;
+  }
+});
+
+/* == CHART INSERT POINT == */
+
+/* ============================ 目的セレクタ ============================ */
+var PURPOSES=[
+  {id:"p1",label:"経営会議に、人員配分の偏りを",chart:"rank",
+   why:"カスタマーサポート1部門で320人、全社1,476人の21.7%を占め、2位の個人営業240人との差も80人ある。順位と絶対量を12部門とりこぼさず同時に見せられるのは横棒ランキングだけで、比率の話は構成図に譲れる。"},
+  {id:"p2",label:"CFOに、売上がどこに集中しているかを",chart:"pareto",
+   why:"推計部門売上33,543百万円のうち、上位4部門で66.5%、上位5部門で77.0%に達する。「どこまで数えれば全体の8割か」に直接答えられるのは累積線を持つパレートだけで、順位だけの棒では累積が読めない。"},
+  {id:"p3",label:"人事担当役員に、離職リスクの構造を",chart:"scatter",
+   why:"満足度と離職率の相関は r=-0.91 で、満足度2.4のカスタマーサポートが離職率34%、満足度4.3のデータ分析が6%と両端に並ぶ。離職率を並べるだけでは「下げるために何を動かすか」が示せず、2測度を同時に置く散布図が要る。"},
+  {id:"p4",label:"投資判断として、増員の優先順位を",chart:"quad",
+   why:"営業利益率の中央値7.5%・満足度の中央値3.55で切ると、右上（両方上位）の4部門は合計490人＝全社の33.2%しかなく、左下（両方下位）に664人＝45.0%がいる。人をどちらへ寄せるかという二択は、しきい値で仕切った2×2が最も短く言い切れる。"}
+];
+
+/* ============================ 描画 ============================ */
+function renderCards(){
+  var grid=document.getElementById("grid");
+  CARDS.forEach(function(c){
+    var art=document.createElement("article");
+    art.className="card"; art.id="card-"+c.id;
+    var head=document.createElement("div"); head.className="chead";
+    var h3=document.createElement("h3"); h3.textContent=c.title;
+    var f=document.createElement("span"); f.className="form"; f.textContent=c.form;
+    head.appendChild(h3); head.appendChild(f); art.appendChild(head);
+    var sub=document.createElement("p"); sub.className="csub"; sub.textContent=c.sub; art.appendChild(sub);
+    var body=document.createElement("div"); body.className="cbody";
+    try{ body.appendChild(c.draw()); }catch(err){ body.textContent="描画エラー: "+err.message; console.error(c.id,err); }
+    art.appendChild(body);
+    var note=document.createElement("p"); note.className="cnote"; note.textContent=c.note; art.appendChild(note);
+    grid.appendChild(art);
+  });
+}
+function renderPurposes(){
+  var host=document.getElementById("purp"), why=document.getElementById("why");
+  function apply(p){
+    Array.prototype.forEach.call(host.children,function(b){ b.setAttribute("aria-pressed", String(b.dataset.p===(p?p.id:"all"))); });
+    CARDS.forEach(function(c){
+      var el=document.getElementById("card-"+c.id); if(!el)return;
+      el.classList.toggle("dim", !!p && c.id!==p.chart);
+      el.classList.toggle("spot", !!p && c.id===p.chart);
+    });
+    if(p){
+      var t=CARDS.filter(function(c){return c.id===p.chart;})[0];
+      why.innerHTML="<em>推奨: "+(t?t.title+"（"+t.form+"）":p.chart)+"</em>"+p.why;
+    }else{
+      why.innerHTML="<em>すべて表示</em>目的を選ぶと、推奨する1枚に枠線が付き、それ以外は薄く沈みます。10枚とも消えません。";
+    }
+  }
+  PURPOSES.forEach(function(p){
+    var b=document.createElement("button"); b.type="button"; b.className="pb"; b.dataset.p=p.id;
+    b.textContent=p.label; b.setAttribute("aria-pressed","false");
+    b.addEventListener("click",function(){ apply(p); });
+    host.appendChild(b);
+  });
+  var all=document.createElement("button"); all.type="button"; all.className="pb"; all.dataset.p="all";
+  all.textContent="すべて表示"; all.setAttribute("aria-pressed","true");
+  all.addEventListener("click",function(){ apply(null); });
+  host.appendChild(all);
+  apply(null);
+}
+function renderTable(){
+  var host=document.getElementById("tableHost");
+  var cols=["部門","グループ","従業員数","一人当たり売上<br>（百万円）","営業利益率<br>（%）","満足度<br>（5点）","離職率<br>（%）","推計部門売上<br>（百万円）"];
+  var h="<table><thead><tr>"+cols.map(function(c){return "<th>"+c+"</th>";}).join("")+"</tr></thead><tbody>";
+  D.forEach(function(r){
+    h+="<tr><td>"+r.d+"</td><td>"+GROUPS[r.g].name+"</td><td>"+n0(r.hc)+"</td><td>"+r.rpe+"</td><td>"+r.mgn+"</td><td>"+r.sat.toFixed(1)+"</td><td>"+r.trn+"</td><td>"+n0(r.rev)+"</td></tr>";
+  });
+  h+="</tbody><tfoot><tr><td>合計 / 加重平均</td><td class='small'>12部門</td><td>"+n0(TOT_HC)+"</td>"+
+     "<td class='small'>"+n1(TOT_REV/TOT_HC)+"<br>加重平均</td>"+
+     "<td class='small'>"+n1(W_MGN)+"<br>売上加重</td>"+
+     "<td class='small'>"+W_SAT.toFixed(2)+"<br>人数加重</td>"+
+     "<td class='small'>"+n1(W_TRN)+"<br>人数加重</td>"+
+     "<td>"+n0(TOT_REV)+"</td></tr></tfoot></table>";
+  host.innerHTML=h;
+  document.getElementById("verify").textContent=
+    "検算: 加算可能と判定した測度だけ合計を取った。従業員数 = "+n0(TOT_HC)+"人（12部門の和）、推計部門売上 = "+n0(TOT_REV)+
+    "百万円（各部門の従業員数×一人当たり売上の和）。ヒストグラムの階級人数の和も "+n0(TOT_HC)+
+    "人で一致する。加算不可と判定した4列（一人当たり売上・営業利益率・満足度・離職率）は合計欄を空けず加重平均を置いたが、これは足し算の結果ではない。";
+}
+document.getElementById("themeBtn").addEventListener("click",function(){
+  var cur=document.documentElement.getAttribute("data-theme");
+  var dark=cur? cur==="dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", dark?"light":"dark");
+});
+renderCards();
+renderPurposes();
+renderTable();
+</script>
+</body>
+</html>
