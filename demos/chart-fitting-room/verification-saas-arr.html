@@ -1,0 +1,870 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>プラン別ARR — 10通りの見せ方</title>
+<style>
+:root{
+  color-scheme: light;
+  --bg:#f6f6f4; --surface:#ffffff; --surface-2:#fbfbfa;
+  --ink:#1a1a1e; --ink-2:#55555f; --ink-3:#8b8b95;
+  --line:#e4e4df; --grid:#eaeae5; --grid-strong:#cfcfc8;
+  --c-ent:#0f766e; --c-bus:#4338ca; --c-sta:#a21f6f; --c-leg:#7c736c;
+  --up:#1d4ed8; --down:#b91c1c; --neutral:#6b7280;
+  --spot:#1a1a1e; --spot-soft:rgba(26,26,30,.06);
+  --hm1:#fdf6e9; --hm2:#f7e2b6; --hm3:#eec277; --hm4:#dfa14a; --hm5:#8a5207;
+  --hm1-ink:#1a1a1e; --hm2-ink:#1a1a1e; --hm3-ink:#1a1a1e; --hm4-ink:#1a1a1e; --hm5-ink:#fffdf6;
+  --btn:#ffffff; --btn-b:#d8d8d2;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --bg:#0e0e10; --surface:#18181b; --surface-2:#1e1e22;
+    --ink:#ededf0; --ink-2:#a9a9b3; --ink-3:#77777f;
+    --line:#2b2b31; --grid:#26262b; --grid-strong:#3b3b43;
+    --c-ent:#2dd4bf; --c-bus:#a5b4fc; --c-sta:#f0a3d0; --c-leg:#bbb3ab;
+    --up:#60a5fa; --down:#f87171; --neutral:#9ca3af;
+    --spot:#ededf0; --spot-soft:rgba(237,237,240,.08);
+    --hm1:#241d10; --hm2:#3b2c14; --hm3:#5d431a; --hm4:#a5711d; --hm5:#e2a645;
+    --hm1-ink:#ededf0; --hm2-ink:#ededf0; --hm3-ink:#ededf0; --hm4-ink:#17110a; --hm5-ink:#17110a;
+    --btn:#202024; --btn-b:#35353c;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#0e0e10; --surface:#18181b; --surface-2:#1e1e22;
+  --ink:#ededf0; --ink-2:#a9a9b3; --ink-3:#77777f;
+  --line:#2b2b31; --grid:#26262b; --grid-strong:#3b3b43;
+  --c-ent:#2dd4bf; --c-bus:#a5b4fc; --c-sta:#f0a3d0; --c-leg:#bbb3ab;
+  --up:#60a5fa; --down:#f87171; --neutral:#9ca3af;
+  --spot:#ededf0; --spot-soft:rgba(237,237,240,.08);
+  --hm1:#241d10; --hm2:#3b2c14; --hm3:#5d431a; --hm4:#a5711d; --hm5:#e2a645;
+  --hm1-ink:#ededf0; --hm2-ink:#ededf0; --hm3-ink:#ededf0; --hm4-ink:#17110a; --hm5-ink:#17110a;
+  --btn:#202024; --btn-b:#35353c;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;max-width:100%;overflow-x:hidden}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic","Meiryo",system-ui,sans-serif;
+  font-size:15px; line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1280px; margin:0 auto; padding:32px 24px 72px}
+
+/* ---------- header ---------- */
+.top{display:flex; gap:16px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap}
+h1{
+  font-size:26px; line-height:1.35; margin:0 0 6px;
+  font-weight:680; letter-spacing:-.01em;
+}
+.sub{margin:0; color:var(--ink-2); font-size:13.5px; letter-spacing:.01em}
+.lede{
+  margin:18px 0 0; max-width:74ch; font-size:16px; line-height:1.75;
+  color:var(--ink); font-weight:450;
+  border-left:2px solid var(--grid-strong); padding-left:16px;
+}
+.lede b{font-weight:660}
+.theme{display:flex; gap:0; border:1px solid var(--btn-b); border-radius:8px; overflow:hidden; flex:none}
+.theme button{
+  font:inherit; font-size:11.5px; letter-spacing:.04em; padding:6px 11px;
+  background:var(--btn); color:var(--ink-2); border:0; cursor:pointer;
+  border-right:1px solid var(--btn-b);
+}
+.theme button:last-child{border-right:0}
+.theme button[aria-pressed="true"]{background:var(--spot); color:var(--bg)}
+
+/* ---------- purpose selector ---------- */
+.purpose{
+  margin:30px 0 0; padding:20px 22px 22px;
+  background:var(--surface); border:1px solid var(--line); border-radius:14px;
+}
+.purpose h2{
+  margin:0 0 3px; font-size:15px; font-weight:660; letter-spacing:.005em;
+}
+.purpose .hint{margin:0 0 14px; font-size:12.5px; color:var(--ink-3)}
+.pbtns{display:flex; gap:9px; flex-wrap:wrap}
+.pbtns button{
+  font:inherit; font-size:13.5px; font-weight:500; letter-spacing:.01em;
+  padding:9px 15px; border-radius:999px; cursor:pointer;
+  background:var(--btn); color:var(--ink); border:1px solid var(--btn-b);
+  transition:background .35s ease, color .35s ease, border-color .35s ease;
+}
+.pbtns button:hover{border-color:var(--ink-3)}
+.pbtns button[aria-pressed="true"]{background:var(--spot); color:var(--bg); border-color:var(--spot)}
+.pbtns button.reset{color:var(--ink-2)}
+.why{
+  margin-top:0; max-height:0; opacity:0; overflow:hidden;
+  transition:max-height .35s ease, opacity .35s ease, margin-top .35s ease;
+}
+.why.on{max-height:340px; opacity:1; margin-top:16px}
+.why-in{
+  background:var(--surface-2); border:1px solid var(--line); border-radius:10px;
+  padding:14px 16px;
+}
+.why-h{font-size:11.5px; letter-spacing:.09em; color:var(--ink-3); margin:0 0 5px}
+.why-t{font-size:14.5px; font-weight:640; margin:0 0 5px; letter-spacing:.005em}
+.why-b{font-size:13.5px; color:var(--ink-2); margin:0; line-height:1.75}
+
+/* ---------- grid + cards ---------- */
+.grid{
+  margin-top:26px; display:grid; gap:20px;
+  /* min(560px,100%) にすることで、狭い画面でも横スクロールを起こさずに1列へ落ちる */
+  grid-template-columns:repeat(auto-fit, minmax(min(560px,100%),1fr));
+}
+.card{
+  background:var(--surface); border:1px solid var(--line); border-radius:14px;
+  padding:18px 18px 16px; min-width:0;
+  opacity:1; box-shadow:0 0 0 0 transparent;
+  transition:opacity .35s ease, box-shadow .35s ease, border-color .35s ease;
+}
+.card.dim{opacity:.24}
+.card.spot{border-color:var(--spot); box-shadow:0 0 0 2px var(--spot)}
+.card-h{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:2px}
+.card-h .num{
+  font-size:11px; color:var(--ink-3); font-variant-numeric:tabular-nums;
+  letter-spacing:.06em; flex:none;
+}
+.card-h h3{margin:0; font-size:15.5px; font-weight:640; letter-spacing:.005em}
+.form{
+  font-size:11.5px; color:var(--ink-2); letter-spacing:.05em;
+  border:1px solid var(--line); border-radius:5px; padding:1px 7px; flex:none;
+}
+.scale{margin:2px 0 10px; font-size:11.5px; color:var(--ink-3); letter-spacing:.01em}
+.lgd{display:flex; gap:14px; flex-wrap:wrap; list-style:none; margin:0 0 8px; padding:0}
+.lgd li{display:flex; align-items:center; gap:5px; font-size:11.5px; color:var(--ink-2)}
+.sw{width:10px; height:10px; border-radius:2px; display:block; flex:none}
+.sw.ent{background:var(--c-ent)} .sw.bus{background:var(--c-bus)}
+.sw.sta{background:var(--c-sta)} .sw.leg{background:var(--c-leg)}
+.sw.up{background:var(--up)} .sw.down{background:var(--down)} .sw.tot{background:var(--neutral)}
+/* viewBox幅と同じ上限を掛けて 1単位 ≤ 1px に固定する。
+   これをしないとカード幅に応じてSVGが拡大し、棒が24pxを超えてしまう */
+.chart svg{display:block; width:100%; max-width:560px; height:auto; margin:0 auto}
+.read{
+  margin:12px 0 0; padding-top:11px; border-top:1px solid var(--line);
+  font-size:12.5px; line-height:1.72; color:var(--ink-2);
+}
+.read b{color:var(--ink); font-weight:640}
+
+/* ---------- svg text ---------- */
+svg text{font-family:inherit; fill:var(--ink-2); font-variant-numeric:tabular-nums}
+.t-ax{font-size:10px; fill:var(--ink-3)}
+.t-cat{font-size:11px; fill:var(--ink-2)}
+.t-val{font-size:11px; fill:var(--ink); font-weight:620}
+.t-sm{font-size:10px; fill:var(--ink); font-weight:600}
+.t-q{font-size:10.5px; fill:var(--ink-3); letter-spacing:.07em}
+.t-hd{font-size:11.5px; fill:var(--ink-2); font-weight:600}
+.gl{stroke:var(--grid); stroke-width:1; fill:none}
+.gl-s{stroke:var(--grid-strong); stroke-width:1; fill:none}
+.gl-x{stroke:var(--ink-3); stroke-width:1; fill:none}
+.f-ent{fill:var(--c-ent)} .f-bus{fill:var(--c-bus)} .f-sta{fill:var(--c-sta)} .f-leg{fill:var(--c-leg)}
+.k-ent{stroke:var(--c-ent)} .k-bus{stroke:var(--c-bus)} .k-sta{stroke:var(--c-sta)} .k-leg{stroke:var(--c-leg)}
+.ln{fill:none; stroke-width:2; stroke-linejoin:round; stroke-linecap:round}
+.f-up{fill:var(--up)} .f-down{fill:var(--down)} .f-tot{fill:var(--neutral)}
+
+
+/* ---------- data table ---------- */
+details.data{
+  margin-top:30px; background:var(--surface); border:1px solid var(--line);
+  border-radius:14px; padding:0 20px;
+}
+details.data summary{
+  cursor:pointer; padding:16px 0; font-size:14.5px; font-weight:620; list-style:none;
+  display:flex; align-items:center; gap:9px;
+}
+details.data summary::-webkit-details-marker{display:none}
+details.data summary::before{
+  content:"+"; font-size:15px; color:var(--ink-3); width:14px; text-align:center;
+}
+details.data[open] summary::before{content:"−"}
+.tw{overflow-x:auto; padding-bottom:20px; max-width:100%}
+table{border-collapse:collapse; width:100%; min-width:620px; font-size:12.5px}
+th,td{padding:7px 10px; text-align:right; border-bottom:1px solid var(--line); white-space:nowrap}
+th{color:var(--ink-3); font-weight:600; font-size:11px; letter-spacing:.05em}
+td{font-variant-numeric:tabular-nums; color:var(--ink-2)}
+td.name{text-align:left; color:var(--ink)}
+td.name span{display:inline-flex; align-items:center; gap:7px}
+tr.tot td{color:var(--ink); font-weight:620; border-top:1px solid var(--grid-strong)}
+tr.gap td{border-bottom:0; padding:3px 0}
+.note{margin:22px 0 0; font-size:11.5px; color:var(--ink-3); line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div>
+      <h1>プラン別ARRを、10通りの形式で見比べる</h1>
+      <p class="sub">SaaSのプラン別ARR（2023–2025年 / 4プラン / 百万円）— 契約社数・粗利率・解約率を併記</p>
+    </div>
+    <div class="theme" role="group" aria-label="テーマ">
+      <button type="button" data-th="auto" aria-pressed="true">自動</button>
+      <button type="button" data-th="light" aria-pressed="false">ライト</button>
+      <button type="button" data-th="dark" aria-pressed="false">ダーク</button>
+    </div>
+  </div>
+
+  <p class="lede">全社ARRは <b>1,380 → 1,530百万円（+150、+10.9%）</b> と伸びているが、増分の実体は <b>Enterpriseの +340</b> ひとつであり、Starter −90・Legacy −135 という合計 −225 の毀損を、それが一人で埋めている。</p>
+
+  <section class="purpose">
+    <h2>誰に、何を言いたいですか</h2>
+    <p class="hint">選ぶと、その相手に効く1枚だけが残ります。他の9枚は消さずに沈めるので、そのまま見比べられます。</p>
+    <div class="pbtns" id="pbtns"></div>
+    <div class="why" id="why">
+      <div class="why-in">
+        <p class="why-h" id="whyHead">この目的なら、この1枚</p>
+        <p class="why-t" id="whyTitle"></p>
+        <p class="why-b" id="whyBody"></p>
+      </div>
+    </div>
+  </section>
+
+  <div class="grid" id="grid"></div>
+
+  <details class="data">
+    <summary>数値で見る（元データ）</summary>
+    <div class="tw" id="tableHost"></div>
+    <p class="note" style="padding-bottom:20px">出典: arr.csv（プラン, 年, ARR_百万円, 契約社数, 粗利率_pct, 解約率_pct）。構成比は各年の全社ARRに対する比率で、四捨五入後も各年 100.0% になることを確認済み。上の10枚のチャートはすべてこの表と同じ数値から描いている。</p>
+  </details>
+
+  <p class="note">ライブラリ・外部フォント・CDNを使わず、SVGとインラインCSS/JSだけで描画。オフラインで開けます。</p>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   DATA  — 単一の情報源。チャートも表もここから生成する
+   ============================================================ */
+var YEARS = [2023, 2024, 2025];
+var PLANS = [
+  { id:'ent', name:'Enterprise', arr:[420,560,760], acct:[84,102,128],    gm:[78,79,80], ch:[4,4,3]    },
+  { id:'bus', name:'Business',   arr:[510,530,545], acct:[680,712,731],   gm:[72,72,71], ch:[9,9,10]   },
+  { id:'sta', name:'Starter',    arr:[260,215,170], acct:[2400,2010,1580],gm:[61,60,58], ch:[22,25,28] },
+  { id:'leg', name:'Legacy',     arr:[190,120,55],  acct:[310,196,88],    gm:[55,52,48], ch:[15,31,44] }
+];
+var TOTAL = YEARS.map(function(_, i){
+  return PLANS.reduce(function(s,p){ return s + p.arr[i]; }, 0);
+});                                            // [1380, 1425, 1530]
+var DELTA = PLANS.map(function(p){ return p.arr[2] - p.arr[0]; });   // [340,35,-90,-135]
+var GROW  = PLANS.map(function(p){ return (p.arr[2]/p.arr[0] - 1) * 100; });
+
+function share(p, i){ return p.arr[i] / TOTAL[i] * 100; }
+/* 本文と同じ真のマイナス記号(U+2212)を使う。ハイフンと混ざらないように */
+function mn(s){ return String(s).replace(/-/g, '−'); }
+function nf(v){ return mn(v.toLocaleString('en-US')); }
+function sgn(v){ return (v > 0 ? '+' : '') + nf(v); }
+function pctAx(v){ return (v > 0 ? '+' : '') + mn(v) + '%'; }
+
+/* ============================================================
+   SVG helpers
+   ============================================================ */
+var NS = 'http://www.w3.org/2000/svg';
+function E(tag, a){
+  var n = document.createElementNS(NS, tag);
+  if (a) for (var k in a) if (a[k] !== null && a[k] !== undefined) n.setAttribute(k, a[k]);
+  return n;
+}
+function T(x, y, str, cls, anchor){
+  var n = E('text', { x:x, y:y, 'class':cls||'t-ax', 'text-anchor':anchor||'start' });
+  n.textContent = str;
+  return n;
+}
+function R(x, y, w, h, cls, rx){
+  return E('rect', { x:x, y:y, width:Math.max(w,0), height:Math.max(h,0), 'class':cls, rx:rx||0 });
+}
+function L(x1, y1, x2, y2, cls){
+  return E('line', { x1:x1, y1:y1, x2:x2, y2:y2, 'class':cls||'gl' });
+}
+function CANVAS(w, h){
+  var s = E('svg', { viewBox:'0 0 '+w+' '+h, role:'img' });
+  s.setAttribute('preserveAspectRatio','xMidYMid meet');
+  return s;
+}
+/* color chip + label, laid out left→right from x */
+function chipLabel(g, x, y, id, str, cls){
+  g.appendChild(R(x, y-8, 9, 9, 'f-'+id, 2));
+  g.appendChild(T(x+13, y, str, cls||'t-cat', 'start'));
+}
+/* color chip + label, right-aligned so the label ENDS at x.
+   幅の見積もりは当てにならないので、DOM挿入後に実測して置き直す（下の RELAYOUT）*/
+var RELAYOUT = [];
+function chipLabelEnd(g, x, y, id, str){
+  var t = T(x, y, str, 't-cat', 'end');
+  var r = R(x - 70, y-8, 9, 9, 'f-'+id, 2);
+  g.appendChild(r); g.appendChild(t);
+  RELAYOUT.push({ rect:r, text:t });
+}
+
+/* ============================================================
+   CHART 1 — 折れ線
+   ============================================================ */
+function chartLine(){
+  var W=560, H=300, x0=48, x1=442, yT=16, yB=264, MAX=800;
+  var s = CANVAS(W,H), g = E('g'); s.appendChild(g);
+  var y = function(v){ return yB - v/MAX*(yB-yT); };
+  var X = [x0, (x0+x1)/2, x1];
+
+  [0,200,400,600,800].forEach(function(t){
+    g.appendChild(L(x0, y(t), x1, y(t), t===0 ? 'gl-s' : 'gl'));
+    g.appendChild(T(x0-8, y(t)+3.5, nf(t), 't-ax', 'end'));
+  });
+  YEARS.forEach(function(yr,i){ g.appendChild(T(X[i], 284, String(yr), 't-ax', 'middle')); });
+
+  PLANS.forEach(function(p){
+    var d = p.arr.map(function(v,i){ return (i?'L':'M') + X[i] + ' ' + y(v).toFixed(1); }).join(' ');
+    g.appendChild(E('path', { d:d, 'class':'ln k-'+p.id }));
+    p.arr.forEach(function(v,i){
+      g.appendChild(E('circle', { cx:X[i], cy:y(v), r:4.5, 'class':'f-'+p.id }));
+    });
+    /* 端（右端）だけに数値。系列名は色マークが担う */
+    chipLabel(g, x1+10, y(p.arr[2])+4, p.id, p.name + ' ' + nf(p.arr[2]));
+  });
+  return s;
+}
+
+/* ============================================================
+   CHART 2 — 積み上げ棒
+   ============================================================ */
+function chartStack(){
+  var W=560, H=300, x0=56, x1=504, yT=30, yB=266, MAX=1600, BW=24;
+  var s = CANVAS(W,H), g = E('g'); s.appendChild(g);
+  var y = function(v){ return yB - v/MAX*(yB-yT); };
+  var band = (x1-x0)/3;
+
+  [0,400,800,1200,1600].forEach(function(t){
+    g.appendChild(L(x0, y(t), x1, y(t), t===0 ? 'gl-s' : 'gl'));
+    g.appendChild(T(x0-8, y(t)+3.5, nf(t), 't-ax', 'end'));
+  });
+
+  YEARS.forEach(function(yr,i){
+    var cx = x0 + band*(i+0.5), acc = 0;
+    PLANS.forEach(function(p, j){
+      var y1 = y(acc), y0 = y(acc + p.arr[i]);
+      var gap = j > 0 ? 2 : 0;                     /* 背景色2pxの隙間で段を分ける */
+      g.appendChild(R(cx-BW/2, y0+gap, BW, (y1-y0)-gap, 'f-'+p.id));
+      acc += p.arr[i];
+    });
+    g.appendChild(T(cx, y(acc)-8, nf(acc), 't-val', 'middle'));
+    g.appendChild(T(cx, 284, String(yr), 't-ax', 'middle'));
+  });
+  return s;
+}
+
+/* ============================================================
+   CHART 3 — 100%積み上げ
+   ============================================================ */
+function chartPct(){
+  var W=560, H=300, x0=100, x1=440, yT=24, yB=272, BW=24;
+  var s = CANVAS(W,H), g = E('g'); s.appendChild(g);
+  var y = function(v){ return yB - v/100*(yB-yT); };
+  var band = (x1-x0)/3;
+
+  [25,50,75].forEach(function(t){ g.appendChild(L(x0, y(t), x1, y(t), 'gl')); });
+  g.appendChild(L(x0, y(0),   x1, y(0),   'gl-s'));
+  g.appendChild(L(x0, y(100), x1, y(100), 'gl-s'));
+
+  YEARS.forEach(function(yr,i){
+    var cx = x0 + band*(i+0.5), acc = 0, mids = [];
+    PLANS.forEach(function(p, j){
+      var v = share(p,i);
+      var y1 = y(acc), y0 = y(acc+v), gap = j > 0 ? 2 : 0;
+      g.appendChild(R(cx-BW/2, y0+gap, BW, (y1-y0)-gap, 'f-'+p.id));
+      mids.push((y0+y1)/2);
+      acc += v;
+    });
+    g.appendChild(T(cx, 290, String(yr), 't-ax', 'middle'));
+    /* 端（2023と2025）だけ直接ラベル。中間の2024は凡例に任せる */
+    if (i === 0 || i === 2){
+      var lx = (i === 0) ? 40 : 452;
+      PLANS.forEach(function(p, j){
+        g.appendChild(R(lx, mids[j]-7.5, 9, 9, 'f-'+p.id, 2));
+        g.appendChild(T(lx+13, mids[j], share(p,i).toFixed(1)+'%', 't-sm', 'start'));
+      });
+    }
+  });
+  return s;
+}
+
+/* ============================================================
+   CHART 4 — ウォーターフォール
+   ============================================================ */
+function chartWater(){
+  var W=560, H=300, x0=52, x1=536, yT=30, yB=262, MAX=2000, BW=24;
+  var s = CANVAS(W,H), g = E('g'); s.appendChild(g);
+  var y = function(v){ return yB - v/MAX*(yB-yT); };
+  var band = (x1-x0)/6;
+
+  [0,500,1000,1500,2000].forEach(function(t){
+    g.appendChild(L(x0, y(t), x1, y(t), t===0 ? 'gl-s' : 'gl'));
+    g.appendChild(T(x0-8, y(t)+3.5, nf(t), 't-ax', 'end'));
+  });
+
+  /* 期首 → 4プランの増減 → 期末。合計は厳密に一致する */
+  var steps = [{ kind:'tot', label:'2023', val:TOTAL[0] }];
+  PLANS.forEach(function(p,i){
+    steps.push({ kind: DELTA[i] >= 0 ? 'up' : 'down', label:p.name, val:DELTA[i], plan:p.id });
+  });
+  steps.push({ kind:'tot', label:'2025', val:TOTAL[2] });
+
+  var run = 0, prevX = null, prevY = null;
+  steps.forEach(function(st, i){
+    var cx = x0 + band*(i+0.5), top, bot;
+    if (st.kind === 'tot'){ run = st.val; top = y(run); bot = y(0); }
+    else { var from = run; run += st.val; top = y(Math.max(from, run)); bot = y(Math.min(from, run)); }
+
+    if (prevX !== null) g.appendChild(L(prevX, prevY, cx-BW/2, prevY, 'gl-s'));
+
+    g.appendChild(R(cx-BW/2, top, BW, Math.max(bot-top, 2), 'f-'+st.kind));
+    g.appendChild(T(cx, top-7, st.kind==='tot' ? nf(st.val) : sgn(st.val), 't-val', 'middle'));
+    g.appendChild(T(cx, 280, st.label, 't-ax', 'middle'));
+    if (st.plan) g.appendChild(R(cx-6, 286, 12, 3, 'f-'+st.plan, 1.5));
+
+    prevX = cx + BW/2; prevY = y(run);
+  });
+  return s;
+}
+
+/* ============================================================
+   CHART 5 — バブル（規模 × 成長 × 収益性）
+   ============================================================ */
+function chartBubble(){
+  var W=560, H=320, x0=56, x1=450, yT=20, yB=276;
+  var XMIN=-80, XMAX=100, YMIN=40, YMAX=90;
+  var s = CANVAS(W,H), g = E('g'); s.appendChild(g);
+  var X = function(v){ return x0 + (v-XMIN)/(XMAX-XMIN)*(x1-x0); };
+  var Y = function(v){ return yB - (v-YMIN)/(YMAX-YMIN)*(yB-yT); };
+  var k = 30/Math.sqrt(760);                       /* 面積 ∝ ARR */
+
+  [40,50,60,70,80,90].forEach(function(t){
+    g.appendChild(L(x0, Y(t), x1, Y(t), 'gl'));
+    g.appendChild(T(x0-8, Y(t)+3.5, t+'%', 't-ax', 'end'));
+  });
+  [-80,-40,0,40,80].forEach(function(t){
+    g.appendChild(L(X(t), yT, X(t), yB, t===0 ? 'gl-s' : 'gl'));
+    g.appendChild(T(X(t), yB+16, pctAx(t), 't-ax', 'middle'));
+  });
+  g.appendChild(T((x0+x1)/2, 312, '成長率 2023→2025', 't-ax', 'middle'));
+  var yl = T(0, 0, '粗利率 2025', 't-ax', 'middle');
+  yl.setAttribute('transform','translate(16,'+((yT+yB)/2)+') rotate(-90)');
+  g.appendChild(yl);
+
+  PLANS.forEach(function(p, i){
+    var cx = X(GROW[i]), cy = Y(p.gm[2]), r = k*Math.sqrt(p.arr[2]);
+    var c = E('circle', { cx:cx, cy:cy, r:r, 'class':'f-'+p.id });
+    c.setAttribute('opacity','.82');
+    g.appendChild(c);
+    /* 全ラベルを円の右外に置き、上下位置が重ならないことを確認済み */
+    g.appendChild(T(cx + r + 8, cy + 4, p.name + ' ' + nf(p.arr[2]), 't-cat', 'start'));
+  });
+  return s;
+}
+
+/* ============================================================
+   CHART 6 — 2×2マトリクス
+   ============================================================ */
+function chartMatrix(){
+  var W=560, H=330, x0=56, x1=544, yT=34, yB=284;
+  var XMIN=0, XMAX=50, YMIN=-80, YMAX=100, MX=15, MY=0;
+  var s = CANVAS(W,H), g = E('g'); s.appendChild(g);
+  var X = function(v){ return x0 + (v-XMIN)/(XMAX-XMIN)*(x1-x0); };
+  var Y = function(v){ return yB - (v-YMIN)/(YMAX-YMIN)*(yB-yT); };
+
+  g.appendChild(R(x0, yT, x1-x0, yB-yT, 'gl'));
+  var fr = g.lastChild; fr.setAttribute('fill','none'); fr.setAttribute('stroke','var(--grid)');
+  [0,10,20,30,40,50].forEach(function(t){
+    g.appendChild(L(X(t), yT, X(t), yB, 'gl'));
+    g.appendChild(T(X(t), yB+16, t+'%', 't-ax', 'middle'));
+  });
+  [-80,-40,0,40,80].forEach(function(t){
+    g.appendChild(L(x0, Y(t), x1, Y(t), 'gl'));
+    g.appendChild(T(x0-8, Y(t)+3.5, pctAx(t), 't-ax', 'end'));
+  });
+  /* しきい値の十字（分析者が置いた線）。4象限が象限として読めるよう一段強く */
+  g.appendChild(L(X(MX), yT, X(MX), yB, 'gl-x'));
+  g.appendChild(L(x0, Y(MY), x1, Y(MY), 'gl-x'));
+
+  g.appendChild(T(x0+6,  yT+14,  '拡大投資',   't-q', 'start'));
+  g.appendChild(T(x1-6,  yT+14,  '穴の開いたバケツ', 't-q', 'end'));
+  g.appendChild(T(x0+6,  yB-8,   '刈り取り',   't-q', 'start'));
+  g.appendChild(T(x1-6,  Y(MY)+22, '撤退・移行', 't-q', 'end'));
+
+  g.appendChild(T((x0+x1)/2, 320, '解約率 2025 →（右ほど高い）', 't-ax', 'middle'));
+  var yl = T(0,0,'成長率 2023→2025', 't-ax', 'middle');
+  yl.setAttribute('transform','translate(16,'+((yT+yB)/2)+') rotate(-90)');
+  g.appendChild(yl);
+
+  /* ラベルは点ごとに向きを指定して衝突を回避 */
+  var side = { ent:'r', bus:'r', sta:'r', leg:'l' };
+  PLANS.forEach(function(p, i){
+    var cx = X(p.ch[2]), cy = Y(GROW[i]);
+    g.appendChild(E('circle', { cx:cx, cy:cy, r:6, 'class':'f-'+p.id }));
+    if (side[p.id] === 'r') g.appendChild(T(cx+10, cy+4, p.name, 't-cat', 'start'));
+    else                    g.appendChild(T(cx-10, cy+4, p.name, 't-cat', 'end'));
+  });
+  return s;
+}
+
+/* ============================================================
+   CHART 7 — ヒートマップ（解約率、1色の明暗）
+   ============================================================ */
+var HM_BINS = [
+  { max:4.999, cls:'hm1', label:'5%未満' },
+  { max:14.999,cls:'hm2', label:'5–14%' },
+  { max:24.999,cls:'hm3', label:'15–24%' },
+  { max:34.999,cls:'hm4', label:'25–34%' },
+  { max:1e9,   cls:'hm5', label:'35%以上' }
+];
+function bin(v){ for (var i=0;i<HM_BINS.length;i++) if (v <= HM_BINS[i].max) return HM_BINS[i]; }
+
+function chartHeat(){
+  var W=560, H=214, cw=96, chh=40, gap=2, cx0=118, cy0=26;
+  var s = CANVAS(W,H), g = E('g'); s.appendChild(g);
+
+  YEARS.forEach(function(yr,i){
+    g.appendChild(T(cx0 + i*(cw+gap) + cw/2, 18, String(yr), 't-hd', 'middle'));
+  });
+  PLANS.forEach(function(p, r){
+    var yy = cy0 + r*(chh+gap);
+    g.appendChild(R(0, yy + chh/2 - 4.5, 9, 9, 'f-'+p.id, 2));
+    g.appendChild(T(15, yy + chh/2 + 4, p.name, 't-cat', 'start'));
+    YEARS.forEach(function(_, i){
+      var v = p.ch[i], b = bin(v), xx = cx0 + i*(cw+gap);
+      var cell = R(xx, yy, cw, chh, '', 2);
+      cell.setAttribute('fill','var(--'+b.cls+')');
+      g.appendChild(cell);
+      /* 文字色はセルの濃さに合わせて反転させる（系列色ではなく可読性のため） */
+      var t = T(xx + cw/2, yy + chh/2 + 4.5, v + '%', 't-val', 'middle');
+      t.setAttribute('style','fill:var(--'+b.cls+'-ink)');   /* class より強い指定が要る */
+      g.appendChild(t);
+    });
+  });
+
+  g.appendChild(T(434, 22, '解約率', 't-hd', 'start'));
+  HM_BINS.forEach(function(b, i){
+    var yy = 38 + i*22;
+    var sw = R(434, yy, 14, 14, '', 2); sw.setAttribute('fill','var(--'+b.cls+')');
+    g.appendChild(sw);
+    g.appendChild(T(454, yy + 11, b.label, 't-ax', 'start'));
+  });
+  /* 「濃いほど高い」はダークモードで逆になるので、凡例の並び順で説明する */
+  g.appendChild(T(0, 208, 'セルの数値は解約率（%）。右の凡例の下にいくほど高い。', 't-ax', 'start'));
+  return s;
+}
+
+/* ============================================================
+   CHART 8 — 横棒ランキング
+   ============================================================ */
+function chartBar(){
+  var W=560, H=210, x0=96, x1=476, MAX=800, BH=22;
+  var s = CANVAS(W,H), g = E('g'); s.appendChild(g);
+  var X = function(v){ return x0 + v/MAX*(x1-x0); };
+  var rows = PLANS.slice().sort(function(a,b){ return b.arr[2] - a.arr[2]; });
+
+  [0,200,400,600,800].forEach(function(t){
+    g.appendChild(L(X(t), 16, X(t), 178, t===0 ? 'gl-s' : 'gl'));
+    g.appendChild(T(X(t), 194, nf(t), 't-ax', 'middle'));
+  });
+  rows.forEach(function(p, i){
+    var cy = 34 + i*42;
+    g.appendChild(R(8, cy-4.5, 9, 9, 'f-'+p.id, 2));
+    g.appendChild(T(22, cy+4, p.name, 't-cat', 'start'));
+    g.appendChild(R(x0, cy-BH/2, X(p.arr[2])-x0, BH, 'f-'+p.id));
+    g.appendChild(T(X(p.arr[2])+8, cy+4, nf(p.arr[2]), 't-val', 'start'));
+  });
+  return s;
+}
+
+/* ============================================================
+   CHART 9 — スロープグラフ
+   ============================================================ */
+function chartSlope(){
+  var W=560, H=280, xa=190, xb=380, yT=40, yB=250, MAX=800;
+  var s = CANVAS(W,H), g = E('g'); s.appendChild(g);
+  var Y = function(v){ return yB - v/MAX*(yB-yT); };
+
+  g.appendChild(L(xa, yT-4, xa, yB+6, 'gl'));
+  g.appendChild(L(xb, yT-4, xb, yB+6, 'gl'));
+  g.appendChild(T(xa, 26, '2023', 't-hd', 'middle'));
+  g.appendChild(T(xb, 26, '2025', 't-hd', 'middle'));
+
+  PLANS.forEach(function(p){
+    var ya = Y(p.arr[0]), yb = Y(p.arr[2]);
+    g.appendChild(E('line', { x1:xa, y1:ya, x2:xb, y2:yb, 'class':'ln k-'+p.id }));
+    g.appendChild(E('circle', { cx:xa, cy:ya, r:4.5, 'class':'f-'+p.id }));
+    g.appendChild(E('circle', { cx:xb, cy:yb, r:4.5, 'class':'f-'+p.id }));
+    chipLabelEnd(g, xa-12, ya+4, p.id, p.name + ' ' + nf(p.arr[0]));
+    chipLabel(g, xb+12, yb+4, p.id, p.name + ' ' + nf(p.arr[2]));
+  });
+  return s;
+}
+
+/* ============================================================
+   CHART 10 — 小倍数（共通スケール 0–800）
+   ============================================================ */
+function chartSmall(){
+  var W=560, H=340, PW=258, PH=162, MAX=800;
+  var s = CANVAS(W,H), g = E('g'); s.appendChild(g);
+
+  PLANS.forEach(function(p, n){
+    var px = 8 + (n % 2) * 286, py = 8 + Math.floor(n/2) * 170;
+    var lx = px+36, rx = px+250, by = py+128, ty = py+34;
+    var Y = function(v){ return by - v/MAX*(by-ty); };
+    var X = [lx, (lx+rx)/2, rx];
+
+    g.appendChild(R(px+2, py+8, 9, 9, 'f-'+p.id, 2));
+    g.appendChild(T(px+15, py+16, p.name, 't-cat', 'start'));
+
+    [0,400,800].forEach(function(t){
+      g.appendChild(L(lx, Y(t), rx, Y(t), t===0 ? 'gl-s' : 'gl'));
+      g.appendChild(T(px+30, Y(t)+3, nf(t), 't-ax', 'end'));
+    });
+
+    var d = p.arr.map(function(v,i){ return (i?'L':'M') + X[i] + ' ' + Y(v).toFixed(1); }).join(' ');
+    g.appendChild(E('path', { d:d, 'class':'ln k-'+p.id }));
+    p.arr.forEach(function(v,i){ g.appendChild(E('circle', { cx:X[i], cy:Y(v), r:4.5, 'class':'f-'+p.id })); });
+
+    /* 端の2点だけ数値。始点ラベルは縦軸の目盛りと同じ行に並ばないよう右へ逃がす */
+    g.appendChild(T(lx + 8, Y(p.arr[0]) + 14, nf(p.arr[0]), 't-sm', 'start'));
+    g.appendChild(T(rx, Y(p.arr[2]) - 7,  nf(p.arr[2]), 't-sm', 'end'));
+    g.appendChild(T(lx, py+144, '2023', 't-ax', 'start'));
+    g.appendChild(T(rx, py+144, '2025', 't-ax', 'end'));
+  });
+  return s;
+}
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+var PLAN_LEGEND = PLANS.map(function(p){ return { cls:p.id, name:p.name }; });
+
+var CARDS = [
+  { key:'line', title:'時系列の動き', form:'折れ線', draw:chartLine,
+    legend:PLAN_LEGEND, scale:'縦軸 ARR 0–800百万円',
+    read:'4プランの水準と方向が同時に見え、上を向いているのがEnterpriseだけであることは分かるが、<b>観測点が年次の3つしかないため線の傾きは点と点を結んだ見かけにすぎず</b>、いつ折れたのかも、全社合計がいくらなのかも、この1枚からは読めない。' },
+
+  { key:'stack', title:'合計と構成の推移', form:'積み上げ棒', draw:chartStack,
+    legend:PLAN_LEGEND, scale:'縦軸 ARR 0–1,600百万円 / 数値は各年の全社合計',
+    read:'棒の高さで全社1,380→1,530の伸びが、色で内訳が同時に読めるが、<b>中間の段は下の段に押し上げられて位置が動くため</b>、Starterの−90やLegacyの−135が「減った」のか「押し上げられただけ」なのかを目で追えない。' },
+
+  { key:'pct', title:'構成比の変化', form:'100%積み上げ', draw:chartPct,
+    legend:PLAN_LEGEND, scale:'縦軸 構成比 0–100%（各年の合計は100.0%）/ 数値は2023と2025のみ',
+    read:'Enterpriseの構成比が30.4%→49.7%へ、Legacyが13.8%→3.6%へ動いたことが一目で分かるが、<b>縦軸が常に100%なので全社ARRが増えたのか減ったのかは完全に消える</b>。全プランが半減しても、この絵はまったく同じ形になる。' },
+
+  { key:'water', title:'期首から期末への増減分解', form:'ウォーターフォール', draw:chartWater,
+    legend:[{cls:'tot',name:'期首・期末'},{cls:'up',name:'増加'},{cls:'down',name:'減少'}],
+    scale:'縦軸 ARR 0–2,000百万円 / 棒の下の色は該当プラン',
+    read:'+150という結果がEnterprise +340・Business +35・Starter −90・Legacy −135に厳密に分解され、どこを止めれば何が残るかを金額で言えるが、<b>2023と2025の2点だけを結んでいるため、間の2024が存在しない</b>。Legacyの解約率が15%→31%に跳ねた年は、この1枚には映らない。' },
+
+  { key:'bubble', title:'規模 × 成長 × 収益性', form:'バブル', draw:chartBubble,
+    legend:PLAN_LEGEND, scale:'横軸 成長率 / 縦軸 粗利率 / 円の面積 = 2025年ARR、数値も面積の横に併記',
+    read:'投資判断に要る3変数を1枚で比べられ、Enterpriseが右上・Legacyが左下という配置がそのまま結論の絵になるが、<b>円の面積は目で正確に比較できない</b>ためARR 170と55の差は「小さい2つ」としか読めず、3年間どういう経路でそこに来たかも消えている。' },
+
+  { key:'matrix', title:'ポジショニングと優先度', form:'2×2マトリクス', draw:chartMatrix,
+    legend:PLAN_LEGEND, scale:'しきい値は解約率15% / 成長率0%（分析者が置いた線で、データが決めた線ではない）',
+    read:'解約率と成長率で4プランを分類でき、Enterprise・Businessが左上、Starter・Legacyが右下と整理されるが、<b>4プランが対角の2象限に固まるため、この枠組みは実質2分類しか生んでいない</b>。しきい値を少し動かせば結論が動く程度の脆さも抱えている。' },
+
+  { key:'heat', title:'時期 × プランの解約率', form:'ヒートマップ', draw:chartHeat,
+    legend:PLAN_LEGEND, scale:'濃淡は解約率のみを表す1色の明暗（ARRの規模は含まない）',
+    read:'Legacyが15%→31%→44%と色を強めていく過程が視野の隅でも分かり、Enterpriseの淡さとの対比で危機の所在が伝わるが、<b>色は順序しか表さないので「44%は28%の1.6倍」という量の差は読めず</b>、ARRの規模が入らないぶん、小さい事業の悲鳴を実際より大きく見せてしまう。' },
+
+  { key:'bar', title:'現時点の大小', form:'横棒ランキング', draw:chartBar,
+    legend:PLAN_LEGEND, scale:'横軸 2025年ARR 0–800百万円',
+    read:'2025年時点でEnterprise 760がBusiness 545を抜いて最大であることを誤解の余地なく示せるが、<b>時間の軸がないため、伸びた結果なのか元から大きかったのかが分からない</b>。縮小中のStarterとLegacyも、ただの「小さいプラン」としか映らない。' },
+
+  { key:'slope', title:'2時点間の変化と順位の入れ替わり', form:'スロープグラフ', draw:chartSlope,
+    legend:PLAN_LEGEND, scale:'縦軸 ARR 0–800百万円（2023と2025の2時点のみ）',
+    read:'2023にBusiness 510 &gt; Enterprise 420だった順位が2025にEnterprise 760 &gt; Business 545へ逆転したことを、交差する2本の線として最短で示せるが、<b>間の2024を意図的に捨てている</b>ため、単調な変化だったのか山谷があったのかを、この絵を根拠に主張することはできない。' },
+
+  { key:'small', title:'プランを並べて平等に比較', form:'小倍数', draw:chartSmall,
+    legend:PLAN_LEGEND, scale:'4パネルとも縦軸 ARR 0–800百万円の共通スケール',
+    read:'共通スケールなのでBusiness 545の「横ばい」とEnterpriseの立ち上がりを面積の錯覚なしに比較できるが、<b>共通にした代償としてLegacy 190→55（−71.1%）の急落がパネル下端で潰れる</b>。当事者にとっては事業消滅の3年間なのに、絵の上ではほぼ平らな線になってしまう。' }
+];
+
+/* ============================================================
+   PURPOSES — 目的が変われば推奨も変わる
+   ============================================================ */
+var PURPOSES = [
+  { id:'invest', label:'役員に投資判断を迫る', pick:'bubble',
+    body:'Enterpriseだけが成長 +81.0%・粗利率80%・ARR 760百万円で右上に単独で立ち、Legacyは成長 −71.1%・粗利率48%・ARR 55百万円で左下に沈んでいる。投資配分の判断に必要な「規模・成長・収益性」の3変数が1枚に載るのはこの形式だけで、どこに金を寄せるかの議論を1画面で終わらせられる。' },
+
+  { id:'alarm', label:'現場に危機感を伝える', pick:'heat',
+    body:'Legacyの解約率は15%→31%→44%と3年で29ポイント悪化し、Starterも22%→28%へ上がり続けている。ARRの話が通じない相手にも、色が強まっていく過程だけで「どこが燃えているか」が数秒で伝わる。' },
+
+  { id:'report', label:'経営会議で現状報告する', pick:'stack',
+    body:'全社ARR 1,380→1,530百万円（+150、+10.9%）という結論と、その内訳が同じ1枚に載る。「伸びています」で終わらせず、Enterprise 420→760の伸びが他プランの縮小を吸収している構図まで、追加のスライドなしで示せる。' },
+
+  { id:'restr', label:'事業の再編を提案する', pick:'water',
+    body:'+150の内訳はEnterprise +340・Business +35に対して、Starter −90・Legacy −135。合計 −225の毀損をEnterpriseが一人で埋めている構造が、金額のまま分解されている。どこを畳めばいくら軽くなるかが目盛りで読めるので、再編の対象と原資をそのまま議題にできる。' }
+];
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+var grid = document.getElementById('grid');
+
+CARDS.forEach(function(c, i){
+  var art = document.createElement('article');
+  art.className = 'card';
+  art.id = 'card-' + c.key;
+
+  var h = document.createElement('div');
+  h.className = 'card-h';
+  h.innerHTML = '<span class="num">' + String(i+1).padStart(2,'0') + '</span>' +
+                '<h3>' + c.title + '</h3>' +
+                '<span class="form">' + c.form + '</span>';
+  art.appendChild(h);
+
+  if (c.legend && c.legend.length > 1){
+    var ul = document.createElement('ul');
+    ul.className = 'lgd';
+    ul.innerHTML = c.legend.map(function(s){
+      return '<li><i class="sw ' + s.cls + '"></i>' + s.name + '</li>';
+    }).join('');
+    art.appendChild(ul);
+  }
+  if (c.scale){
+    var sc = document.createElement('p');
+    sc.className = 'scale'; sc.textContent = c.scale;
+    art.appendChild(sc);
+  }
+
+  var box = document.createElement('div');
+  box.className = 'chart';
+  box.appendChild(c.draw());
+  art.appendChild(box);
+
+  var rd = document.createElement('p');
+  rd.className = 'read';
+  rd.innerHTML = c.read;
+  art.appendChild(rd);
+
+  grid.appendChild(art);
+});
+
+/* 右寄せラベルの色マークを、実測した文字幅にぴったり合わせて置き直す */
+RELAYOUT.forEach(function(pair){
+  var b = pair.text.getBBox();
+  pair.rect.setAttribute('x', (b.x - 13).toFixed(1));
+});
+
+/* ---- data table ---- */
+(function(){
+  var rows = '';
+  PLANS.forEach(function(p, pi){
+    p.arr.forEach(function(_, i){
+      rows += '<tr>' +
+        '<td class="name">' + (i===0 ? '<span><i class="sw ' + p.id + '"></i>' + p.name + '</span>' : '') + '</td>' +
+        '<td>' + YEARS[i] + '</td>' +
+        '<td>' + nf(p.arr[i]) + '</td>' +
+        '<td>' + nf(p.acct[i]) + '</td>' +
+        '<td>' + p.gm[i] + '%</td>' +
+        '<td>' + p.ch[i] + '%</td>' +
+        '<td>' + share(p,i).toFixed(1) + '%</td>' +
+      '</tr>';
+    });
+    rows += '<tr class="gap"><td colspan="7"></td></tr>';
+  });
+  YEARS.forEach(function(yr, i){
+    rows += '<tr class="tot">' +
+      '<td class="name">' + (i===0 ? '全社合計' : '') + '</td>' +
+      '<td>' + yr + '</td>' +
+      '<td>' + nf(TOTAL[i]) + '</td>' +
+      '<td>' + nf(PLANS.reduce(function(s,p){ return s + p.acct[i]; },0)) + '</td>' +
+      '<td>—</td><td>—</td><td>100.0%</td>' +
+    '</tr>';
+  });
+  rows += '<tr class="tot"><td class="name">2023→2025 増減</td><td>—</td><td>' +
+    sgn(TOTAL[2]-TOTAL[0]) + '</td><td colspan="4">Enterprise ' + sgn(DELTA[0]) +
+    ' / Business ' + sgn(DELTA[1]) + ' / Starter ' + sgn(DELTA[2]) +
+    ' / Legacy ' + sgn(DELTA[3]) + '</td></tr>';
+
+  document.getElementById('tableHost').innerHTML =
+    '<table><thead><tr>' +
+    '<th style="text-align:left">プラン</th><th>年</th><th>ARR（百万円）</th><th>契約社数</th>' +
+    '<th>粗利率</th><th>解約率</th><th>構成比</th>' +
+    '</tr></thead><tbody>' + rows + '</tbody></table>';
+})();
+
+/* ---- purpose selector ---- */
+var pbtns  = document.getElementById('pbtns');
+var why    = document.getElementById('why');
+var whyT   = document.getElementById('whyTitle');
+var whyB   = document.getElementById('whyBody');
+var cardEls = {};
+CARDS.forEach(function(c){ cardEls[c.key] = document.getElementById('card-' + c.key); });
+
+function clearAll(){
+  CARDS.forEach(function(c){
+    cardEls[c.key].classList.remove('dim');
+    cardEls[c.key].classList.remove('spot');
+  });
+}
+function setPurpose(p){
+  if (!p){
+    clearAll();
+    why.classList.remove('on');
+    return;
+  }
+  CARDS.forEach(function(c){
+    var el = cardEls[c.key];
+    if (c.key === p.pick){ el.classList.remove('dim'); el.classList.add('spot'); }
+    else { el.classList.add('dim'); el.classList.remove('spot'); }
+  });
+  var card = CARDS.filter(function(c){ return c.key === p.pick; })[0];
+  whyT.textContent = card.title + '（' + card.form + '）';
+  whyB.textContent = p.body;
+  why.classList.add('on');
+}
+
+PURPOSES.forEach(function(p){
+  var b = document.createElement('button');
+  b.type = 'button'; b.textContent = p.label;
+  b.setAttribute('aria-pressed','false');
+  b.dataset.pid = p.id;
+  b.addEventListener('click', function(){
+    var on = b.getAttribute('aria-pressed') === 'true';
+    [].forEach.call(pbtns.children, function(x){ x.setAttribute('aria-pressed','false'); });
+    if (on){ setPurpose(null); }
+    else { b.setAttribute('aria-pressed','true'); setPurpose(p); }
+  });
+  pbtns.appendChild(b);
+});
+var rb = document.createElement('button');
+rb.type = 'button'; rb.className = 'reset'; rb.textContent = 'すべて表示';
+rb.setAttribute('aria-pressed','false');
+rb.addEventListener('click', function(){
+  [].forEach.call(pbtns.children, function(x){ x.setAttribute('aria-pressed','false'); });
+  setPurpose(null);
+});
+pbtns.appendChild(rb);
+
+/* ---- theme toggle (prefers-color-scheme と [data-theme] の両対応) ---- */
+var thBtns = document.querySelectorAll('.theme button');
+[].forEach.call(thBtns, function(b){
+  b.addEventListener('click', function(){
+    [].forEach.call(thBtns, function(x){ x.setAttribute('aria-pressed','false'); });
+    b.setAttribute('aria-pressed','true');
+    var v = b.dataset.th;
+    if (v === 'auto') document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme', v);
+  });
+});
+
+/* ---- 検算: ウォーターフォールの分解が期末に一致するか ---- */
+(function(){
+  var sum = TOTAL[0] + DELTA.reduce(function(a,b){ return a+b; }, 0);
+  if (sum !== TOTAL[2]) throw new Error('waterfall mismatch: ' + sum + ' != ' + TOTAL[2]);
+  YEARS.forEach(function(_, i){
+    var s = PLANS.reduce(function(a,p){ return a + Math.round(share(p,i)*10)/10; }, 0);
+    if (Math.abs(s - 100) > 0.05) throw new Error('share mismatch ' + YEARS[i] + ': ' + s);
+  });
+})();
+
+})();
+</script>
+</body>
+</html>
