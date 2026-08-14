@@ -3,138 +3,283 @@
 <title>収録用ステージ</title>
 <style>
   :root{
-    --bg:#1a1917; --rail:#211f1d; --line:#332f2b; --panel:#extra;
-    --ink:#eeece7; --ink2:#a9a49c; --ink3:#736e66;
-    --accent:#c96442; --chip:#2a2724;
-    --font: system-ui,-apple-system,"Segoe UI","Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;
+    --win:#1c1b19; --side:#141413; --hair:#2b2a27; --hair2:#232220;
+    --ink:#f0efec; --ink2:#a5a19a; --ink3:#6e6b64;
+    --sel:#2c2b28; --chip:#242320; --field:#1f1e1c; --fieldline:#33322e;
+    --accent:#d97757; --green:#7cc98d; --red:#e0736c; --blue:#7aa7e8;
+    --f: system-ui,-apple-system,"Segoe UI","Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;
   }
   *{box-sizing:border-box}
-  html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:var(--font)}
-  .app{display:flex;height:100vh;width:100vw}
+  html,body{margin:0;height:100%;overflow:hidden;background:var(--win);color:var(--ink);
+            font-family:var(--f);-webkit-font-smoothing:antialiased}
+  svg{display:block}
+  .ico{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.6;
+       stroke-linecap:round;stroke-linejoin:round;flex:none}
 
-  /* ---------- 左1/4: セッション一覧 ---------- */
-  .rail{width:25%;flex:none;background:var(--rail);border-right:1px solid var(--line);
-        display:flex;flex-direction:column;padding:14px 12px;gap:12px}
-  .brand{display:flex;align-items:center;gap:8px;padding:2px 6px 8px}
-  .glyph{width:20px;height:20px;flex:none;border-radius:5px;background:var(--accent)}
-  .brand b{font-size:13.5px;font-weight:600;letter-spacing:.02em}
-  .newbtn{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);
-          border-radius:8px;font-size:12.5px;color:var(--ink2);background:transparent}
-  .newbtn span:first-child{color:var(--accent);font-weight:700}
-  .seclabel{font-size:10px;letter-spacing:.12em;color:var(--ink3);padding:4px 6px 0;text-transform:uppercase}
-  .list{display:flex;flex-direction:column;gap:2px}
-  .item{padding:8px 10px;border-radius:7px;font-size:12.5px;color:var(--ink2);
-        white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .item .when{display:block;font-size:10.5px;color:var(--ink3);margin-top:2px}
-  .item.on{background:#2b2724;color:var(--ink)}
-  .item.fresh{opacity:0;transform:translateY(-6px);transition:opacity .45s,transform .45s}
-  .item.fresh.in{opacity:1;transform:none}
+  /* ===== タイトルバー ===== */
+  .tbar{height:34px;display:flex;align-items:center;gap:3px;padding:0 2px 0 9px;
+        border-bottom:1px solid var(--hair2);color:var(--ink2)}
+  .tbtn{width:26px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:5px}
+  .tbar .sp{flex:1}
+  .wctl{display:flex;align-items:center}
+  .wctl div{width:42px;height:34px;display:flex;align-items:center;justify-content:center;color:var(--ink2)}
 
-  /* ---------- 右3/4: チャット ---------- */
-  .main{flex:1;position:relative;display:flex;flex-direction:column;min-width:0}
-  .topbar{height:44px;flex:none;border-bottom:1px solid var(--line);display:flex;align-items:center;
-          padding:0 18px;gap:10px;font-size:12.5px;color:var(--ink2)}
-  .dot{width:7px;height:7px;border-radius:50%;background:#4a8f5b}
-  .stream{flex:1;overflow:hidden;padding:26px 96px;display:flex;flex-direction:column;gap:20px}
+  .body{display:flex;height:calc(100vh - 34px)}
 
-  .msg{opacity:0;transform:translateY(8px);transition:opacity .4s,transform .4s}
+  /* ===== サイドバー ===== */
+  .side{width:19.5%;flex:none;background:var(--side);border-right:1px solid var(--hair2);
+        display:flex;flex-direction:column;padding:9px 9px 0}
+  .seg{display:flex;gap:3px;background:transparent;margin-bottom:11px}
+  .seg a{flex:1;height:27px;display:flex;align-items:center;justify-content:center;gap:5px;
+         border-radius:7px;font-size:12px;color:var(--ink2)}
+  .seg a.on{background:var(--sel);color:var(--ink);font-weight:500}
+  nav{display:flex;flex-direction:column;gap:1px;margin-bottom:13px}
+  nav a{display:flex;align-items:center;gap:9px;padding:5px 7px;border-radius:6px;
+        font-size:12.5px;color:var(--ink2)}
+  .sec{display:flex;align-items:center;font-size:11px;color:var(--ink3);padding:8px 7px 4px}
+  .sec .sp{flex:1}
+  .sec.fold{padding:6px 7px;gap:5px;color:var(--ink3);font-size:11.5px}
+  .list{display:flex;flex-direction:column;gap:1px}
+  .row{display:flex;align-items:center;gap:8px;padding:6px 7px;border-radius:6px;
+       font-size:12.5px;color:var(--ink2);white-space:nowrap;overflow:hidden}
+  .row.on{background:var(--sel);color:var(--ink)}
+  .row .t{overflow:hidden;text-overflow:ellipsis}
+  .bul{width:6px;height:6px;border-radius:50%;flex:none;border:1.4px solid var(--ink3)}
+  .bul.fill{background:var(--ink2);border-color:var(--ink2)}
+  .bul.blue{background:var(--blue);border-color:var(--blue)}
+  .fresh{opacity:0;transform:translateY(-5px);transition:opacity .4s,transform .4s}
+  .fresh.in{opacity:1;transform:none}
+  .more{font-size:11.5px;color:var(--ink3);padding:5px 7px 5px 20px}
+  .user{margin-top:auto;display:flex;align-items:center;gap:8px;padding:9px 5px;
+        border-top:1px solid var(--hair2);font-size:12px;color:var(--ink2)}
+  .ava{width:17px;height:17px;border-radius:50%;background:#4a4844;flex:none;
+       display:flex;align-items:center;justify-content:center}
+
+  /* ===== メイン ===== */
+  main{flex:1;position:relative;display:flex;flex-direction:column;min-width:0}
+  .head{height:38px;flex:none;display:flex;align-items:center;gap:8px;padding:0 13px;color:var(--ink2)}
+  .head .title{font-size:13px;font-weight:600;color:var(--ink)}
+  .rchip{font-size:11.5px;color:var(--ink2);background:var(--chip);border-radius:5px;padding:2px 7px}
+  .head .sp{flex:1}
+  .head .ri{display:flex;align-items:center;gap:9px}
+
+  .col{width:60%;max-width:790px;margin:0 auto}
+  .stream{flex:1;overflow:hidden;padding:14px 0 0}
+  .msg{opacity:0;transform:translateY(7px);transition:opacity .4s,transform .4s}
   .msg.in{opacity:1;transform:none}
-  .user{align-self:flex-end;max-width:78%;background:#2b2724;border:1px solid var(--line);
-        border-radius:12px;padding:11px 14px;font-size:14px;line-height:1.7}
-  .user .att{display:inline-flex;align-items:center;gap:7px;background:#332f2b;border-radius:6px;
-             padding:5px 9px;font-size:12px;color:var(--ink2);margin-bottom:8px}
-  .xls{width:14px;height:14px;border-radius:3px;background:#1d6f42;flex:none}
-  .bot{display:flex;gap:12px;max-width:88%}
-  .avatar{width:22px;height:22px;flex:none;border-radius:6px;background:var(--accent);margin-top:2px}
-  .bot .body{font-size:14px;line-height:1.8;color:var(--ink)}
-  .think{display:flex;align-items:center;gap:9px;color:var(--ink2);font-size:13px;margin-top:10px}
-  .spin{width:13px;height:13px;border-radius:50%;border:2px solid #46413b;border-top-color:var(--accent);
-        animation:sp .8s linear infinite}
-  @keyframes sp{to{transform:rotate(360deg)}}
-  .tool{font-size:12.5px;color:var(--ink3);margin-top:8px;font-variant-numeric:tabular-nums}
+  .umsg{display:flex;justify-content:flex-end;margin-bottom:16px}
+  .ubub{background:var(--chip);border-radius:11px;padding:9px 13px;font-size:13.5px;
+        line-height:1.65;max-width:82%}
+  .uatt{display:inline-flex;align-items:center;gap:6px;background:#2e2d29;border-radius:5px;
+        padding:3px 8px;font-size:11.5px;color:var(--ink2);margin-bottom:7px}
+  .xls{width:11px;height:11px;border-radius:2px;background:#1d7044;flex:none}
+  .amsg{font-size:13.5px;line-height:1.85;color:var(--ink)}
+  .arow{display:flex;align-items:center;gap:8px;color:var(--ink2);font-size:12.5px;margin:9px 0}
+  .ast{width:15px;height:15px;flex:none;animation:pulse 1.6s ease-in-out infinite}
+  @keyframes pulse{50%{opacity:.45}}
+  .tools{font-size:12px;color:var(--ink3);line-height:1.9;margin-top:5px;white-space:pre-line;
+         font-variant-numeric:tabular-nums}
 
-  /* ---------- 入力欄 ---------- */
-  .composer{flex:none;padding:0 96px 22px}
-  .chips{display:flex;gap:8px;margin-bottom:8px;min-height:0}
-  .chip{display:inline-flex;align-items:center;gap:8px;background:var(--chip);border:1px solid var(--line);
-        border-radius:8px;padding:7px 11px;font-size:12px;color:var(--ink2);
-        opacity:0;transform:translateY(5px);transition:opacity .35s,transform .35s}
-  .chip.in{opacity:1;transform:none}
-  .chip .sz{color:var(--ink3);font-size:11px}
-  .box{border:1px solid var(--line);border-radius:12px;background:#211f1d;padding:13px 15px;
-       display:flex;align-items:center;gap:10px;min-height:48px}
-  .box.focus{border-color:#4a443d}
-  .typed{font-size:14px;line-height:1.6;color:var(--ink);white-space:pre-wrap}
-  .caret{display:inline-block;width:1.5px;height:16px;background:var(--accent);vertical-align:-3px;
-         animation:bl 1s step-end infinite}
+  /* ===== 入力まわり ===== */
+  .comp{flex:none;padding:0 0 13px}
+  .ctx{display:flex;align-items:center;gap:9px;background:var(--field);border:1px solid var(--fieldline);
+       border-radius:9px;padding:7px 9px 7px 12px;font-size:11.5px;color:var(--ink2);margin-bottom:7px;
+       opacity:0;transition:opacity .4s}
+  .ctx.in{opacity:1}
+  .ctx .sp{flex:1}
+  .plus{color:var(--green);font-variant-numeric:tabular-nums}
+  .minus{color:var(--red);font-variant-numeric:tabular-nums}
+  .prbtn{display:flex;align-items:center;gap:5px;background:var(--chip);border:1px solid var(--fieldline);
+         border-radius:6px;padding:3px 8px;color:var(--ink);font-size:11.5px}
+  .att{display:inline-flex;align-items:center;gap:7px;background:var(--chip);border:1px solid var(--fieldline);
+       border-radius:7px;padding:5px 10px;font-size:11.5px;color:var(--ink2);margin-bottom:7px;
+       opacity:0;transform:translateY(4px);transition:opacity .35s,transform .35s}
+  .att.in{opacity:1;transform:none}
+  .att .sz{color:var(--ink3);font-size:10.5px}
+  .field{background:var(--field);border:1px solid var(--fieldline);border-radius:11px;
+         min-height:44px;display:flex;align-items:center;padding:11px 13px;gap:9px}
+  .ph{color:var(--ink3);font-size:13.5px}
+  .typed{font-size:13.5px;line-height:1.6;white-space:pre-wrap}
+  .car{display:inline-block;width:1.5px;height:15px;background:var(--accent);vertical-align:-3px;
+       animation:bl 1s step-end infinite}
   @keyframes bl{50%{opacity:0}}
-  .send{margin-left:auto;width:28px;height:28px;flex:none;border-radius:7px;background:#332f2b;
-        display:flex;align-items:center;justify-content:center;color:var(--ink3);font-size:14px}
-  .send.hot{background:var(--accent);color:#fff}
+  .fend{margin-left:auto;color:var(--ink3)}
+  .ctl{display:flex;align-items:center;gap:9px;padding:8px 3px 0;font-size:11.5px;color:var(--ink2)}
+  .pill{background:#3a2a22;color:var(--accent);border-radius:5px;padding:3px 8px;font-size:11px}
+  .meter{width:58px;height:5px;border-radius:3px;background:#3a3934}
+  .ctl .sp{flex:1}
+  .mdl{color:var(--ink2)}
+  .ring{width:11px;height:11px;border-radius:50%;border:1.6px solid #45443f;flex:none}
 
-  /* ---------- 右からせり出すパネル ---------- */
-  .panel{position:absolute;inset:0 0 0 0;transform:translateX(101%);
-         transition:transform .62s cubic-bezier(.22,.61,.36,1);
-         background:#fff;border-left:1px solid var(--line);display:flex;flex-direction:column}
+  /* ===== プレビューパネル ===== */
+  .panel{position:absolute;inset:0;transform:translateX(101%);
+         transition:transform .6s cubic-bezier(.22,.61,.36,1);
+         background:#fff;display:flex;flex-direction:column;border-left:1px solid var(--hair)}
   .panel.open{transform:none}
-  .phead{height:38px;flex:none;background:#211f1d;border-bottom:1px solid var(--line);
-         display:flex;align-items:center;gap:9px;padding:0 14px;font-size:12px;color:var(--ink2)}
-  .phead .fname{color:var(--ink)}
-  .phead .right{margin-left:auto;color:var(--ink3);font-size:11px}
+  .phead{height:34px;flex:none;background:var(--win);border-bottom:1px solid var(--hair2);
+         display:flex;align-items:center;gap:8px;padding:0 12px;font-size:11.5px;color:var(--ink2)}
+  .phead .fn{color:var(--ink)}
+  .phead .sp{flex:1}
   iframe{flex:1;width:100%;border:0;background:#fff}
 
-  /* ---------- 疑似カーソル ---------- */
-  #cur{position:fixed;left:0;top:0;width:17px;height:17px;border-radius:50%;
-       background:rgba(255,255,255,.82);box-shadow:0 0 0 1.5px rgba(0,0,0,.45),0 2px 7px rgba(0,0,0,.4);
+  #cur{position:fixed;left:0;top:0;width:16px;height:16px;border-radius:50%;
+       background:rgba(255,255,255,.85);box-shadow:0 0 0 1.5px rgba(0,0,0,.5),0 2px 7px rgba(0,0,0,.45);
        pointer-events:none;z-index:99;opacity:0;transition:opacity .3s;transform:translate(-50%,-50%)}
   #cur.on{opacity:1}
-  #cur.tap{animation:tap .32s ease}
-  @keyframes tap{50%{transform:translate(-50%,-50%) scale(.62)}}
+  #cur.tap{animation:tap .3s ease}
+  @keyframes tap{50%{transform:translate(-50%,-50%) scale(.6)}}
 </style>
 
-<div class="app">
-  <aside class="rail">
-    <div class="brand"><i class="glyph"></i><b>Claude Code</b></div>
-    <div class="newbtn"><span>+</span><span>新規セッション</span></div>
-    <div class="seclabel">最近のセッション</div>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-panel" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="2"/><path d="M6 3v10"/></symbol>
+  <symbol id="i-side" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="2"/><path d="M10 3v10"/></symbol>
+  <symbol id="i-search" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.2"/><path d="M10.2 10.2 13.5 13.5"/></symbol>
+  <symbol id="i-back" viewBox="0 0 16 16"><path d="M12.5 8H3.5M7 4 3.3 8 7 12"/></symbol>
+  <symbol id="i-fwd" viewBox="0 0 16 16"><path d="M3.5 8h9M9 4l3.7 4L9 12"/></symbol>
+  <symbol id="i-home" viewBox="0 0 16 16"><path d="M2.6 7 8 2.8 13.4 7v6a.8.8 0 0 1-.8.8H3.4a.8.8 0 0 1-.8-.8z"/></symbol>
+  <symbol id="i-code" viewBox="0 0 16 16"><path d="M5.4 4.6 2 8l3.4 3.4M10.6 4.6 14 8l-3.4 3.4"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 16 16"><path d="M8 3.5v9M3.5 8h9"/></symbol>
+  <symbol id="i-art" viewBox="0 0 16 16"><path d="M3 12.5V6l5-3 5 3v6.5"/><path d="M6 12.5V9h4v3.5"/></symbol>
+  <symbol id="i-rt" viewBox="0 0 16 16"><path d="M9 2 4 9h3.4L7 14l5-7H8.6z"/></symbol>
+  <symbol id="i-cus" viewBox="0 0 16 16"><rect x="2.5" y="4.5" width="11" height="8" rx="1.6"/><path d="M2.5 7h11"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 16 16"><path d="M5.5 6.5 8 9.2l2.5-2.7"/></symbol>
+  <symbol id="i-chevr" viewBox="0 0 16 16"><path d="M6.6 4.6 9.8 8l-3.2 3.4"/></symbol>
+  <symbol id="i-filter" viewBox="0 0 16 16"><path d="M4 4v8M4 6.4a1.4 1.4 0 1 0 0-2.8M12 4v8M12 11.4a1.4 1.4 0 1 0 0-2.8"/></symbol>
+  <symbol id="i-mon" viewBox="0 0 16 16"><rect x="2" y="3.5" width="12" height="8" rx="1.4"/><path d="M6 13.2h4"/></symbol>
+  <symbol id="i-term" viewBox="0 0 16 16"><path d="M3 4.5 6.2 8 3 11.5M8 11.5h5"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.4"/><path d="M2.7 8h10.6M8 2.6c1.6 1.7 1.6 9.1 0 10.8-1.6-1.7-1.6-9.1 0-10.8"/></symbol>
+  <symbol id="i-kebab" viewBox="0 0 16 16"><circle cx="8" cy="3.6" r=".9" fill="currentColor" stroke="none"/><circle cx="8" cy="8" r=".9" fill="currentColor" stroke="none"/><circle cx="8" cy="12.4" r=".9" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-share" viewBox="0 0 16 16"><path d="M8 10.5V2.8M5.2 5.6 8 2.8l2.8 2.8M3.4 9.5v3.1a.9.9 0 0 0 .9.9h7.4a.9.9 0 0 0 .9-.9V9.5"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 16 16"><rect x="6.2" y="2.4" width="3.6" height="7" rx="1.8"/><path d="M4 8.2a4 4 0 0 0 8 0M8 12.2v1.6"/></symbol>
+  <symbol id="i-ret" viewBox="0 0 16 16"><path d="M13 4v3.6a1 1 0 0 1-1 1H3.4M6 5.8 3.2 8.6 6 11.4"/></symbol>
+  <symbol id="i-min" viewBox="0 0 16 16"><path d="M3.5 8h9"/></symbol>
+  <symbol id="i-max" viewBox="0 0 16 16"><rect x="3.6" y="3.6" width="8.8" height="8.8" rx="1.2"/></symbol>
+  <symbol id="i-close" viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8"/></symbol>
+  <!-- Claude の星形マーク -->
+  <symbol id="i-ast" viewBox="0 0 24 24">
+    <g fill="currentColor" stroke="none">
+      <rect x="10.7" y="1.4" width="2.6" height="21.2" rx="1.3"/>
+      <rect x="10.7" y="1.4" width="2.6" height="21.2" rx="1.3" transform="rotate(45 12 12)"/>
+      <rect x="10.7" y="1.4" width="2.6" height="21.2" rx="1.3" transform="rotate(90 12 12)"/>
+      <rect x="10.7" y="1.4" width="2.6" height="21.2" rx="1.3" transform="rotate(135 12 12)"/>
+    </g>
+  </symbol>
+</svg>
+
+<div class="tbar">
+  <div class="tbtn"><svg class="ico"><use href="#i-panel"/></svg></div>
+  <div class="tbtn"><svg class="ico"><use href="#i-side"/></svg></div>
+  <div class="tbtn"><svg class="ico"><use href="#i-search"/></svg></div>
+  <div class="tbtn"><svg class="ico"><use href="#i-back"/></svg></div>
+  <div class="tbtn"><svg class="ico"><use href="#i-fwd"/></svg></div>
+  <div class="sp"></div>
+  <div class="wctl">
+    <div><svg class="ico"><use href="#i-min"/></svg></div>
+    <div><svg class="ico"><use href="#i-max"/></svg></div>
+    <div><svg class="ico"><use href="#i-close"/></svg></div>
+  </div>
+</div>
+
+<div class="body">
+  <aside class="side">
+    <div class="seg">
+      <a><svg class="ico" style="width:13px;height:13px"><use href="#i-home"/></svg>ホーム</a>
+      <a class="on"><svg class="ico" style="width:13px;height:13px"><use href="#i-code"/></svg>Code</a>
+    </div>
+    <nav>
+      <a><svg class="ico"><use href="#i-plus"/></svg>新規</a>
+      <a><svg class="ico"><use href="#i-art"/></svg>アーティファクト</a>
+      <a><svg class="ico"><use href="#i-rt"/></svg>ルーティン</a>
+      <a><svg class="ico"><use href="#i-cus"/></svg>カスタマイズ</a>
+      <a><svg class="ico"><use href="#i-chev"/></svg>もっと見る</a>
+    </nav>
+    <div class="sec">ルーティン</div>
+    <div class="list"><div class="row"><i class="bul blue"></i><span class="t">Kanban</span></div></div>
+    <div class="sec">本日<span class="sp"></span><svg class="ico" style="width:13px;height:13px;color:var(--ink3)"><use href="#i-filter"/></svg></div>
     <div class="list" id="list">
-      <div class="item">請求データの突合スクリプト<span class="when">昨日</span></div>
-      <div class="item">議事録の論点整理<span class="when">2日前</span></div>
-      <div class="item">競合IRの読み込み<span class="when">3日前</span></div>
-      <div class="item">週次レポートの自動化<span class="when">先週</span></div>
+      <div class="row"><i class="bul"></i><span class="t">X投稿ネタ：AI活用Tips</span></div>
+    </div>
+    <div class="sec fold">昨日<svg class="ico" style="width:12px;height:12px"><use href="#i-chevr"/></svg></div>
+    <div class="sec fold">8月13日<svg class="ico" style="width:12px;height:12px"><use href="#i-chevr"/></svg></div>
+    <div class="sec fold">8月12日<svg class="ico" style="width:12px;height:12px"><use href="#i-chevr"/></svg></div>
+    <div class="sec fold">8月9日<svg class="ico" style="width:12px;height:12px"><use href="#i-chevr"/></svg></div>
+    <div class="sec fold">古い順<svg class="ico" style="width:12px;height:12px"><use href="#i-chevr"/></svg></div>
+    <div class="more">もっと表示</div>
+    <div class="user">
+      <i class="ava"><svg class="ico" style="width:10px;height:10px;color:var(--accent)"><use href="#i-ast"/></svg></i>
+      <span>Kotetsu</span><span style="color:var(--ink3)">· Max</span>
+      <svg class="ico" style="width:12px;height:12px"><use href="#i-chev"/></svg>
+      <span class="sp" style="flex:1"></span>
+      <svg class="ico" style="width:13px;height:13px;color:var(--ink3)"><use href="#i-ast"/></svg>
     </div>
   </aside>
 
-  <main class="main">
-    <div class="topbar"><i class="dot"></i><span id="ttl">新規セッション</span></div>
-
-    <div class="stream" id="stream">
-      <div class="msg user" id="m1">
-        <div class="att"><i class="xls"></i>営業部門別_営業利益_2023-2025.xlsx</div>
-        <div>添付データを元に、全営業部門の営業利益を可視化するためのグラフを提案して</div>
+  <main>
+    <div class="head">
+      <svg class="ico" style="color:var(--blue)"><use href="#i-mon"/></svg>
+      <span class="title" id="ttl">新規セッション</span>
+      <span class="rchip" id="rchip">kotetsu-work-ai-skills</span>
+      <span class="sp"></span>
+      <div class="ri">
+        <svg class="ico"><use href="#i-term"/></svg>
+        <svg class="ico"><use href="#i-panel"/></svg>
+        <svg class="ico"><use href="#i-globe"/></svg>
+        <svg class="ico"><use href="#i-kebab"/></svg>
       </div>
-      <div class="msg bot" id="m2">
-        <i class="avatar"></i>
-        <div class="body">
-          <div>わかりました。営業利益を「どう見せるか」で結論が変わるので、考えられる形式を一通り描いて並べます。</div>
-          <div class="think" id="think"><i class="spin"></i><span id="thinktxt">データを読んでいます</span></div>
-          <div class="tool" id="tool"></div>
+    </div>
+
+    <div class="stream">
+      <div class="col">
+        <div class="msg umsg" id="m1">
+          <div class="ubub">
+            <div class="uatt"><i class="xls"></i>営業部門別_営業利益_2023-2025.xlsx</div>
+            <div>添付データを元に、全営業部門の営業利益を可視化するためのグラフを提案して</div>
+          </div>
+        </div>
+        <div class="msg" id="m2">
+          <div class="arow"><svg class="ico ast" style="color:var(--accent)"><use href="#i-ast"/></svg>
+            <span id="thinktxt">データを読んでいます</span>
+            <span id="secs" style="color:var(--ink3)"></span></div>
+          <div class="amsg" id="answer" style="display:none">
+            営業利益は「どう見せるか」で結論が変わるので、考えられる形式を一通り描いて並べました。
+          </div>
+          <div class="tools" id="tools"></div>
         </div>
       </div>
     </div>
 
-    <div class="composer">
-      <div class="chips"><div class="chip" id="chip"><i class="xls"></i>営業部門別_営業利益_2023-2025.xlsx<span class="sz">18 KB</span></div></div>
-      <div class="box" id="box">
-        <div class="typed" id="typed"></div><i class="caret" id="caret"></i>
-        <div class="send" id="send">↑</div>
+    <div class="comp">
+      <div class="col">
+        <div class="att" id="att"><i class="xls"></i>営業部門別_営業利益_2023-2025.xlsx<span class="sz">18 KB</span></div>
+        <div class="ctx" id="ctx">
+          <span>kotetsu-work-ai-skills</span><span style="color:var(--ink3)">claude/chart-fitting-room</span>
+          <span class="sp"></span>
+          <span class="plus">+612</span><span class="minus">−0</span>
+          <span class="prbtn">PRを作成<svg class="ico" style="width:11px;height:11px"><use href="#i-chev"/></svg></span>
+          <svg class="ico" style="width:12px;height:12px;color:var(--ink3)"><use href="#i-close"/></svg>
+        </div>
+        <div class="field">
+          <span class="ph" id="ph">/でコマンド</span><span class="typed" id="typed"></span><i class="car" id="car"></i>
+          <span class="fend"><svg class="ico" style="width:13px;height:13px"><use href="#i-ret"/></svg></span>
+        </div>
+        <div class="ctl">
+          <span class="pill">権限をバイパス</span>
+          <svg class="ico" style="width:13px;height:13px"><use href="#i-plus"/></svg>
+          <svg class="ico" style="width:13px;height:13px"><use href="#i-mic"/></svg>
+          <svg class="ico" style="width:11px;height:11px"><use href="#i-chev"/></svg>
+          <i class="meter"></i>
+          <span class="sp"></span>
+          <span class="mdl">Opus 5</span><span class="mdl">最大</span><i class="ring"></i>
+        </div>
       </div>
     </div>
 
     <section class="panel" id="panel">
-      <div class="phead"><i class="xls" style="background:#c96442"></i>
-        <span class="fname">営業利益_チャート試着室.html</span>
-        <span class="right">プレビュー</span></div>
+      <div class="phead">
+        <svg class="ico" style="width:12px;height:12px;color:var(--accent)"><use href="#i-art"/></svg>
+        <span class="fn">営業利益_チャート試着室.html</span>
+        <span class="sp"></span><span>プレビュー</span>
+      </div>
       <iframe id="frame" src="./demo-op-profit.html"></iframe>
     </section>
   </main>
@@ -145,120 +290,105 @@
 const $=s=>document.querySelector(s);
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const cur=$('#cur');
-
-function moveCur(x,y){cur.style.left=x+'px';cur.style.top=y+'px';}
-async function glide(x,y,ms=650){
+function moveCur(x,y){cur.style.left=x+'px';cur.style.top=y+'px'}
+async function glide(x,y,ms=620){
   cur.classList.add('on');
   const r=cur.getBoundingClientRect();
-  const x0=r.left+r.width/2||x, y0=r.top+r.height/2||y;
-  const t0=performance.now();
-  return new Promise(res=>{
-    const step=n=>{
-      const t=Math.min(1,(n-t0)/ms), k=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
-      moveCur(x0+(x-x0)*k, y0+(y-y0)*k);
-      t<1?requestAnimationFrame(step):res();
-    };requestAnimationFrame(step);
-  });
+  const x0=r.left+r.width/2||x, y0=r.top+r.height/2||y, t0=performance.now();
+  return new Promise(res=>{const st=n=>{const t=Math.min(1,(n-t0)/ms),
+    k=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+    moveCur(x0+(x-x0)*k,y0+(y-y0)*k); t<1?requestAnimationFrame(st):res()};requestAnimationFrame(st)});
 }
-async function tap(){cur.classList.add('tap');await sleep(320);cur.classList.remove('tap');}
+async function tap(){cur.classList.add('tap');await sleep(300);cur.classList.remove('tap')}
+function smoothScroll(win,from,to,ms){
+  return new Promise(res=>{const t0=performance.now();
+    const st=n=>{const t=Math.min(1,(n-t0)/ms);
+      const k=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+      win.scrollTo(0,from+(to-from)*k); t<1?requestAnimationFrame(st):res()};requestAnimationFrame(st)});
+}
 
 async function run(){
   const MSG='添付データを元に、全営業部門の営業利益を可視化するためのグラフを提案して';
   await sleep(700);
 
-  // 1. 新規セッションが一覧に生まれる
+  // 1. 本日の一覧に新しいセッションが生まれる
   const fresh=document.createElement('div');
-  fresh.className='item on fresh';
-  fresh.innerHTML='営業利益の可視化<span class="when">たった今</span>';
+  fresh.className='row on fresh';
+  fresh.innerHTML='<i class="bul fill"></i><span class="t">営業利益の可視化</span>';
   $('#list').prepend(fresh);
   await sleep(60); fresh.classList.add('in');
+  await sleep(850);
+
+  // 2. Excel を添付
+  $('#att').classList.add('in');
   await sleep(900);
 
-  // 2. Excelを添付
-  $('#chip').classList.add('in');
-  $('#box').classList.add('focus');
-  await sleep(950);
-
   // 3. 指示を打ち込む
+  $('#ph').style.display='none';
   const typed=$('#typed');
-  for(let i=0;i<MSG.length;i++){
-    typed.textContent=MSG.slice(0,i+1);
-    await sleep(i%7===0?78:52);
-  }
-  await sleep(600);
+  for(let i=0;i<MSG.length;i++){typed.textContent=MSG.slice(0,i+1);await sleep(i%7===0?76:50)}
+  await sleep(560);
 
   // 4. 送信
-  $('#send').classList.add('hot');
-  await sleep(320);
-  typed.textContent=''; $('#caret').style.display='none';
-  $('#chip').classList.remove('in'); $('#send').classList.remove('hot');
+  typed.textContent=''; $('#car').style.display='none'; $('#ph').style.display='';
+  $('#att').classList.remove('in');
   $('#ttl').textContent='営業利益の可視化';
   $('#m1').classList.add('in');
-  await sleep(750);
+  await sleep(700);
 
-  // 5. Claudeが考える
+  // 5. Claude が考える
   $('#m2').classList.add('in');
-  const steps=[['データを読んでいます',900],
-               ['4部門 × 3年 の営業利益を確認しました',1000],
-               ['成立するチャート形式を洗い出しています',1100],
-               ['10形式を描画しています',1200]];
-  const tool=$('#tool');
+  const steps=[['データを読んでいます','',900],
+               ['4部門 × 3年 の営業利益を確認しました','1s',950],
+               ['成立するチャート形式を洗い出しています','3s',1050],
+               ['10形式を描画しています','5s',1250]];
   const logs=['Read  営業部門別_営業利益_2023-2025.xlsx',
-              'Analyze  4部門 / 3年 / 加算可能な測度 1本',
-              'Write  営業利益_チャート試着室.html'];
+              'Read  営業部門別_営業利益_2023-2025.xlsx\nAnalyze  4部門 / 3年 / 加算可能な測度 1本',
+              'Read  営業部門別_営業利益_2023-2025.xlsx\nAnalyze  4部門 / 3年 / 加算可能な測度 1本\nWrite  営業利益_チャート試着室.html'];
   for(let i=0;i<steps.length;i++){
-    $('#thinktxt').textContent=steps[i][0];
-    if(logs[i-1]) tool.textContent=logs[i-1];
-    await sleep(steps[i][1]);
+    $('#thinktxt').textContent=steps[i][0]; $('#secs').textContent=steps[i][1];
+    if(logs[i-1]) $('#tools').textContent=logs[i-1];
+    await sleep(steps[i][2]);
   }
-  tool.textContent=logs[2];
-  $('#think').style.display='none';
-  await sleep(450);
+  $('#tools').textContent=logs[2];
+  $('#thinktxt').textContent='完了'; $('#secs').textContent='8s';
+  $('.ast').style.animation='none';
+  $('#answer').style.display='';
+  $('#ctx').classList.add('in');
+  await sleep(700);
 
-  // 6. パネルが右からせり出す
+  // 6. プレビューが右からせり出す
   $('#panel').classList.add('open');
-  await sleep(1150);
+  await sleep(1100);
 
-  // 7. 10枚をゆっくりスクロール
+  // 7. 10枚をゆっくり流す
   const fw=$('#frame').contentWindow, fd=$('#frame').contentDocument;
   const max=()=>fd.documentElement.scrollHeight-fw.innerHeight;
-  await smoothScroll(fw,0,max(),16500);
-  await sleep(500);
-  await smoothScroll(fw,max(),0,1600);
-  await sleep(600);
+  await smoothScroll(fw,0,max(),16000);
+  await sleep(450);
+  await smoothScroll(fw,max(),0,1500);
+  await sleep(550);
 
-  // 8. 目的ボタンを押して、推奨が変わるのを見せる
+  // 8. 目的ボタンで推奨が入れ替わるのを見せる
   const btns=[...fd.querySelectorAll('#purposes button')];
   for(const idx of [0,1]){
     const b=btns[idx]; if(!b) continue;
     const r=b.getBoundingClientRect(), f=$('#frame').getBoundingClientRect();
-    await glide(f.left+r.left+r.width/2, f.top+r.top+r.height/2, 620);
+    await glide(f.left+r.left+r.width/2, f.top+r.top+r.height/2, 600);
     await tap(); b.click();
-    await sleep(1800);                    // 理由文を読ませる
+    await sleep(1750);
     const spot=fd.querySelector('.card.spot');
-    if(spot){                             // 選ばれた1枚まで送って見せる
-      const to=Math.max(0, Math.min(max(), fw.scrollY + spot.getBoundingClientRect().top - 88));
-      await smoothScroll(fw, fw.scrollY, to, 950);
-      await sleep(1900);
-      await smoothScroll(fw, fw.scrollY, 0, 800);
-      await sleep(300);
+    if(spot){
+      const to=Math.max(0,Math.min(max(),fw.scrollY+spot.getBoundingClientRect().top-84));
+      await smoothScroll(fw,fw.scrollY,to,900);
+      await sleep(1850);
+      await smoothScroll(fw,fw.scrollY,0,780);
+      await sleep(280);
     }
   }
   cur.classList.remove('on');
-  await sleep(900);
+  await sleep(850);
   document.title='DONE';
-}
-
-function smoothScroll(win,from,to,ms){
-  return new Promise(res=>{
-    const t0=performance.now();
-    const step=n=>{
-      const t=Math.min(1,(n-t0)/ms);
-      const k=t<.15?(t/.15)*(t/.15)*.5*.15/.5:(t>.9?1-Math.pow(1-t,2)*1.2:t);
-      win.scrollTo(0, from+(to-from)*Math.min(1,Math.max(0,k)));
-      t<1?requestAnimationFrame(step):res();
-    };requestAnimationFrame(step);
-  });
 }
 
 addEventListener('load',()=>{

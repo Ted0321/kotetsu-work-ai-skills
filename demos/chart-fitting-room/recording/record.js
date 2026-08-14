@@ -19,7 +19,7 @@ const OUTDIR = path.join(__dirname, 'out');
 const FFMPEG = process.env.FFMPEG ||
   '/usr/local/lib/python3.11/dist-packages/imageio_ffmpeg/binaries/ffmpeg-linux-x86_64-v7.0.2';
 const PORT = 8931;
-const W = 1280, H = 720;
+const W = 1600, H = 900;
 
 (async () => {
   fs.rmSync(OUTDIR, { recursive: true, force: true });
