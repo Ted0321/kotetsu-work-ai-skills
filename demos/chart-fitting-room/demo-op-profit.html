@@ -1,0 +1,648 @@
+<title>チャート試着室 — 営業部門別 営業利益</title>
+<style>
+  :root {
+    color-scheme: light;
+    --plane:   #f9f9f7;
+    --surface: #fcfcfb;
+    --rail:    #f2f1ed;
+    --ink:     #0b0b0b;
+    --ink-2:   #52514e;
+    --muted:   #898781;
+    --grid:    #e1e0d9;
+    --axis:    #c3c2b7;
+    --hairline: rgba(11,11,11,.10);
+    --s1: #2a78d6;   /* 第一営業部 blue    */
+    --s2: #008300;   /* 新規開拓部 green   */
+    --s3: #eda100;   /* 第二営業部 yellow  */
+    --s4: #e87ba4;   /* 代理店営業部 magenta */
+    --seq-1: #cde2fb; --seq-2: #9ec5f4; --seq-3: #5598e7;
+    --seq-4: #2a78d6; --seq-5: #1c5cab; --seq-6: #104281;
+    --spot: #2a78d6;
+    --font-sans: system-ui, -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN",
+                 "Hiragino Sans", "Yu Gothic UI", Meiryo, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --plane: #0d0d0d; --surface: #1a1a19; --rail: #171716;
+      --ink: #fff; --ink-2: #c3c2b7; --muted: #898781;
+      --grid: #2c2c2a; --axis: #383835; --hairline: rgba(255,255,255,.10);
+      --s1: #3987e5; --s2: #008300; --s3: #c98500; --s4: #d55181;
+      --seq-1: #104281; --seq-2: #184f95; --seq-3: #256abf;
+      --seq-4: #3987e5; --seq-5: #6da7ec; --seq-6: #b7d3f6;
+      --spot: #3987e5;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --plane: #0d0d0d; --surface: #1a1a19; --rail: #171716;
+    --ink: #fff; --ink-2: #c3c2b7; --muted: #898781;
+    --grid: #2c2c2a; --axis: #383835; --hairline: rgba(255,255,255,.10);
+    --s1: #3987e5; --s2: #008300; --s3: #c98500; --s4: #d55181;
+    --seq-1: #104281; --seq-2: #184f95; --seq-3: #256abf;
+    --seq-4: #3987e5; --seq-5: #6da7ec; --seq-6: #b7d3f6;
+    --spot: #3987e5;
+  }
+
+  body { margin:0; background:var(--plane); color:var(--ink);
+         font-family:var(--font-sans); line-height:1.6; -webkit-font-smoothing:antialiased; }
+  * { box-sizing:border-box; }
+  :focus-visible { outline:2px solid var(--spot); outline-offset:2px; border-radius:3px; }
+
+  .app { max-width:1280px; margin:0 auto; padding:28px 24px 56px; }
+
+  .masthead { padding-bottom:16px; border-bottom:1px solid var(--hairline); }
+  .eyebrow { font-size:10.5px; font-weight:650; letter-spacing:.13em;
+             text-transform:uppercase; color:var(--muted); }
+  h1 { font-size:22px; font-weight:650; letter-spacing:.01em; margin:2px 0 6px; }
+  .lede { margin:0; color:var(--ink-2); font-size:13.5px; max-width:68ch; }
+
+  /* ---- purpose selector ---- */
+  .picker { background:var(--rail); border:1px solid var(--hairline); border-radius:10px;
+            padding:14px 16px; margin:18px 0 6px; }
+  .picker-head { display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 12px; }
+  .picker-head strong { font-size:13.5px; font-weight:650; }
+  .picker-head span { font-size:12px; color:var(--ink-2); }
+  .purposes { display:flex; flex-wrap:wrap; gap:7px; margin-top:10px; }
+  .purposes button {
+    font:inherit; font-size:12.5px; font-weight:550; padding:8px 13px; cursor:pointer;
+    color:var(--ink); background:var(--surface);
+    border:1px solid var(--hairline); border-radius:999px; transition:border-color .15s;
+  }
+  .purposes button:hover { border-color:var(--spot); }
+  .purposes button[aria-pressed="true"] { border-color:var(--spot);
+    box-shadow:inset 0 0 0 1px var(--spot); }
+
+  .verdict { margin-top:12px; padding-top:12px; border-top:1px solid var(--hairline);
+             font-size:13px; color:var(--ink-2); display:none; }
+  .verdict.on { display:block; }
+  .verdict b { color:var(--ink); }
+
+  /* ---- grid ---- */
+  .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(330px,1fr));
+          gap:14px; margin-top:16px; }
+  .card { background:var(--surface); border:1px solid var(--hairline); border-radius:10px;
+          padding:14px 15px 10px; min-width:0;
+          transition:opacity .35s, box-shadow .35s, border-color .35s; }
+  .card.dim { opacity:.24; }
+  .card.spot { border-color:var(--spot); box-shadow:0 0 0 2px var(--spot); }
+  .card h2 { font-size:13px; font-weight:650; margin:0; letter-spacing:.01em; }
+  .card .form { font-size:10.5px; color:var(--muted); letter-spacing:.04em; }
+  .card .says { font-size:11.5px; color:var(--ink-2); margin:7px 0 0; }
+  .chart { margin-top:6px; }
+  svg { display:block; max-width:100%; }
+  .tick { font-size:9.5px; fill:var(--muted); font-variant-numeric:tabular-nums; }
+  .cat  { font-size:10px; fill:var(--ink-2); }
+  .dlab { font-size:10px; fill:var(--ink); font-weight:600; font-variant-numeric:tabular-nums; }
+  .inlab{ font-size:9.5px; font-weight:600; font-variant-numeric:tabular-nums; }
+
+  .legend { display:flex; flex-wrap:wrap; gap:3px 12px; font-size:11px; color:var(--ink-2);
+            margin-top:10px; }
+  .legend span { display:inline-flex; align-items:center; gap:5px; }
+  .sw { width:9px; height:9px; border-radius:2px; flex:none; }
+
+  #tip { position:fixed; z-index:20; pointer-events:none; opacity:0; transition:opacity .1s;
+         background:var(--surface); color:var(--ink); border:1px solid var(--axis);
+         border-radius:7px; padding:7px 10px; font-size:12px; line-height:1.45;
+         box-shadow:0 4px 16px rgba(0,0,0,.16); max-width:230px; }
+  #tip .t-lab { color:var(--ink-2); font-size:11px; }
+  #tip .t-val { font-weight:650; font-variant-numeric:tabular-nums; }
+
+  details { background:var(--surface); border:1px solid var(--hairline); border-radius:10px;
+            padding:12px 18px; margin-top:16px; }
+  summary { cursor:pointer; font-size:13px; font-weight:550; }
+  .tablewrap { overflow-x:auto; margin-top:10px; }
+  table { border-collapse:collapse; width:100%; font-size:12.5px; }
+  th,td { text-align:right; padding:6px 10px; border-bottom:1px solid var(--hairline);
+          font-variant-numeric:tabular-nums; white-space:nowrap; }
+  th:first-child, td:first-child { text-align:left; font-variant-numeric:normal; }
+  thead th { color:var(--ink-2); font-weight:550; font-size:11.5px; }
+  tbody tr:last-child td, tbody tr:last-child th { border-bottom:none; font-weight:650; }
+
+  footer { margin-top:22px; padding-top:14px; border-top:1px solid var(--hairline);
+           font-size:11.5px; color:var(--muted); }
+  footer p { margin:0 0 4px; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition-duration:.01ms !important; } }
+</style>
+
+<div class="app">
+  <header class="masthead">
+    <div class="eyebrow">営業部門別 営業利益 · 10の見せ方</div>
+    <h1>この営業利益、どのチャートで見せますか</h1>
+    <p class="lede">3年分の営業部門別の営業利益を、考えられる10形式で一度に描いています。全社の営業利益は3年で+5%。
+      グラフの選び方ひとつで、この組織が「順調」にも「危機」にも見えます。</p>
+  </header>
+
+  <section class="picker">
+    <div class="picker-head">
+      <strong>誰に、何を言いたいですか</strong>
+      <span>目的を選ぶと、その1枚が残ります</span>
+    </div>
+    <div class="purposes" id="purposes"></div>
+    <div class="verdict" id="verdict"></div>
+  </section>
+
+  <div class="grid" id="grid"></div>
+
+  <details>
+    <summary>数値で見る</summary>
+    <div class="tablewrap"><table id="datatable"></table></div>
+  </details>
+
+  <footer>
+    <p>営業利益は百万円。架空の営業部門ポートフォリオ（第一営業部が落ち、新規開拓部が伸び、全体では横ばい〜微増）。</p>
+    <p>月次はサンプル用に季節変動を加えて生成していますが、各年の合計は年次の数値と一致します。</p>
+  </footer>
+</div>
+
+<div id="tip" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  "use strict";
+
+  /* ================= data ================= */
+  const YEARS = [2023, 2024, 2025];
+  const PRODUCTS = [
+    { id:'A', name:'第一営業部',   v:'--s1', y:[480,440,390], margin:18, share:32, mkt:  1 },
+    { id:'B', name:'第二営業部',   v:'--s3', y:[320,325,330], margin:12, share:18, mkt:  2 },
+    { id:'S', name:'新規開拓部',   v:'--s2', y:[ 60,150,280], margin:24, share: 6, mkt: 28 },
+    { id:'D', name:'代理店営業部', v:'--s4', y:[140, 95, 50], margin: 4, share: 9, mkt:-12 },
+  ];
+  const TOTALS = YEARS.map((_, i) => PRODUCTS.reduce((s, p) => s + p.y[i], 0));
+
+  // monthly series — seasonal + deterministic wiggle, rescaled so each year sums exactly
+  const rnd = (() => { let s = 20260813;
+    return () => (s = (s * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff; })();
+  PRODUCTS.forEach(p => {
+    const raw = [];
+    for (let m = 0; m < 36; m++) {
+      const yi = Math.floor(m / 12), t = (m % 12 + 0.5) / 12;
+      const prev = p.y[yi - 1] ?? p.y[yi], next = p.y[yi + 1] ?? p.y[yi];
+      const trend = p.y[yi] + (t < 0.5 ? (p.y[yi] - prev) * (t - 0.5) : (next - p.y[yi]) * (t - 0.5));
+      const seas = 1 + 0.13 * Math.sin(2 * Math.PI * ((m % 12) - 2) / 12);
+      raw.push(Math.max(0.5, trend / 12 * seas * (0.96 + 0.08 * rnd())));
+    }
+    p.m = raw.map((v, m) => {
+      const yi = Math.floor(m / 12);
+      const sum = raw.slice(yi * 12, yi * 12 + 12).reduce((a, b) => a + b, 0);
+      return v * p.y[yi] / sum;
+    });
+    p.q = Array.from({ length: 12 }, (_, k) =>
+      p.m.slice(k * 3, k * 3 + 3).reduce((a, b) => a + b, 0));
+    p.growth = (p.y[2] / p.y[0] - 1) * 100;
+  });
+
+  /* ================= helpers ================= */
+  const NS = 'http://www.w3.org/2000/svg';
+  const el = (n, a = {}) => { const e = document.createElementNS(NS, n);
+    for (const k in a) if (a[k] != null) e.setAttribute(k, a[k]); return e; };
+  const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const col = p => cssv(p.v);
+  const nf = (v, d = 0) => Math.abs(v).toLocaleString('ja-JP',
+    { minimumFractionDigits: d, maximumFractionDigits: d });
+  const sg = v => (v < -0.0499 ? '−' : '');
+  const num = (v, d = 0) => sg(v) + nf(v, d);
+  const pctS = (v, d = 0) => (v >= 0 ? '+' : '−') + nf(v, d) + '%';
+
+  function barPath(x, y, w, h, r, rTop, rBot) {
+    if (h < 0.6) return `M${x},${y}h${w}v0.6h${-w}Z`;
+    const rr = Math.max(0, Math.min(r, w / 2, h / 2));
+    const a = rTop ? rr : 0, b = rBot ? rr : 0;
+    let d = `M${x},${y + a}`;
+    d += a ? `A${a},${a} 0 0 1 ${x + a},${y}` : ''; d += `L${x + w - a},${y}`;
+    d += a ? `A${a},${a} 0 0 1 ${x + w},${y + a}` : ''; d += `L${x + w},${y + h - b}`;
+    d += b ? `A${b},${b} 0 0 1 ${x + w - b},${y + h}` : ''; d += `L${x + b},${y + h}`;
+    d += b ? `A${b},${b} 0 0 1 ${x},${y + h - b}` : ''; return d + 'Z';
+  }
+  function hBar(x, y, w, h, r) {
+    const rr = Math.max(0, Math.min(r, w / 2, h / 2));
+    return `M${x},${y}L${x + w - rr},${y}A${rr},${rr} 0 0 1 ${x + w},${y + rr}` +
+           `L${x + w},${y + h - rr}A${rr},${rr} 0 0 1 ${x + w - rr},${y + h}L${x},${y + h}Z`;
+  }
+  function ticks(lo, hi, n = 4) {
+    const raw = (hi - lo || 1) / n, mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    const k = raw / mag, step = (k >= 5 ? 10 : k >= 2 ? 5 : k >= 1 ? 2 : 1) * mag, out = [];
+    for (let t = Math.ceil(lo / step) * step; t <= hi + 1e-9; t += step) out.push(t);
+    return out;
+  }
+  const tip = document.getElementById('tip');
+  function showTip(e, html) {
+    tip.innerHTML = html; tip.style.opacity = '1';
+    const r = tip.getBoundingClientRect();
+    let x = e.clientX + 14, y = e.clientY - r.height - 10;
+    if (x + r.width > innerWidth - 8) x = e.clientX - r.width - 14;
+    if (y < 8) y = e.clientY + 14;
+    tip.style.left = x + 'px'; tip.style.top = y + 'px';
+  }
+  const hideTip = () => { tip.style.opacity = '0'; };
+  function hit(t, html) {
+    t.addEventListener('pointermove', e => showTip(e, html));
+    t.addEventListener('pointerleave', hideTip);
+  }
+  function frame(W, H, M, label) {
+    const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, width: W, height: H,
+      role: 'img', 'aria-label': label });
+    return { svg, pw: W - M.l - M.r, ph: H - M.t - M.b };
+  }
+  const gridline = (svg, x1, x2, y, zero) => svg.appendChild(el('line',
+    { x1, x2, y1: y, y2: y, stroke: zero ? cssv('--axis') : cssv('--grid'), 'stroke-width': 1 }));
+  function yAxis(svg, M, pw, ph, lo, hi, Y, n = 4, d = 0) {
+    for (const t of ticks(lo, hi, n)) {
+      gridline(svg, M.l, M.l + pw, Y(t), Math.abs(t) < 1e-9);
+      const lb = el('text', { x: M.l - 7, y: Y(t) + 3.4, 'text-anchor': 'end', class: 'tick' });
+      lb.textContent = num(t, d); svg.appendChild(lb);
+    }
+  }
+
+  /* ================= the ten charts ================= */
+  const W = 336, H = 190;
+
+  // 1. 折れ線（月次推移）
+  function lineChart() {
+    // end-labels are deliberately absent: at 3 of the 4 line-ends they collide, and
+    // nudging them apart would detach them from their lines. The legend carries identity —
+    // which is exactly this chart's weakness, and the point of showing it.
+    const M = { t: 12, r: 12, b: 24, l: 34 }, { svg, pw, ph } = frame(W, H, M, '月次推移');
+    const hi = Math.max(...PRODUCTS.flatMap(p => p.m)) * 1.12;
+    const X = i => M.l + i / 35 * pw, Y = v => M.t + ph - v / hi * ph;
+    yAxis(svg, M, pw, ph, 0, hi, Y, 3);
+    PRODUCTS.forEach(p => {
+      svg.appendChild(el('path', { d: p.m.map((v, i) =>
+        `${i ? 'L' : 'M'}${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(''),
+        fill: 'none', stroke: col(p), 'stroke-width': 2,
+        'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+    });
+    YEARS.forEach((y, i) => {
+      const lb = el('text', { x: X(i * 12 + 6), y: H - 8, 'text-anchor': 'middle', class: 'tick' });
+      lb.textContent = y; svg.appendChild(lb);
+    });
+    const hz = el('rect', { x: M.l, y: M.t, width: pw, height: ph, fill: 'transparent' });
+    hit(hz, PRODUCTS.map(p => `<div class="t-lab">${p.name} 直近月</div>
+      <div class="t-val">${num(p.m[35], 1)}</div>`).join(''));
+    svg.appendChild(hz);
+    return svg;
+  }
+
+  // 2. 積み上げ棒（年次）
+  function stackedBar() {
+    const M = { t: 14, r: 12, b: 24, l: 40 }, { svg, pw, ph } = frame(W, H, M, '構成の推移');
+    const hi = Math.max(...TOTALS) * 1.12, Y = v => M.t + ph - v / hi * ph;
+    yAxis(svg, M, pw, ph, 0, hi, Y, 3);
+    const band = pw / 3, bw = Math.min(24, band * 0.42);
+    YEARS.forEach((yr, i) => {
+      let acc = 0;
+      const cx = M.l + band * (i + 0.5);
+      PRODUCTS.forEach(p => {
+        const y0 = Y(acc + p.y[i]), y1 = Y(acc);
+        svg.appendChild(el('path', { d: barPath(cx - bw / 2, y0, bw, Math.max(0, y1 - y0 - 2), 2,
+          false, false), fill: col(p) }));
+        acc += p.y[i];
+      });
+      const tl = el('text', { x: cx, y: Y(acc) - 6, 'text-anchor': 'middle', class: 'dlab' });
+      tl.textContent = num(acc); svg.appendChild(tl);
+      const lb = el('text', { x: cx, y: H - 8, 'text-anchor': 'middle', class: 'tick' });
+      lb.textContent = yr; svg.appendChild(lb);
+      const hz = el('rect', { x: M.l + band * i, y: M.t, width: band, height: ph, fill: 'transparent' });
+      hit(hz, `<div class="t-lab">${yr}年 合計 ${num(acc)}</div>` +
+        PRODUCTS.map(p => `<div class="t-val">${p.name} ${num(p.y[i])}</div>`).join(''));
+      svg.appendChild(hz);
+    });
+    return svg;
+  }
+
+  // 3. 100%積み上げ
+  function pctStack() {
+    const M = { t: 12, r: 12, b: 24, l: 34 }, { svg, pw, ph } = frame(W, H, M, '構成比の変化');
+    const Y = v => M.t + ph - v * ph;
+    for (const t of [0, .25, .5, .75, 1]) {
+      gridline(svg, M.l, M.l + pw, Y(t));
+      const lb = el('text', { x: M.l - 7, y: Y(t) + 3.4, 'text-anchor': 'end', class: 'tick' });
+      lb.textContent = (t * 100) + '%'; svg.appendChild(lb);
+    }
+    const band = pw / 3, bw = Math.min(38, band * 0.55);
+    YEARS.forEach((yr, i) => {
+      let acc = 0; const cx = M.l + band * (i + 0.5);
+      PRODUCTS.forEach(p => {
+        const f = p.y[i] / TOTALS[i], y0 = Y(acc + f), y1 = Y(acc);
+        const h = Math.max(0, y1 - y0 - 2);
+        svg.appendChild(el('path', { d: barPath(cx - bw / 2, y0, bw, h, 2, false, false), fill: col(p) }));
+        if (h > 15) {
+          const t = el('text', { x: cx, y: y0 + h / 2 + 3.4, 'text-anchor': 'middle',
+            class: 'inlab', fill: p.v === '--s3' || p.v === '--s4' ? '#0b0b0b' : '#fff' });
+          t.textContent = Math.round(f * 100) + '%'; svg.appendChild(t);
+        }
+        acc += f;
+      });
+      const lb = el('text', { x: cx, y: H - 8, 'text-anchor': 'middle', class: 'tick' });
+      lb.textContent = yr; svg.appendChild(lb);
+    });
+    return svg;
+  }
+
+  // 4. ウォーターフォール（2023→2025）
+  function waterfall() {
+    const M = { t: 16, r: 10, b: 26, l: 40 }, { svg, pw, ph } = frame(W, H, M, '増減分解');
+    const steps = [{ n: '2023', v: TOTALS[0], tot: true },
+      ...PRODUCTS.map(p => ({ n: p.id, v: p.y[2] - p.y[0], c: col(p) })),
+      { n: '2025', v: TOTALS[2], tot: true }];
+    let run = 0; const bars = steps.map(s => {
+      if (s.tot) { const b = { ...s, a: 0, b: s.v }; run = s.v; return b; }
+      const a = run; run += s.v; return { ...s, a, b: run };
+    });
+    const vals = bars.flatMap(b => [b.a, b.b]).concat([0]);
+    let lo = Math.min(...vals), hi = Math.max(...vals);
+    const pad = (hi - lo) * 0.18 || 1; lo = Math.max(0, lo - pad); hi += pad;
+    const Y = v => M.t + ph - (v - lo) / (hi - lo) * ph;
+    yAxis(svg, M, pw, ph, lo, hi, Y, 3);
+    const band = pw / bars.length, bw = Math.min(20, band * 0.44);
+    bars.forEach((b, i) => {
+      const cx = M.l + band * (i + 0.5), top = Math.min(Y(b.a), Y(b.b));
+      const h = Math.abs(Y(b.b) - Y(b.a)), up = b.b >= b.a;
+      svg.appendChild(el('path', { d: barPath(cx - bw / 2, top, bw, h, 3, up, !up),
+        fill: b.tot ? cssv('--ink-2') : b.c }));
+      if (i < bars.length - 1) svg.appendChild(el('line', {
+        x1: cx + bw / 2 + 2, x2: M.l + band * (i + 1.5) - bw / 2 - 2,
+        y1: Y(b.b), y2: Y(b.b), stroke: cssv('--axis'), 'stroke-width': 1 }));
+      const lb = el('text', { x: cx, y: top - 5, 'text-anchor': 'middle', class: 'dlab' });
+      lb.textContent = b.tot ? num(b.v) : (b.v >= 0 ? '+' : '−') + nf(b.v);
+      svg.appendChild(lb);
+      const cl = el('text', { x: cx, y: H - 8, 'text-anchor': 'middle', class: 'tick' });
+      cl.textContent = b.n; svg.appendChild(cl);
+    });
+    return svg;
+  }
+
+  // 5. バブル（成長率 × 利益率 × 規模）
+  function bubble() {
+    const M = { t: 14, r: 20, b: 28, l: 38 }, { svg, pw, ph } = frame(W, H, M, '成長率と利益率');
+    const gx = [-70, 400], gy = [0, 28];
+    const X = v => M.l + (v - gx[0]) / (gx[1] - gx[0]) * pw;
+    const Y = v => M.t + ph - (v - gy[0]) / (gy[1] - gy[0]) * ph;
+    for (const t of [0, 10, 20]) {
+      gridline(svg, M.l, M.l + pw, Y(t));
+      const lb = el('text', { x: M.l - 7, y: Y(t) + 3.4, 'text-anchor': 'end', class: 'tick' });
+      lb.textContent = t + '%'; svg.appendChild(lb);
+    }
+    svg.appendChild(el('line', { x1: X(0), x2: X(0), y1: M.t, y2: M.t + ph,
+      stroke: cssv('--axis'), 'stroke-width': 1 }));
+    const rMax = Math.max(...PRODUCTS.map(p => p.y[2]));
+    const pts = PRODUCTS.map(p => ({ p, x: X(p.growth), y: Y(p.margin),
+      r: 6 + 20 * Math.sqrt(p.y[2] / rMax) }));
+    pts.forEach(q => {
+      const c = el('circle', { cx: q.x, cy: q.y, r: q.r,
+        fill: col(q.p), 'fill-opacity': .58, stroke: col(q.p), 'stroke-width': 2 });
+      svg.appendChild(c);
+      hit(c, `<div class="t-lab">${q.p.name}</div>
+        <div class="t-val">成長 ${pctS(q.p.growth)} / 利益率 ${q.p.margin}% / 営業利益 ${num(q.p.y[2])}</div>`);
+    });
+    // labels ride outward from the cloud's centre, so overlapping bubbles never share one
+    const mx = pts.reduce((s, q) => s + q.x, 0) / pts.length;
+    const my = pts.reduce((s, q) => s + q.y, 0) / pts.length;
+    pts.forEach(q => {
+      let dx = q.x - mx, dy = q.y - my;
+      const L = Math.hypot(dx, dy) || 1; dx /= L; dy /= L;
+      const lx = Math.max(M.l + 8, Math.min(M.l + pw - 8, q.x + dx * (q.r + 10)));
+      const ly = Math.max(M.t + 9, Math.min(M.t + ph - 4, q.y + dy * (q.r + 10) + 3.4));
+      const lb = el('text', { x: lx, y: ly, class: 'dlab',
+        'text-anchor': dx > 0.3 ? 'start' : dx < -0.3 ? 'end' : 'middle' });
+      lb.textContent = q.p.id; svg.appendChild(lb);
+    });
+    const xl = el('text', { x: M.l + pw / 2, y: H - 7, 'text-anchor': 'middle', class: 'tick' });
+    xl.textContent = '3年成長率 →'; svg.appendChild(xl);
+    const yl = el('text', { x: M.l - 7, y: M.t - 4, 'text-anchor': 'end', class: 'tick' });
+    yl.textContent = '利益率'; svg.appendChild(yl);
+    return svg;
+  }
+
+  // 6. 2×2マトリクス（市場成長率 × 相対シェア）
+  function matrix() {
+    const M = { t: 14, r: 16, b: 26, l: 38 }, { svg, pw, ph } = frame(W, H, M, 'ポートフォリオ');
+    const gx = [0, 36], gy = [-18, 34];
+    const X = v => M.l + (v - gx[0]) / (gx[1] - gx[0]) * pw;
+    const Y = v => M.t + ph - (v - gy[0]) / (gy[1] - gy[0]) * ph;
+    svg.appendChild(el('rect', { x: M.l, y: M.t, width: pw, height: ph,
+      fill: 'none', stroke: cssv('--grid'), 'stroke-width': 1 }));
+    svg.appendChild(el('line', { x1: X(16), x2: X(16), y1: M.t, y2: M.t + ph,
+      stroke: cssv('--axis'), 'stroke-width': 1 }));
+    svg.appendChild(el('line', { x1: M.l, x2: M.l + pw, y1: Y(8), y2: Y(8),
+      stroke: cssv('--axis'), 'stroke-width': 1 }));
+    // quadrant names sit in the outer corners, clear of the marks and the crosshair
+    [['問題児', M.l + 5, M.t + 11, 'start'], ['花形', M.l + pw - 5, M.t + 11, 'end'],
+     ['負け犬', M.l + 5, M.t + ph - 5, 'start'], ['金のなる木', M.l + pw - 5, M.t + ph - 5, 'end']]
+      .forEach(([t, x, y, a]) => {
+        const e = el('text', { x, y, 'text-anchor': a, class: 'tick' });
+        e.textContent = t; svg.appendChild(e);
+      });
+    PRODUCTS.forEach(p => {
+      const c = el('circle', { cx: X(p.share), cy: Y(p.mkt), r: 7,
+        fill: col(p), stroke: cssv('--surface'), 'stroke-width': 2 });
+      svg.appendChild(c);
+      const lb = el('text', { x: X(p.share), y: Y(p.mkt) - 11, 'text-anchor': 'middle', class: 'dlab' });
+      lb.textContent = p.id; svg.appendChild(lb);
+      hit(c, `<div class="t-lab">${p.name}</div>
+        <div class="t-val">シェア ${p.share}% / 市場成長 ${pctS(p.mkt)}</div>`);
+    });
+    const xl = el('text', { x: M.l + pw / 2, y: H - 7, 'text-anchor': 'middle', class: 'tick' });
+    xl.textContent = '自社シェア →'; svg.appendChild(xl);
+    const yl = el('text', { x: M.l - 5, y: M.t - 3, 'text-anchor': 'end', class: 'tick' });
+    yl.textContent = '↑ 市場成長'; svg.appendChild(yl);
+    return svg;
+  }
+
+  // 7. ヒートマップ（部門 × 四半期）
+  function heatmap() {
+    const M = { t: 12, r: 10, b: 24, l: 80 }, { svg, pw, ph } = frame(W, H, M, '四半期ヒートマップ');
+    const all = PRODUCTS.flatMap(p => p.q), lo = Math.min(...all), hi = Math.max(...all);
+    const steps = ['--seq-1', '--seq-2', '--seq-3', '--seq-4', '--seq-5', '--seq-6'];
+    const cw = pw / 12, chh = ph / PRODUCTS.length;
+    PRODUCTS.forEach((p, r) => {
+      p.q.forEach((v, c) => {
+        const k = Math.min(5, Math.floor((v - lo) / (hi - lo + 1e-9) * 6));
+        const rect = el('rect', { x: M.l + cw * c + 1, y: M.t + chh * r + 1,
+          width: cw - 2, height: chh - 2, rx: 2, fill: cssv(steps[k]) });
+        svg.appendChild(rect);
+        hit(rect, `<div class="t-lab">${p.name} ${YEARS[Math.floor(c / 4)]}年 Q${c % 4 + 1}</div>
+          <div class="t-val">${num(v, 1)}</div>`);
+      });
+      const lb = el('text', { x: M.l - 7, y: M.t + chh * (r + 0.5) + 3.4,
+        'text-anchor': 'end', class: 'cat' });
+      lb.textContent = p.name; svg.appendChild(lb);
+    });
+    YEARS.forEach((y, i) => {
+      const lb = el('text', { x: M.l + cw * (i * 4 + 2), y: H - 8,
+        'text-anchor': 'middle', class: 'tick' });
+      lb.textContent = y; svg.appendChild(lb);
+    });
+    return svg;
+  }
+
+  // 8. 横棒ランキング（2025）
+  function ranking() {
+    const M = { t: 12, r: 40, b: 18, l: 80 }, { svg, pw, ph } = frame(W, H, M, '2025年ランキング');
+    const rows = [...PRODUCTS].sort((a, b) => b.y[2] - a.y[2]);
+    const hi = rows[0].y[2] * 1.05, X = v => v / hi * pw;
+    const band = ph / rows.length, bh = Math.min(24, band * 0.52);
+    rows.forEach((p, i) => {
+      const y = M.t + band * (i + 0.5) - bh / 2;
+      svg.appendChild(el('path', { d: hBar(M.l, y, X(p.y[2]), bh, 4), fill: col(p) }));
+      const nm = el('text', { x: M.l - 7, y: y + bh / 2 + 3.4, 'text-anchor': 'end', class: 'cat' });
+      nm.textContent = p.name; svg.appendChild(nm);
+      const vl = el('text', { x: M.l + X(p.y[2]) + 6, y: y + bh / 2 + 3.4, class: 'dlab' });
+      vl.textContent = num(p.y[2]); svg.appendChild(vl);
+    });
+    return svg;
+  }
+
+  // 9. スロープグラフ（2023 vs 2025）
+  function slope() {
+    const M = { t: 16, r: 44, b: 22, l: 44 }, { svg, pw, ph } = frame(W, H, M, '2023と2025の比較');
+    const hi = Math.max(...PRODUCTS.flatMap(p => [p.y[0], p.y[2]])) * 1.1;
+    const Y = v => M.t + ph - v / hi * ph, x0 = M.l, x1 = M.l + pw;
+    [x0, x1].forEach(x => svg.appendChild(el('line', { x1: x, x2: x, y1: M.t, y2: M.t + ph,
+      stroke: cssv('--grid'), 'stroke-width': 1 })));
+    PRODUCTS.forEach(p => {
+      svg.appendChild(el('line', { x1: x0, x2: x1, y1: Y(p.y[0]), y2: Y(p.y[2]),
+        stroke: col(p), 'stroke-width': 2, 'stroke-linecap': 'round' }));
+      [[x0, p.y[0]], [x1, p.y[2]]].forEach(([x, v]) => svg.appendChild(el('circle',
+        { cx: x, cy: Y(v), r: 4.5, fill: col(p), stroke: cssv('--surface'), 'stroke-width': 2 })));
+      const l0 = el('text', { x: x0 - 7, y: Y(p.y[0]) + 3.4, 'text-anchor': 'end', class: 'dlab' });
+      l0.textContent = num(p.y[0]); svg.appendChild(l0);
+      const l1 = el('text', { x: x1 + 7, y: Y(p.y[2]) + 3.4, class: 'dlab' });
+      l1.textContent = `${p.id} ${num(p.y[2])}`; svg.appendChild(l1);
+    });
+    [['2023', x0], ['2025', x1]].forEach(([t, x]) => {
+      const e = el('text', { x, y: H - 6, 'text-anchor': 'middle', class: 'tick' });
+      e.textContent = t; svg.appendChild(e);
+    });
+    return svg;
+  }
+
+  // 10. 小倍数（部門別・月次）
+  function smallMultiples() {
+    const M = { t: 10, r: 8, b: 8, l: 8 }, { svg, pw, ph } = frame(W, H, M, '部門別の推移');
+    const cw = pw / 2, chh = ph / 2, hi = Math.max(...PRODUCTS.flatMap(p => p.m));
+    PRODUCTS.forEach((p, i) => {
+      const ox = M.l + cw * (i % 2), oy = M.t + chh * Math.floor(i / 2);
+      const iw = cw - 12, ih = chh - 26;
+      const X = k => ox + 6 + k / 35 * iw, Y = v => oy + 20 + ih - v / hi * ih;
+      svg.appendChild(el('line', { x1: ox + 6, x2: ox + 6 + iw, y1: oy + 20 + ih,
+        y2: oy + 20 + ih, stroke: cssv('--grid'), 'stroke-width': 1 }));
+      svg.appendChild(el('path', { d: p.m.map((v, k) =>
+        `${k ? 'L' : 'M'}${X(k).toFixed(1)},${Y(v).toFixed(1)}`).join(''),
+        fill: 'none', stroke: col(p), 'stroke-width': 2, 'stroke-linejoin': 'round' }));
+      const nm = el('text', { x: ox + 6, y: oy + 12, class: 'cat' });
+      nm.textContent = p.name; svg.appendChild(nm);
+      const gr = el('text', { x: ox + 6 + iw, y: oy + 12, 'text-anchor': 'end', class: 'inlab',
+        fill: cssv('--ink-2') });
+      gr.textContent = pctS(p.growth); svg.appendChild(gr);
+    });
+    return svg;
+  }
+
+  /* ================= cards ================= */
+  const CHARTS = [
+    { id:'line',   name:'月次推移',        form:'折れ線',        fn:lineChart,
+      says:'動きは追えるが、線が4本あると結局どれが問題か伝わりにくい。' },
+    { id:'stack',  name:'構成の推移',      form:'積み上げ棒',    fn:stackedBar,
+      says:'合計は横ばいでも、中身が入れ替わっていることが分かる。' },
+    { id:'pct',    name:'構成比の変化',    form:'100%積み上げ',  fn:pctStack,
+      says:'第一営業部の比率が48%→37%へ。依存度の低下が一目で分かる。' },
+    { id:'water',  name:'増減の分解',      form:'ウォーターフォール', fn:waterfall,
+      says:'+50の裏で、第一営業部が−90、新規開拓部が+220動いている。差分の内訳が出る。' },
+    { id:'bubble', name:'成長率と利益率',  form:'バブル',        fn:bubble,
+      says:'伸びていて利益率も高いのは新規開拓部。投資先の議論に直結する。' },
+    { id:'matrix', name:'ポートフォリオ',  form:'2×2マトリクス', fn:matrix,
+      says:'撤退・投資の線引きを1枚で示せる。ただし前提の置き方で位置が動く。' },
+    { id:'heat',   name:'四半期の濃淡',    form:'ヒートマップ',  fn:heatmap,
+      says:'規模の大小が濃淡を支配する。伸び縮みは面で追えるが、細かい比較には向かない。' },
+    { id:'rank',   name:'2025年の順位',    form:'横棒ランキング', fn:ranking,
+      says:'いまの大小関係だけを、迷いなく伝えられる。時間軸は消える。' },
+    { id:'slope',  name:'3年での変化',     form:'スロープグラフ', fn:slope,
+      says:'第一営業部と新規開拓部の線が交差寸前。落差が最も残酷に見える1枚。' },
+    { id:'small',  name:'部門別の推移',    form:'小倍数',        fn:smallMultiples,
+      says:'4部門を平等に比べられる。重ね合わせないので誤読が起きにくい。' },
+  ];
+
+  const PURPOSES = [
+    { label:'役員に投資判断を迫る', pick:'bubble',
+      why:'議題が「どこに張るか」なら、規模・成長・利益率が一度に乗る<b>バブル</b>。新規開拓部が右上にいることが、そのまま結論になります。' },
+    { label:'現場に危機感を伝える', pick:'slope',
+      why:'数字を追わせず一撃で伝えるなら<b>スロープグラフ</b>。第一営業部の下降と新規開拓部の上昇が交差寸前、という絵が言葉より効きます。' },
+    { label:'経営会議で現状報告する', pick:'water',
+      why:'「全社+50」で終わらせないための<b>ウォーターフォール</b>。増えた分と減った分を並べると、横ばいの中身が説明できます。' },
+    { label:'事業部の再編を提案する', pick:'matrix',
+      why:'撤退と追加投資を同時に諮るなら<b>2×2マトリクス</b>。代理店営業部が負け犬、新規開拓部が花形という位置づけが議論の共通土台になります。' },
+  ];
+
+  const grid = document.getElementById('grid');
+  CHARTS.forEach(c => {
+    const d = document.createElement('div');
+    d.className = 'card'; d.dataset.id = c.id;
+    d.innerHTML = `<h2>${c.name}</h2><div class="form">${c.form}</div>
+      <div class="chart"></div><p class="says">${c.says}</p>`;
+    grid.appendChild(d);
+  });
+
+  function renderAll() {
+    CHARTS.forEach(c => {
+      const box = document.querySelector(`.card[data-id="${c.id}"] .chart`);
+      box.replaceChildren(c.fn());
+    });
+  }
+
+  /* legend + purposes + table */
+  const legend = document.createElement('div');
+  legend.className = 'legend';
+  legend.innerHTML = PRODUCTS.map(p =>
+    `<span><i class="sw" style="background:var(${p.v})"></i>${p.name}</span>`).join('');
+  document.querySelector('.masthead').appendChild(legend);
+
+  let active = -1;
+  const verdict = document.getElementById('verdict');
+  const pbox = document.getElementById('purposes');
+  PURPOSES.forEach((p, i) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = p.label; b.setAttribute('aria-pressed', 'false');
+    b.addEventListener('click', () => { active = active === i ? -1 : i; applyPurpose(); });
+    pbox.appendChild(b);
+  });
+  const reset = document.createElement('button');
+  reset.type = 'button'; reset.textContent = 'すべて表示';
+  reset.addEventListener('click', () => { active = -1; applyPurpose(); });
+  pbox.appendChild(reset);
+
+  function applyPurpose() {
+    const p = PURPOSES[active];
+    pbox.querySelectorAll('button').forEach((b, i) =>
+      b.setAttribute('aria-pressed', String(i === active)));
+    document.querySelectorAll('.card').forEach(c => {
+      const on = !p || c.dataset.id === p.pick;
+      c.classList.toggle('dim', !on);
+      c.classList.toggle('spot', !!p && on);
+    });
+    verdict.classList.toggle('on', !!p);
+    if (p) verdict.innerHTML = `この目的なら、この1枚。${p.why}`;
+  }
+
+  document.getElementById('datatable').innerHTML =
+    `<thead><tr><th scope="col">営業部門</th>${YEARS.map(y => `<th scope="col">${y}</th>`).join('')}
+     <th scope="col">3年成長</th><th scope="col">利益率</th><th scope="col">シェア</th>
+     <th scope="col">市場成長</th></tr></thead><tbody>
+     ${PRODUCTS.map(p => `<tr><th scope="row" style="font-weight:500">${p.name}</th>
+       ${p.y.map(v => `<td>${num(v)}</td>`).join('')}
+       <td>${pctS(p.growth)}</td><td>${p.margin}%</td><td>${p.share}%</td>
+       <td>${pctS(p.mkt)}</td></tr>`).join('')}
+     <tr><th scope="row">合計</th>${TOTALS.map(v => `<td>${num(v)}</td>`).join('')}
+       <td>${pctS((TOTALS[2] / TOTALS[0] - 1) * 100, 1)}</td><td colspan="3"></td></tr>
+     </tbody>`;
+
+  renderAll();
+  let rt = null;
+  new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(renderAll, 90); }).observe(grid);
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', renderAll);
+  new MutationObserver(renderAll).observe(document.documentElement,
+    { attributes: true, attributeFilter: ['data-theme'] });
+})();
+</script>
