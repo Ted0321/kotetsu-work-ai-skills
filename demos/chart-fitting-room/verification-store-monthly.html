@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>チャート試着室 — 4店舗×6ヶ月</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f6f6f3; --card:#ffffff; --ink:#1f2328; --muted:#5f666e;
+  --grid:#e9e9e4; --line:#dcdcd6; --neutral:#9aa1a9;
+  --up:#2563eb; --down:#dc2626; --spot:#1f2328;
+  --c1:#0072b2; --c2:#e69f00; --c3:#009e73; --c4:#cc79a7;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121316; --card:#1c1e22; --ink:#e7e9ec; --muted:#9aa2ac;
+    --grid:#2a2d33; --line:#343841; --neutral:#788089;
+    --up:#60a5fa; --down:#f87171; --spot:#e7e9ec;
+    --c1:#4aa3dd; --c2:#e6a817; --c3:#17b287; --c4:#d795b9;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121316; --card:#1c1e22; --ink:#e7e9ec; --muted:#9aa2ac;
+  --grid:#2a2d33; --line:#343841; --neutral:#788089;
+  --up:#60a5fa; --down:#f87171; --spot:#e7e9ec;
+  --c1:#4aa3dd; --c2:#e6a817; --c3:#17b287; --c4:#d795b9;
+}
+body{background:var(--bg);color:var(--ink);font-size:15px;line-height:1.65;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI",Meiryo,sans-serif}
+.wrap{max-width:1220px;margin:0 auto;padding:20px 16px 64px}
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+h1{font-size:22px;line-height:1.3}
+h2{font-size:16px;margin-bottom:8px}
+.sub{color:var(--muted);font-size:13.5px;margin-top:4px}
+.lede{margin-top:8px;font-size:14.5px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:16px 0}
+.diag li{margin:3px 0 3px 1.4em;font-size:13.5px}
+.diag b{font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:14px;align-items:center;font-size:13px;margin:14px 2px 4px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.legend .div{width:1px;height:16px;background:var(--line)}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+.gbtn{font:inherit;font-size:13px;padding:7px 13px;border-radius:999px;border:1px solid var(--line);
+  background:var(--card);color:var(--ink);cursor:pointer;transition:border-color .2s}
+.gbtn:hover{border-color:var(--muted)}
+.gbtn.on{border-color:var(--spot);box-shadow:0 0 0 1px var(--spot)}
+.gbtn.ghost{color:var(--muted)}
+.reason{margin-top:12px;font-size:13.5px;border-left:3px solid var(--spot);padding:6px 12px;background:var(--bg);border-radius:4px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,430px),1fr));margin-top:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;
+  outline:2px solid transparent;outline-offset:3px;transition:opacity .35s ease,outline-color .35s ease}
+.card.dim{opacity:.24}
+.card.spot{outline-color:var(--spot)}
+.card h3{font-size:15px}
+.form{font-size:12px;color:var(--muted);margin:2px 0 10px}
+.note{font-size:12.5px;color:var(--muted);margin-top:10px;border-top:1px solid var(--grid);padding-top:8px}
+.note b{color:var(--ink);font-weight:600}
+.cv{width:100%;max-width:560px;height:auto;display:block}
+.cv text{font-family:inherit}
+.lab{font-size:12px;fill:var(--ink)}
+.val{font-size:12px;fill:var(--ink)}
+.ax{font-size:11px;fill:var(--muted)}
+.sm{font-size:9.5px;fill:var(--muted)}
+.gl{stroke:var(--grid);stroke-width:1}
+.err{color:var(--down);font-size:13px}
+.drop li{margin:5px 0 5px 1.4em;font-size:13.5px}
+details{margin-top:16px}
+summary{cursor:pointer;font-weight:600;font-size:14.5px}
+.tablewrap{overflow-x:auto;margin-top:10px}
+.tbl{border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tbl th,.tbl td{padding:4px 12px;border-bottom:1px solid var(--grid);text-align:right}
+.tbl th{color:var(--muted);font-weight:600}
+.tbl .tl{text-align:left}
+.tbl .der{color:var(--muted)}
+.tbl .totrow td{font-weight:600;border-top:1px solid var(--line)}
+.fn{font-size:12px;color:var(--muted);margin-top:6px}
+.sums{display:flex;flex-wrap:wrap;gap:28px;margin-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="topbar">
+  <div>
+    <h1>「どのチャートで見せるか」試着室</h1>
+    <p class="sub">データ: 小売4店舗の月次実績（1〜6月）— 売上・客数・客単価・会員比率（4店舗 × 6ヶ月 = 24行）</p>
+    <p class="lede">全体で起きていること: 全社売上は半年で 18,982 → 20,203千円（+6.4%）と微増だが、その中身は駅前店の減収（−16.4%）を郊外モール店の急成長（+43.7%）が上書きする「主役交代」である。</p>
+  </div>
+  <button class="gbtn" id="themeBtn" type="button">テーマ: 自動</button>
+</header>
+
+<section class="panel">
+  <h2>このデータをこう読みました（診断）</h2>
+  <ul class="diag">
+    <li><b>時間軸:</b> あり。1月〜6月の6時点（月次・等間隔）。</li>
+    <li><b>カテゴリ軸:</b> 店舗の1軸・4水準のみ。第2のカテゴリ軸はなし（月は時間軸として扱う）。</li>
+    <li><b>測度:</b> 4本。売上_千円 = <b>加算可</b> ／ 客数 = <b>加算可</b> ／ 客単価_円 = <b>非加算</b>（売上÷客数の平均値）／ 会員比率_pct = <b>非加算</b>（比率）。客単価と会員比率は合計・積み上げの対象にしない（保守的判定）。</li>
+    <li><b>正負:</b> 元データはすべて正。前月比・期間差分を派生させたときだけ正負が混在する（⑥ウォーターフォール・⑦ヒートマップで使用。派生と明記）。</li>
+    <li><b>整合の確認:</b> 全24行で 客数 × 客単価 ≒ 売上（丸め差 ±1千円未満）。加算可の売上は、店舗別上半期合計の和 = 月別全社合計の和 = 116,518千円 で一致。</li>
+    <li><b>比率からの復元:</b> 会員比率 × 客数 = 会員数（人・加算可）を派生列として復元できる（末尾の表に「派生」列で掲載）。ただしパレート・ツリーマップが成立しない理由は測度ではなくカテゴリ数（4店舗 &lt; 5）なので、この復元では両形式は救えない。</li>
+  </ul>
+</section>
+
+<section class="panel" id="selector">
+  <h2>誰に、何を言いたいですか</h2>
+  <div class="btns">
+    <button class="gbtn" id="g1" type="button">上半期の主役交代を1枚で伝えたい</button>
+    <button class="gbtn" id="g2" type="button">全社売上の増減の中身を説明したい</button>
+    <button class="gbtn" id="g3" type="button">駅前店の不振の原因を深掘りしたい</button>
+    <button class="gbtn" id="g4" type="button">郊外モール店の成長の源泉を示したい</button>
+    <button class="gbtn ghost on" id="gAll" type="button">すべて表示</button>
+  </div>
+  <p id="reason" class="reason" hidden></p>
+</section>
+
+<div class="legend" aria-label="凡例（全チャート共通）">
+  <span><i style="background:var(--c1)"></i>駅前店</span>
+  <span><i style="background:var(--c2)"></i>郊外モール店</span>
+  <span><i style="background:var(--c3)"></i>商店街店</span>
+  <span><i style="background:var(--c4)"></i>アウトレット店</span>
+  <span class="div"></span>
+  <span><i style="background:var(--up)"></i>増</span>
+  <span><i style="background:var(--down)"></i>減</span>
+  <span><i style="background:var(--neutral)"></i>合計・中立（⑥⑦の増減表現のみ。店舗色ではない）</span>
+</div>
+
+<div class="grid" id="cards">
+
+  <article class="card" id="card-bar">
+    <h3>① 上半期の稼ぎ頭はどこか</h3>
+    <p class="form">形式: 横棒ランキング ｜ 測度: 売上（千円）｜ 読み替え: 時間軸を上半期合計に畳んで集約</p>
+    <div id="ch-bar"></div>
+    <p class="note"><b>言える/言えない:</b> 上半期の規模の序列（郊外モール 43,391千円が駅前 41,629千円を僅差で上回る）は言えるが、順位が期中に入れ替わった経緯や月々の方向は一切言えない。</p>
+  </article>
+
+  <article class="card" id="card-slope">
+    <h3>② 首位交代 — 1月と6月</h3>
+    <p class="form">形式: スロープグラフ ｜ 測度: 売上（千円）、1月→6月の2時点 ｜ 下位2店のラベルは重なるため省略（色は凡例参照）</p>
+    <div id="ch-slope"></div>
+    <p class="note"><b>言える/言えない:</b> 2時点の順位交代と変化幅は言えるが、途中の経路（駅前が6ヶ月かけて減り続けたのか一度の急落か）は言えない。</p>
+  </article>
+
+  <article class="card" id="card-line">
+    <h3>③ 月次の軌跡</h3>
+    <p class="form">形式: 折れ線 ｜ 測度: 売上（千円）、6時点 × 4系列</p>
+    <div id="ch-line"></div>
+    <p class="note"><b>言える/言えない:</b> 逆転の時期（4月に郊外モールが駅前を上回る）と各店の傾きは言えるが、線は積み上がらないので全社合計の水準は言えない。</p>
+  </article>
+
+  <article class="card" id="card-area">
+    <h3>④ 全社の器と中身</h3>
+    <p class="form">形式: 積み上げ面グラフ ｜ 測度: 売上（千円・加算可のため積み上げ可）</p>
+    <div id="ch-area"></div>
+    <p class="note"><b>言える/言えない:</b> 全社合計の水準（18,982→20,203千円）と各店の厚みの同時変化は言えるが、基線が動く中間の帯（郊外モール・商店街）の増減量は正確には読めない。</p>
+  </article>
+
+  <article class="card" id="card-share">
+    <h3>⑤ シェアの構図</h3>
+    <p class="form">形式: 100%積み上げ棒 ｜ 測度: 売上（加算可）の月別構成比</p>
+    <div id="ch-share"></div>
+    <p class="note"><b>言える/言えない:</b> シェアの逆転（駅前 39.7→31.2%、郊外モール 32.0→43.2%）は言えるが、分母である全社売上が伸びたのか縮んだのかは完全に消える。</p>
+  </article>
+
+  <article class="card" id="card-wf">
+    <h3>⑥ 全社 +1,221千円の内訳</h3>
+    <p class="form">形式: ウォーターフォール ｜ 測度: 売上の期間増減（1月合計→6月合計、店舗別に分解。増減は派生値）｜ 色は増減（青=増・赤=減・灰=合計）で店舗色ではない</p>
+    <div id="ch-wf"></div>
+    <p class="note"><b>言える/言えない:</b> 全社 +1,221千円が「郊外モール +2,656 と駅前 −1,240 の相殺」であることは言えるが、各店の増減の理由（客数か単価か）までは分解できない。</p>
+  </article>
+
+  <article class="card" id="card-heat">
+    <h3>⑦ 加速と減速の地図</h3>
+    <p class="form">形式: ヒートマップ（店舗 × 月）｜ 測度: 売上の前月比%（派生・非加算）｜ 1月は前月がないため対象外。数値は極値のみ表示</p>
+    <div id="ch-heat"></div>
+    <p class="note"><b>言える/言えない:</b> 加速・減速のタイミング（郊外モールは5ヶ月連続プラス、駅前は5ヶ月連続マイナス）は言えるが、色は率なので金額の規模（商店街の増減は絶対額では小さい）は言えない。</p>
+  </article>
+
+  <article class="card" id="card-dot">
+    <h3>⑧ 価格ポジションの分断</h3>
+    <p class="form">形式: ドットプロット ｜ 測度: 客単価（円・非加算）｜ 読み替え: 6月時点の断面に絞る。軸はゼロ起点でない（900円〜）</p>
+    <div id="ch-dot"></div>
+    <p class="note"><b>言える/言えない:</b> 非加算の測度でも水準差（1,010〜1,680円、最大1.66倍）を歪みなく比較できるが、単価が売上にどれだけ効いたか（規模との掛け算）は言えない。</p>
+  </article>
+
+  <article class="card" id="card-scatter">
+    <h3>⑨ 客数 × 客単価の平面</h3>
+    <p class="form">形式: 散布図 ｜ 測度: 客数（人）× 客単価（円）、24点 = 4店舗 × 6ヶ月 ｜ 同一店舗内の濃淡は月の順序（濃いほど新しい月）</p>
+    <div id="ch-scatter"></div>
+    <p class="note"><b>言える/言えない:</b> 2測度の関係と各店の移動方向（郊外モールは右上へ、駅前は単価を保ったまま左へ）は言えるが、月の特定は濃淡頼みで、全社の合計や構成比は読めない。</p>
+  </article>
+
+  <article class="card" id="card-sm">
+    <h3>⑩ 1店ずつの会員比率</h3>
+    <p class="form">形式: 小倍数（折れ線 × 4面）｜ 測度: 会員比率（pt・非加算）、全面で同一の縦軸 0〜50</p>
+    <div id="ch-sm"></div>
+    <p class="note"><b>言える/言えない:</b> 4店を同じ尺度で並べると「動いているのは郊外モールだけ（35→48pt）で他は±1pt以内」と言えるが、同じ月の店舗間比較は4面を目で往復することになり、1枚の重ね折れ線より遅い。</p>
+  </article>
+
+</div>
+
+<section class="panel">
+  <h2>採用しなかった形式（一見できそうで、前提を満たさないもの）</h2>
+  <ul class="drop">
+    <li><b>パレート図</b> — 売上は加算可で測度条件は満たすが、カテゴリが4店舗しかなく要求の「5以上」に届かない。累積曲線が3〜4区切りでは集中度の議論にならない（ツリーマップも同じ理由で不成立。派生の会員数を復元しても解消しない）。</li>
+    <li><b>ブレットチャート</b> — 実績列しかなく目標・予算の列がないため、比較の基準を捏造しない限り描けない。</li>
+    <li><b>コホート表</b> — 会員の「開始時期」を追跡できる構造がなく、会員比率は各月のスナップショットにすぎないため、残存の追跡が定義できない。</li>
+  </ul>
+</section>
+
+<details class="panel">
+  <summary>数値で見る（元データ表）</summary>
+  <div class="tablewrap">
+    <table class="tbl">
+      <thead><tr><th class="tl">店舗</th><th class="tl">月</th><th>売上（千円）</th><th>客数（人）</th><th>客単価（円）</th><th>会員比率（%）</th><th>会員数（人）※派生</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+  <p class="fn">※会員数 = 客数 × 会員比率 ÷ 100 から復元した派生値（比率が丸め済みのため四捨五入の概算）。元データの列ではない。</p>
+  <div class="sums">
+    <div>
+      <h2>店舗別 上半期合計（加算可の測度のみ）</h2>
+      <table class="tbl"><thead><tr><th class="tl">店舗</th><th>売上（千円）</th><th>客数（人）</th></tr></thead><tbody id="sumStore"></tbody></table>
+    </div>
+    <div>
+      <h2>月別 全社売上（千円）</h2>
+      <table class="tbl"><thead><tr><th class="tl">月</th><th>売上（千円）</th></tr></thead><tbody id="sumMonth"></tbody></table>
+    </div>
+  </div>
+</details>
+
+</div>
+<script>
+"use strict";
+var STORES = ["駅前店", "郊外モール店", "商店街店", "アウトレット店"];
+var MONTHS = ["1月", "2月", "3月", "4月", "5月", "6月"];
+var COLORS = {
+  "駅前店": "var(--c1)",
+  "郊外モール店": "var(--c2)",
+  "商店街店": "var(--c3)",
+  "アウトレット店": "var(--c4)"
+};
+var D = {
+  "駅前店":       { sales: [7540, 7272, 7130, 6862, 6525, 6300], cust: [5200, 5050, 4900, 4700, 4500, 4300], spend: [1450, 1440, 1455, 1460, 1450, 1465], mem: [22, 22, 23, 23, 24, 24] },
+  "郊外モール店": { sales: [6080, 6379, 6765, 7380, 8051, 8736], cust: [3800, 3950, 4150, 4500, 4850, 5200], spend: [1600, 1615, 1630, 1640, 1660, 1680], mem: [35, 38, 40, 43, 46, 48] },
+  "商店街店":     { sales: [2520, 2450, 2602, 2506, 2544, 2541], cust: [2100, 2050, 2150, 2080, 2120, 2100], spend: [1200, 1195, 1210, 1205, 1200, 1210], mem: [15, 15, 15, 16, 16, 16] },
+  "アウトレット店": { sales: [2842, 2807, 2723, 2687, 2650, 2626], cust: [2900, 2850, 2750, 2700, 2650, 2600], spend: [980, 985, 990, 995, 1000, 1010], mem: [8, 8, 8, 9, 9, 9] }
+};
+function sum(a){ return a.reduce(function(x, y){ return x + y; }, 0); }
+var STORE_TOTAL = {};
+STORES.forEach(function(st){ STORE_TOTAL[st] = sum(D[st].sales); });
+var TOTALS = MONTHS.map(function(m, i){
+  return STORES.reduce(function(a, st){ return a + D[st].sales[i]; }, 0);
+});
+var GRAND = sum(TOTALS);
+function fmt(n){ return n.toLocaleString("ja-JP"); }
+function X(v, d0, d1, r0, r1){ return r0 + (v - d0) / (d1 - d0) * (r1 - r0); }
+
+/* ① 横棒ランキング: 上半期売上合計 */
+function svgBar(){
+  var order = STORES.slice().sort(function(a, b){ return STORE_TOTAL[b] - STORE_TOTAL[a]; });
+  var x0 = 118, x1 = 490, max = 45000;
+  var s = '<svg class="cv" viewBox="0 0 560 190" role="img" aria-label="上半期売上合計の横棒ランキング">';
+  [0, 10000, 20000, 30000, 40000].forEach(function(t){
+    var x = X(t, 0, max, x0, x1).toFixed(1);
+    s += '<line x1="' + x + '" y1="8" x2="' + x + '" y2="168" class="gl"/>';
+    s += '<text x="' + x + '" y="184" text-anchor="middle" class="ax">' + fmt(t) + '</text>';
+  });
+  order.forEach(function(st, i){
+    var y = 14 + i * 40;
+    var w = X(STORE_TOTAL[st], 0, max, 0, x1 - x0);
+    s += '<rect x="' + x0 + '" y="' + y + '" width="' + w.toFixed(1) + '" height="20" rx="2" fill="' + COLORS[st] + '"/>';
+    s += '<text x="110" y="' + (y + 15) + '" text-anchor="end" class="lab">' + st + '</text>';
+    s += '<text x="' + (x0 + w + 8).toFixed(1) + '" y="' + (y + 15) + '" class="val">' + fmt(STORE_TOTAL[st]) + '</text>';
+  });
+  return s + '</svg>';
+}
+
+/* ② スロープ: 売上 1月→6月 */
+function svgSlope(){
+  var xL = 170, xR = 390;
+  function Y(v){ return X(v, 2000, 9000, 270, 24); }
+  var s = '<svg class="cv" viewBox="0 0 560 310" role="img" aria-label="売上のスロープグラフ 1月対6月">';
+  s += '<line x1="' + xL + '" y1="24" x2="' + xL + '" y2="270" class="gl"/>';
+  s += '<line x1="' + xR + '" y1="24" x2="' + xR + '" y2="270" class="gl"/>';
+  s += '<text x="' + xL + '" y="292" text-anchor="middle" class="ax">1月</text>';
+  s += '<text x="' + xR + '" y="292" text-anchor="middle" class="ax">6月</text>';
+  STORES.forEach(function(st){
+    var a = D[st].sales[0], b = D[st].sales[5];
+    var ya = Y(a).toFixed(1), yb = Y(b).toFixed(1);
+    s += '<line x1="' + xL + '" y1="' + ya + '" x2="' + xR + '" y2="' + yb + '" stroke="' + COLORS[st] + '" stroke-width="2"/>';
+    s += '<circle cx="' + xL + '" cy="' + ya + '" r="4" fill="' + COLORS[st] + '"/>';
+    s += '<circle cx="' + xR + '" cy="' + yb + '" r="4" fill="' + COLORS[st] + '"/>';
+  });
+  ["駅前店", "郊外モール店"].forEach(function(st){
+    var a = D[st].sales[0], b = D[st].sales[5];
+    s += '<text x="' + (xL - 10) + '" y="' + (Y(a) + 4).toFixed(1) + '" text-anchor="end" class="lab">' + st + ' ' + fmt(a) + '</text>';
+    s += '<text x="' + (xR + 10) + '" y="' + (Y(b) + 4).toFixed(1) + '" class="lab">' + fmt(b) + ' ' + st + '</text>';
+  });
+  return s + '</svg>';
+}
+
+/* ③ 折れ線: 月次売上 */
+function svgLine(){
+  function Y(v){ return X(v, 2000, 9000, 270, 20); }
+  function Xi(i){ return 64 + i * 75.6; }
+  var s = '<svg class="cv" viewBox="0 0 560 300" role="img" aria-label="月次売上の折れ線">';
+  [2000, 4000, 6000, 8000].forEach(function(t){
+    var y = Y(t).toFixed(1);
+    s += '<line x1="64" y1="' + y + '" x2="442" y2="' + y + '" class="gl"/>';
+    s += '<text x="56" y="' + (Y(t) + 4).toFixed(1) + '" text-anchor="end" class="ax">' + fmt(t) + '</text>';
+  });
+  MONTHS.forEach(function(m, i){
+    s += '<text x="' + Xi(i).toFixed(1) + '" y="292" text-anchor="middle" class="ax">' + m + '</text>';
+  });
+  STORES.forEach(function(st){
+    var pts = D[st].sales.map(function(v, i){ return Xi(i).toFixed(1) + ',' + Y(v).toFixed(1); }).join(' ');
+    s += '<polyline points="' + pts + '" fill="none" stroke="' + COLORS[st] + '" stroke-width="2"/>';
+    D[st].sales.forEach(function(v, i){
+      s += '<circle cx="' + Xi(i).toFixed(1) + '" cy="' + Y(v).toFixed(1) + '" r="4" fill="' + COLORS[st] + '"/>';
+    });
+  });
+  s += '<text x="448" y="' + (Y(8736) + 4).toFixed(1) + '" class="lab">' + fmt(8736) + ' 郊外モール店</text>';
+  s += '<text x="448" y="' + (Y(6300) + 4).toFixed(1) + '" class="lab">' + fmt(6300) + ' 駅前店</text>';
+  return s + '</svg>';
+}
+
+/* ④ 積み上げ面: 売上の構成推移 */
+function svgArea(){
+  function Y(v){ return X(v, 0, 22000, 270, 30); }
+  function Xi(i){ return 64 + i * 94.4; }
+  var cums = MONTHS.map(function(m, i){
+    var c = 0;
+    return STORES.map(function(st){ c += D[st].sales[i]; return c; });
+  });
+  var s = '<svg class="cv" viewBox="0 0 560 300" role="img" aria-label="売上の積み上げ面グラフ">';
+  [0, 5000, 10000, 15000, 20000].forEach(function(t){
+    var y = Y(t).toFixed(1);
+    s += '<line x1="64" y1="' + y + '" x2="536" y2="' + y + '" class="gl"/>';
+    s += '<text x="56" y="' + (Y(t) + 4).toFixed(1) + '" text-anchor="end" class="ax">' + fmt(t) + '</text>';
+  });
+  var k, i;
+  for (k = 0; k < 4; k++){
+    var top = [], bot = [];
+    for (i = 0; i < 6; i++){
+      top.push(Xi(i).toFixed(1) + ',' + Y(cums[i][k]).toFixed(1));
+      bot.push(Xi(i).toFixed(1) + ',' + (k === 0 ? Y(0) : Y(cums[i][k - 1])).toFixed(1));
+    }
+    bot.reverse();
+    s += '<polygon points="' + top.concat(bot).join(' ') + '" fill="' + COLORS[STORES[k]] + '"/>';
+  }
+  for (k = 0; k < 3; k++){
+    var pts = [];
+    for (i = 0; i < 6; i++){ pts.push(Xi(i).toFixed(1) + ',' + Y(cums[i][k]).toFixed(1)); }
+    s += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--card)" stroke-width="2"/>';
+  }
+  MONTHS.forEach(function(m, i){
+    s += '<text x="' + Xi(i).toFixed(1) + '" y="292" text-anchor="middle" class="ax">' + m + '</text>';
+  });
+  s += '<text x="66" y="' + (Y(TOTALS[0]) - 8).toFixed(1) + '" class="val">' + fmt(TOTALS[0]) + '</text>';
+  s += '<text x="534" y="' + (Y(TOTALS[5]) - 8).toFixed(1) + '" text-anchor="end" class="val">' + fmt(TOTALS[5]) + '</text>';
+  return s + '</svg>';
+}
+
+/* ⑤ 100%積み上げ棒: 売上シェア */
+function svgShare(){
+  function Y(p){ return 262 - p / 100 * 232; }
+  function cx(i){ return 130 + 60 * i; }
+  var s = '<svg class="cv" viewBox="0 0 560 300" role="img" aria-label="売上構成比の100パーセント積み上げ棒">';
+  [0, 25, 50, 75, 100].forEach(function(t){
+    var y = Y(t).toFixed(1);
+    s += '<line x1="104" y1="' + y + '" x2="456" y2="' + y + '" class="gl"/>';
+  });
+  [0, 50, 100].forEach(function(t){
+    s += '<text x="96" y="' + (Y(t) + 4).toFixed(1) + '" text-anchor="end" class="ax">' + t + '%</text>';
+  });
+  MONTHS.forEach(function(m, i){
+    var acc = 0;
+    STORES.forEach(function(st){
+      var p = D[st].sales[i] / TOTALS[i] * 100;
+      var yT = Y(acc + p), yB = Y(acc);
+      s += '<rect x="' + (cx(i) - 12) + '" y="' + (yT + 1).toFixed(1) + '" width="24" height="' + Math.max(yB - yT - 2, 0.5).toFixed(1) + '" fill="' + COLORS[st] + '"/>';
+      acc += p;
+    });
+    s += '<text x="' + cx(i) + '" y="280" text-anchor="middle" class="ax">' + m + '</text>';
+  });
+  function midY(i, name){
+    var acc = 0, out = 0;
+    STORES.forEach(function(st){
+      var p = D[st].sales[i] / TOTALS[i] * 100;
+      if (st === name){ out = Y(acc + p / 2); }
+      acc += p;
+    });
+    return out;
+  }
+  function pct(i, name){ return (D[name].sales[i] / TOTALS[i] * 100).toFixed(1) + '%'; }
+  s += '<text x="112" y="' + (midY(0, "駅前店") + 4).toFixed(1) + '" text-anchor="end" class="lab">駅前店 ' + pct(0, "駅前店") + '</text>';
+  s += '<text x="112" y="' + (midY(0, "郊外モール店") + 4).toFixed(1) + '" text-anchor="end" class="lab">郊外モール店 ' + pct(0, "郊外モール店") + '</text>';
+  s += '<text x="448" y="' + (midY(5, "駅前店") + 4).toFixed(1) + '" class="lab">' + pct(5, "駅前店") + '</text>';
+  s += '<text x="448" y="' + (midY(5, "郊外モール店") + 4).toFixed(1) + '" class="lab">' + pct(5, "郊外モール店") + '</text>';
+  return s + '</svg>';
+}
+
+/* ⑥ ウォーターフォール: 全社売上 1月→6月 の店舗別分解 */
+function svgWF(){
+  function Y(v){ return X(v, 0, 22000, 270, 30); }
+  function cx(i){ return 105 + 78 * i; }
+  var deltas = STORES.map(function(st){
+    return { name: st, d: D[st].sales[5] - D[st].sales[0] };
+  }).sort(function(a, b){ return b.d - a.d; });
+  var steps = [{ name: "1月合計", kind: "t", a: 0, b: TOTALS[0] }];
+  var run = TOTALS[0];
+  deltas.forEach(function(e){
+    steps.push({ name: e.name, kind: (e.d >= 0 ? "u" : "d"), a: run, b: run + e.d, d: e.d });
+    run += e.d;
+  });
+  steps.push({ name: "6月合計", kind: "t", a: 0, b: run });
+  var s = '<svg class="cv" viewBox="0 0 560 300" role="img" aria-label="全社売上増減のウォーターフォール">';
+  [0, 5000, 10000, 15000, 20000].forEach(function(t){
+    var y = Y(t).toFixed(1);
+    s += '<line x1="70" y1="' + y + '" x2="540" y2="' + y + '" class="gl"/>';
+    s += '<text x="62" y="' + (Y(t) + 4).toFixed(1) + '" text-anchor="end" class="ax">' + fmt(t) + '</text>';
+  });
+  steps.forEach(function(p, i){
+    var hi = Math.max(p.a, p.b), lo = Math.min(p.a, p.b);
+    var yA = Y(hi), h = Math.max(Y(lo) - Y(hi), 1);
+    var fill = (p.kind === "t") ? "var(--neutral)" : (p.kind === "u" ? "var(--up)" : "var(--down)");
+    s += '<rect x="' + (cx(i) - 12) + '" y="' + yA.toFixed(1) + '" width="24" height="' + h.toFixed(1) + '" fill="' + fill + '"/>';
+    if (i < steps.length - 1){
+      s += '<line x1="' + (cx(i) + 12) + '" y1="' + Y(p.b).toFixed(1) + '" x2="' + (cx(i + 1) - 12) + '" y2="' + Y(p.b).toFixed(1) + '" stroke="var(--line)" stroke-width="1"/>';
+    }
+    var lbl = (p.kind === "t") ? fmt(p.b) : ((p.d >= 0 ? "+" : "−") + fmt(Math.abs(p.d)));
+    s += '<text x="' + cx(i) + '" y="' + (yA - 6).toFixed(1) + '" text-anchor="middle" class="val">' + lbl + '</text>';
+    s += '<text x="' + cx(i) + '" y="288" text-anchor="middle" class="sm">' + p.name + '</text>';
+  });
+  return s + '</svg>';
+}
+
+/* ⑦ ヒートマップ: 売上の前月比%（派生） */
+function heatColor(v){
+  if (v > 0.5){ return 'rgba(37,99,235,' + (0.18 + 0.7 * Math.min(v, 10) / 10).toFixed(2) + ')'; }
+  if (v < -0.5){ return 'rgba(220,38,38,' + (0.18 + 0.7 * Math.min(-v, 10) / 10).toFixed(2) + ')'; }
+  return 'var(--grid)';
+}
+function svgHeat(){
+  var s = '<svg class="cv" viewBox="0 0 560 230" role="img" aria-label="売上前月比のヒートマップ">';
+  var j, i;
+  for (j = 0; j < 5; j++){
+    s += '<text x="' + (120 + 82 * j + 40) + '" y="30" text-anchor="middle" class="ax">' + MONTHS[j + 1] + '</text>';
+  }
+  var maxCell = { v: -999 }, minCell = { v: 999 };
+  STORES.forEach(function(st, i2){
+    var y = 40 + 42 * i2;
+    s += '<text x="110" y="' + (y + 25) + '" text-anchor="end" class="lab">' + st + '</text>';
+    for (j = 0; j < 5; j++){
+      var v = (D[st].sales[j + 1] / D[st].sales[j] - 1) * 100;
+      var x = 120 + 82 * j;
+      s += '<rect x="' + x + '" y="' + y + '" width="80" height="40" rx="2" fill="' + heatColor(v) + '"/>';
+      if (v > maxCell.v){ maxCell = { v: v, x: x + 40, y: y + 25 }; }
+      if (v < minCell.v){ minCell = { v: v, x: x + 40, y: y + 25 }; }
+    }
+  });
+  s += '<text x="' + maxCell.x + '" y="' + maxCell.y + '" text-anchor="middle" class="val">+' + maxCell.v.toFixed(1) + '</text>';
+  s += '<text x="' + minCell.x + '" y="' + minCell.y + '" text-anchor="middle" class="val">−' + Math.abs(minCell.v).toFixed(1) + '</text>';
+  s += '<text x="120" y="222" class="sm">前月比%。青 = 増、赤 = 減、灰 = ±0.5%以内。濃いほど変化率が大きい</text>';
+  return s + '</svg>';
+}
+
+/* ⑧ ドットプロット: 客単価（6月時点） */
+function svgDot(){
+  function Xv(v){ return X(v, 900, 1800, 130, 520); }
+  var order = STORES.slice().sort(function(a, b){ return D[b].spend[5] - D[a].spend[5]; });
+  var s = '<svg class="cv" viewBox="0 0 560 190" role="img" aria-label="6月時点の客単価ドットプロット">';
+  [1000, 1200, 1400, 1600, 1800].forEach(function(t){
+    var x = Xv(t).toFixed(1);
+    s += '<line x1="' + x + '" y1="12" x2="' + x + '" y2="158" class="gl"/>';
+    s += '<text x="' + x + '" y="176" text-anchor="middle" class="ax">' + fmt(t) + '</text>';
+  });
+  order.forEach(function(st, i){
+    var y = 28 + 40 * i;
+    var v = D[st].spend[5];
+    s += '<line x1="130" y1="' + y + '" x2="520" y2="' + y + '" class="gl"/>';
+    s += '<text x="110" y="' + (y + 4) + '" text-anchor="end" class="lab">' + st + '</text>';
+    s += '<circle cx="' + Xv(v).toFixed(1) + '" cy="' + y + '" r="5" fill="' + COLORS[st] + '"/>';
+    s += '<text x="' + (Xv(v) + 12).toFixed(1) + '" y="' + (y + 4) + '" class="val">' + fmt(v) + '</text>';
+  });
+  return s + '</svg>';
+}
+
+/* ⑨ 散布図: 客数 × 客単価（24点） */
+function svgScatter(){
+  function Xv(c){ return X(c, 2000, 5500, 64, 540); }
+  function Yv(p){ return X(p, 900, 1800, 270, 20); }
+  var s = '<svg class="cv" viewBox="0 0 560 310" role="img" aria-label="客数と客単価の散布図">';
+  [1000, 1200, 1400, 1600, 1800].forEach(function(t){
+    var y = Yv(t).toFixed(1);
+    s += '<line x1="64" y1="' + y + '" x2="540" y2="' + y + '" class="gl"/>';
+    s += '<text x="56" y="' + (Yv(t) + 4).toFixed(1) + '" text-anchor="end" class="ax">' + fmt(t) + '</text>';
+  });
+  [2000, 3000, 4000, 5000].forEach(function(t){
+    var x = Xv(t).toFixed(1);
+    s += '<line x1="' + x + '" y1="20" x2="' + x + '" y2="270" class="gl"/>';
+    s += '<text x="' + x + '" y="288" text-anchor="middle" class="ax">' + fmt(t) + '</text>';
+  });
+  s += '<text x="300" y="306" text-anchor="middle" class="ax">客数（人）</text>';
+  s += '<text x="64" y="12" class="ax">客単価（円）</text>';
+  STORES.forEach(function(st){
+    MONTHS.forEach(function(m, i){
+      var op = (0.35 + 0.13 * i).toFixed(2);
+      s += '<circle cx="' + Xv(D[st].cust[i]).toFixed(1) + '" cy="' + Yv(D[st].spend[i]).toFixed(1) + '" r="4.5" fill="' + COLORS[st] + '" fill-opacity="' + op + '"/>';
+    });
+  });
+  s += '<text x="' + Xv(5200).toFixed(1) + '" y="' + (Yv(1680) - 12).toFixed(1) + '" text-anchor="middle" class="lab">郊外モール 6月</text>';
+  s += '<text x="' + Xv(5200).toFixed(1) + '" y="' + (Yv(1450) - 10).toFixed(1) + '" text-anchor="middle" class="lab">駅前 1月</text>';
+  s += '<text x="' + Xv(4300).toFixed(1) + '" y="' + (Yv(1465) - 10).toFixed(1) + '" text-anchor="middle" class="lab">駅前 6月</text>';
+  return s + '</svg>';
+}
+
+/* ⑩ 小倍数: 会員比率の推移 × 4面 */
+function svgSM(){
+  var pos = [[10, 26], [290, 26], [10, 158], [290, 158]];
+  var s = '<svg class="cv" viewBox="0 0 560 290" role="img" aria-label="会員比率の小倍数">';
+  STORES.forEach(function(st, k){
+    var px = pos[k][0], py = pos[k][1];
+    function Xi(i){ return px + 40 + i * 41.6; }
+    function Y(v){ return py + 100 - v / 50 * 72; }
+    s += '<rect x="' + (px + 8) + '" y="' + (py + 2) + '" width="10" height="10" rx="2" fill="' + COLORS[st] + '"/>';
+    s += '<text x="' + (px + 24) + '" y="' + (py + 11) + '" class="lab">' + st + '</text>';
+    [0, 25, 50].forEach(function(t){
+      var y = Y(t).toFixed(1);
+      s += '<line x1="' + (px + 40) + '" y1="' + y + '" x2="' + (px + 248) + '" y2="' + y + '" class="gl"/>';
+    });
+    [0, 50].forEach(function(t){
+      s += '<text x="' + (px + 34) + '" y="' + (Y(t) + 3).toFixed(1) + '" text-anchor="end" class="sm">' + t + '</text>';
+    });
+    var pts = D[st].mem.map(function(v, i){ return Xi(i).toFixed(1) + ',' + Y(v).toFixed(1); }).join(' ');
+    s += '<polyline points="' + pts + '" fill="none" stroke="' + COLORS[st] + '" stroke-width="2"/>';
+    [0, 5].forEach(function(i){
+      var v = D[st].mem[i];
+      s += '<circle cx="' + Xi(i).toFixed(1) + '" cy="' + Y(v).toFixed(1) + '" r="4" fill="' + COLORS[st] + '"/>';
+      s += '<text x="' + Xi(i).toFixed(1) + '" y="' + (Y(v) - 8).toFixed(1) + '" text-anchor="middle" class="val">' + v + '</text>';
+    });
+    s += '<text x="' + Xi(0).toFixed(1) + '" y="' + (py + 112) + '" text-anchor="middle" class="sm">1月</text>';
+    s += '<text x="' + Xi(5).toFixed(1) + '" y="' + (py + 112) + '" text-anchor="middle" class="sm">6月</text>';
+  });
+  return s + '</svg>';
+}
+
+/* マウント（1枚失敗しても他の9枚は描く） */
+function mount(id, fn){
+  var el = document.getElementById(id);
+  try { el.innerHTML = fn(); }
+  catch (e){ el.innerHTML = '<p class="err">描画エラー: ' + e.message + '</p>'; }
+}
+mount("ch-bar", svgBar);
+mount("ch-slope", svgSlope);
+mount("ch-line", svgLine);
+mount("ch-area", svgArea);
+mount("ch-share", svgShare);
+mount("ch-wf", svgWF);
+mount("ch-heat", svgHeat);
+mount("ch-dot", svgDot);
+mount("ch-scatter", svgScatter);
+mount("ch-sm", svgSM);
+
+/* 元データ表（チャートと同じ配列 D から生成し、数値の不一致を作らない） */
+(function buildTable(){
+  var html = "";
+  STORES.forEach(function(st){
+    MONTHS.forEach(function(m, i){
+      var d = D[st];
+      var kai = Math.round(d.cust[i] * d.mem[i] / 100);
+      html += '<tr><td class="tl">' + st + '</td><td class="tl">' + m + '</td><td>' + fmt(d.sales[i]) + '</td><td>' + fmt(d.cust[i]) + '</td><td>' + fmt(d.spend[i]) + '</td><td>' + d.mem[i] + '</td><td class="der">' + fmt(kai) + '</td></tr>';
+    });
+  });
+  document.getElementById("tbody").innerHTML = html;
+  var s1 = "", custGrand = 0;
+  STORES.forEach(function(st){
+    var cs = sum(D[st].cust);
+    custGrand += cs;
+    s1 += '<tr><td class="tl">' + st + '</td><td>' + fmt(STORE_TOTAL[st]) + '</td><td>' + fmt(cs) + '</td></tr>';
+  });
+  s1 += '<tr class="totrow"><td class="tl">全社</td><td>' + fmt(GRAND) + '</td><td>' + fmt(custGrand) + '</td></tr>';
+  document.getElementById("sumStore").innerHTML = s1;
+  var s2 = "";
+  MONTHS.forEach(function(m, i){
+    s2 += '<tr><td class="tl">' + m + '</td><td>' + fmt(TOTALS[i]) + '</td></tr>';
+  });
+  s2 += '<tr class="totrow"><td class="tl">合計</td><td>' + fmt(GRAND) + '</td></tr>';
+  document.getElementById("sumMonth").innerHTML = s2;
+})();
+
+/* 目的セレクタ */
+var GOALS = {
+  g1: { card: "card-slope",
+        text: "推奨: ② スロープグラフ。駅前店は 7,540→6,300千円、郊外モール店は 6,080→8,736千円と、半年で首位が入れ替わった。中間の推移を捨てて2時点だけを残すスロープが、この逆転を最少の要素で断言できる。" },
+  g2: { card: "card-wf",
+        text: "推奨: ⑥ ウォーターフォール。全社は 18,982→20,203千円の +1,221千円だが、内訳は郊外モール +2,656 に対して駅前 −1,240 と相殺の構図である。売上は加算できる測度なので、増減を1本ずつ積むこの形式だけが「伸びたが中身が入れ替わった」ことまで言える。" },
+  g3: { card: "card-scatter",
+        text: "推奨: ⑨ 散布図。駅前店は客単価が 1,450→1,465円とほぼ動かないまま、客数だけが 5,200→4,300人へ約17%減っている。客数×客単価の平面では点が真横に滑る形になり、「単価は守れているが客が流出している」という不振の型が特定できる。" },
+  g4: { card: "card-sm",
+        text: "推奨: ⑩ 小倍数。会員比率が動いたのは郊外モール店だけで 35→48pt（+13pt）、他の3店は ±1pt 以内で止まっている。同一尺度の4面を並べる小倍数なら「1店だけ構造が変わっている」ことを誇張なく示せる。" }
+};
+var CARD_IDS = ["card-bar", "card-slope", "card-line", "card-area", "card-share",
+                "card-wf", "card-heat", "card-dot", "card-scatter", "card-sm"];
+var BTN_IDS = ["g1", "g2", "g3", "g4", "gAll"];
+function setBtn(id){
+  BTN_IDS.forEach(function(b){
+    document.getElementById(b).classList.toggle("on", b === id);
+  });
+}
+function selectGoal(id){
+  var g = GOALS[id];
+  CARD_IDS.forEach(function(c){
+    var el = document.getElementById(c);
+    el.classList.toggle("dim", c !== g.card);
+    el.classList.toggle("spot", c === g.card);
+  });
+  var r = document.getElementById("reason");
+  r.hidden = false;
+  r.textContent = g.text;
+  setBtn(id);
+}
+function clearGoal(){
+  CARD_IDS.forEach(function(c){
+    var el = document.getElementById(c);
+    el.classList.remove("dim");
+    el.classList.remove("spot");
+  });
+  document.getElementById("reason").hidden = true;
+  setBtn("gAll");
+}
+["g1", "g2", "g3", "g4"].forEach(function(id){
+  document.getElementById(id).addEventListener("click", function(){ selectGoal(id); });
+});
+document.getElementById("gAll").addEventListener("click", clearGoal);
+
+/* テーマ切替（ボタンの選択がOS設定より優先） */
+(function(){
+  var btn = document.getElementById("themeBtn");
+  var modes = ["auto", "light", "dark"];
+  var names = { auto: "テーマ: 自動", light: "テーマ: ライト", dark: "テーマ: ダーク" };
+  var cur = 0;
+  btn.addEventListener("click", function(){
+    cur = (cur + 1) % 3;
+    var m = modes[cur];
+    if (m === "auto"){ document.documentElement.removeAttribute("data-theme"); }
+    else { document.documentElement.setAttribute("data-theme", m); }
+    btn.textContent = names[m];
+  });
+})();
+</script>
+</body>
+</html>
